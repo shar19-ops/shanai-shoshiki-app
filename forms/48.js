@@ -9,6 +9,7 @@
 
   FORM_DEFS['48'] = {
     code: '般-48', title: '入札結果報告書',
+    selfStamp: '発行者', // 本人欄（デート印を押す欄）
     meta: [{ label: '報告日', key: 'date', type: 'date' }],
     stamps: [{ boxes: ['社長', '本店長', '確認', '確認', '発行者'] }, { boxes: ['登録済検印'], width: 18 }],
     stampClass: 'small',

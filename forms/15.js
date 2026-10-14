@@ -12,6 +12,7 @@
 
   FORM_DEFS['15'] = {
     code: '般-15', title: '積算依頼登録メモ',
+    selfStamp: '発行者', // 本人欄（デート印を押す欄）
     meta: [{ label: '依頼日', key: 'date', type: 'date' }],
     stamps: [{ boxes: ['確認', '確認', '発行者'] }, { boxes: ['登録済検印'], width: 18 }],
     blocks: [

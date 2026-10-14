@@ -1,6 +1,7 @@
 // 作図依頼書（共用・住戸）
 FORM_DEFS['39'] = {
   code: '般-39', title: '作図依頼書',
+  selfStamp: '依頼者', // 本人欄（デート印を押す欄）
   meta: [
     { label: '区分', key: 'kubun', type: 'checks', options: ['共用', '住戸'], w: 34 },
     { label: '発行日', key: 'date', type: 'date' },

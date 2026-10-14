@@ -210,6 +210,74 @@
     return box;
   }
 
+  // ---------- 本人欄のデート印 ----------
+  // 苗字・役職・色の設定は全帳票共通で1つだけ持つ。押すのは def.selfStamp の欄だけ（承認欄などは手押し）。
+  const STAMP_KEY = STORE_PREFIX + '_stamp';
+  const TITLES = ['', '副長', '課長', '工事長', '支店長', '部長', '本部長', '取締役', '常務', '本店長'];
+  // 伝票アプリと同じ：課長以下は黒、工事長以上は朱
+  const TITLE_COLOR = { '': 'black', '副長': 'black', '課長': 'black' };
+  const STAMP_DEFAULT = { enabled: true, sei: '', title: '', color: 'black', office: '' };
+  let stampCfg = { ...STAMP_DEFAULT };
+  try { stampCfg = { ...STAMP_DEFAULT, ...JSON.parse(localStorage.getItem(STAMP_KEY) || '{}') }; } catch (e) { /* 既定値のまま */ }
+
+  function saveStampCfg() {
+    try { localStorage.setItem(STAMP_KEY, JSON.stringify(stampCfg)); } catch (e) { /* noop */ }
+    renderSelfStamps();
+  }
+  // 日付は帳票の作成日・発行日（def.stampDate、既定 'date'）。未入力なら今日。
+  function stampDate() {
+    const iso = values[def.stampDate || 'date'];
+    if (/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) { const [y, m, d] = iso.split('-').map(Number); return { year: y, month: m, day: d }; }
+    return new Date();
+  }
+  function stampSvg() {
+    const c = stampCfg;
+    if (!c.enabled || !c.sei) return '';
+    // 役職なし：苗字を上下に分割／役職あり：上に苗字・下に役職／支店長：上に事業所名（「支店」を除く）
+    const names = c.title === '支店長' ? { nameTop: (values.office || c.office || '').replace(/支店$/, ''), nameBottom: '支店長' }
+      : c.title ? { nameTop: c.sei, nameBottom: c.title } : { name: c.sei };
+    return DateStamp.svg({ ...names, date: stampDate(), color: c.color });
+  }
+  function renderSelfStamps() {
+    const svg = stampSvg();
+    document.querySelectorAll('.self-stamp').forEach((el) => {
+      el.innerHTML = svg || '<span class="self-hint no-print">クリックで<br>押印設定</span>';
+    });
+  }
+
+  function openStampDialog() {
+    const prev = h('div', { class: 'sd-prev' });
+    const upd = () => { prev.innerHTML = stampSvg() || '<span class="sd-empty">苗字を入れると<br>表示されます</span>'; };
+    const set = (k, v) => { stampCfg[k] = v; saveStampCfg(); upd(); };
+    const colors = ['black', 'red'].map((c) => h('input', { type: 'radio', name: 'sd_color', value: c, checked: stampCfg.color === c, onchange: () => set('color', c) }));
+    const officeRow = h('label', { style: stampCfg.title === '支店長' ? '' : 'display:none' }, '事業所',
+      h('select', { onchange: (e) => set('office', e.target.value) },
+        LISTS.offices.filter((o) => o !== '本店').map((o) => h('option', { value: o, selected: o === stampCfg.office }, o))));
+    const dlg = h('dialog', { class: 'stamp-dialog' }, h('form', { method: 'dialog' },
+      h('h3', null, '押印設定（本人欄のデート印）'),
+      h('p', { class: 'sd-note' }, '全帳票共通の設定です（このPCのブラウザにだけ保存）。日付は帳票の作成日・発行日、未入力なら今日の日付になります。承認・確認欄には押されません。'),
+      h('div', { class: 'sd-body' },
+        h('div', { class: 'sd-fields' },
+          h('label', null, h('input', { type: 'checkbox', checked: stampCfg.enabled, onchange: (e) => set('enabled', e.target.checked) }), 'デート印を表示する'),
+          h('label', null, '苗字', h('input', { type: 'text', value: stampCfg.sei, maxlength: 4, placeholder: '例：佐藤', oninput: (e) => set('sei', e.target.value.trim()) })),
+          h('label', null, '役職', h('select', { onchange: (e) => {
+            const t = e.target.value;
+            stampCfg.color = TITLE_COLOR[t] || 'red';
+            colors.forEach((r) => { r.checked = r.value === stampCfg.color; });
+            if (t === '支店長' && !stampCfg.office) stampCfg.office = LISTS.offices[1];
+            officeRow.style.display = t === '支店長' ? '' : 'none';
+            set('title', t);
+          } }, TITLES.map((t) => h('option', { value: t, selected: t === stampCfg.title }, t || '（なし）')))),
+          officeRow,
+          h('div', { class: 'sd-colors' }, '色', h('label', null, colors[0], '黒'), h('label', null, colors[1], '朱（赤）'))),
+        prev),
+      h('div', { class: 'sd-btns' }, h('button', { value: 'close', class: 'primary' }, '閉じる'))));
+    dlg.addEventListener('close', () => dlg.remove());
+    document.body.append(dlg);
+    dlg.showModal();
+    upd();
+  }
+
   // ---------- ヘッダー ----------
   function stampsEl(groups, cls) {
     if (!groups || !groups.length) return null;
@@ -224,7 +292,9 @@
           g.label ? h('div', { class: 'sg-label' }, g.label) : null,
           g.boxes.map((b) => h('div', { class: 'stamp-box', style: g.width ? `width:${g.width}mm` : '' },
             h('div', { class: 'sb-label', style: lh }, ...String(b).split('\n').flatMap((x, i) => (i ? [h('br'), x] : [x]))),
-            h('div', { class: 'sb-area' }))));
+            def && def.selfStamp === b
+              ? h('div', { class: 'sb-area self-stamp', title: 'クリックで押印設定', onclick: openStampDialog })
+              : h('div', { class: 'sb-area' }))));
       }));
   }
 
@@ -405,9 +475,11 @@
         try { localStorage.removeItem(storeKey); } catch (e) { /* noop */ }
         location.reload();
       } }, 'クリア'),
+      def.selfStamp ? h('button', { onclick: openStampDialog }, '押印設定') : null,
       h('button', { class: 'primary', onclick: () => window.print() }, '印刷')));
     const pages = def.pages || [{ blocks: def.blocks }];
     pages.forEach((p) => root.append(sheetEl(def, p)));
+    if (def.selfStamp) calcs.push(renderSelfStamps); // 日付の入力に追従
     recalc();
   }
 

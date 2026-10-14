@@ -1,6 +1,7 @@
 // 業者コード登録票
 FORM_DEFS['28'] = {
   code: '般-28', title: '業者コード登録票',
+  selfStamp: '発行', // 本人欄（デート印を押す欄）
   meta: [{ label: '作成日', key: 'date', type: 'date' }],
   stamps: [
     { boxes: ['承認', '確認', '確認', '確認', '確認', '発行'] },

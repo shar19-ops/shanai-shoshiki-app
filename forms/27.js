@@ -1,6 +1,7 @@
 // 得意先コード登録（変更）票
 FORM_DEFS['27'] = {
   code: '般-27', title: '得意先コード登録（変更）票',
+  selfStamp: '発行', // 本人欄（デート印を押す欄）
   meta: [{ label: '作成日', key: 'date', type: 'date' }],
   stamps: [
     { boxes: ['承認', '確認', '確認', '確認', '確認', '発行'] },

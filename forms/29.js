@@ -1,6 +1,7 @@
 // 請求書作成依頼書
 FORM_DEFS['29'] = {
   code: '般-29', title: '請求書作成依頼書',
+  selfStamp: '依頼者', // 本人欄（デート印を押す欄）
   meta: [
     { label: '請求月', key: 'month', type: 'ym' },
     { label: '作成日', key: 'date', type: 'date' },

@@ -1,5 +1,6 @@
 FORM_DEFS['19'] = {
   code: '般-19', title: '稟議書', subtitle: '（大）',
+  selfStamp: '起案者', // 本人欄（デート印を押す欄）
   meta: [
     { label: '起案年月日', key: 'date', type: 'date' },
   ],

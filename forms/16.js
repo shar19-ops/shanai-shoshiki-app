@@ -12,6 +12,7 @@
 
   FORM_DEFS['16'] = {
     code: '般-16', title: '設計依頼登録メモ',
+    selfStamp: '発行者', // 本人欄（デート印を押す欄）
     meta: [{ label: '依頼日', key: 'date', type: 'date' }],
     stamps: [{ boxes: ['確認', '確認', '発行者'] }, { boxes: ['登録済検印'], width: 18 }],
     blocks: [

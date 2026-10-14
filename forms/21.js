@@ -12,6 +12,7 @@
 
   FORM_DEFS['21'] = {
     code: '般-21', title: '積算依頼物件　確認事項',
+    selfStamp: '営業担当', // 本人欄（デート印を押す欄）
     meta: [{ label: '作成日', key: 'date', type: 'date' }],
     stamps: [{ boxes: ['見積部確認', '営業担当'], width: 18 }],
     blocks: [

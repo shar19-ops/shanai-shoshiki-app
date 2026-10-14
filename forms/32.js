@@ -1,6 +1,7 @@
 // 推薦業者依頼書
 FORM_DEFS['32'] = {
   code: '般-32', title: '推薦業者依頼書',
+  selfStamp: '発行', // 本人欄（デート印を押す欄）
   meta: [{ label: '作成日', key: 'date', type: 'date' }],
   stamps: [
     { boxes: ['購買部保管'], width: 18 },

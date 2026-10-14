@@ -38,6 +38,7 @@
 
   FORM_DEFS['14'] = {
     code: '般-14', title: '工料発注承認メモ', orientation: 'landscape',
+    selfStamp: '発行者', // 本人欄（デート印を押す欄）
     meta: [
       { label: '発行日', key: 'date', type: 'date' },
       { label: '事業所名', key: 'office', type: 'select', options: LISTS.offices, default: '本店', w: 32 },

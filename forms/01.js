@@ -3,6 +3,7 @@
   const DOW = ['月', '火', '水', '木', '金', '土', '日'];
   FORM_DEFS['01'] = {
     code: '般-01', title: '営業活動報告書', subtitle: '（行先・経費）',
+    selfStamp: '発行', // 本人欄（デート印を押す欄）
     meta: [
       { label: '週の開始日（月）', key: 'week', type: 'date' },
       { label: '氏名', key: 'name', w: 40 },
