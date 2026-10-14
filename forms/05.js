@@ -13,7 +13,8 @@
     { label: '所　属', key: 'dept', span: 16, lw: 3 },
   ];
   FORM_DEFS['05'] = {
-    code: '般-05', title: '届　書', 
+    code: '般-05', title: '届　書',
+    selfStamp: '印', // 本人欄は氏名横の「印」欄（stampCell）
     meta: [{ label: '提出日', key: 'date', type: 'date' }],
     stamps: [
       { boxes: ['承認', '確認', '確認', '確認'] },
@@ -41,7 +42,7 @@
       ] },
       { type: 'grid', rows: [
         person,
-        [{ label: '役　職', key: 'post', type: 'select', options: ['部長', '課長', '副長'], span: 8, lw: 4 }, { label: '氏　名', key: 'name', span: 13, lw: 3 }, { text: '印', span: 3, align: 'center' }],
+        [{ label: '役　職', key: 'post', type: 'select', options: ['部長', '課長', '副長'], span: 8, lw: 4 }, { label: '氏　名', key: 'name', span: 13, lw: 3 }, { stampCell: true, span: 3 }],
       ] },
       { type: 'notes', items: ['（注）この届書は、必ず事前（または事後速やかに）提出すること。'] },
       { type: 'spacer' },

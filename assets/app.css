@@ -100,9 +100,14 @@ body {
 .stamp-box .sb-area { height: 16mm; }
 .stamps.small .stamp-box { width: 14mm; }
 /* 本人欄のデート印 */
-.stamp-box .self-stamp { display: flex; align-items: center; justify-content: center; cursor: pointer; }
-.stamp-box .self-stamp:hover { background: #f3f6fc; }
-.stamp-box .self-stamp svg { width: 90%; height: 90%; display: block; }
+/* 印の大きさは全帳票共通（標準の押印欄に合わせて直径14.4mm）。小さい欄でははみ出してよい */
+.self-stamp { display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: visible; }
+.self-stamp:hover { background: #f3f6fc; }
+.self-stamp svg { width: 14.4mm; height: 14.4mm; flex-shrink: 0; display: block; overflow: visible; position: relative; z-index: 1; }
+/* 本文中の「氏名［　］印」欄 */
+table.grid td.stamp-cell { position: relative; overflow: visible; }
+table.grid td.stamp-cell .self-stamp { position: absolute; inset: 0; }
+.stamp-mark { font-size: 9pt; }
 .self-hint { font-size: 6.5pt; color: #8a94a6; text-align: center; line-height: 1.3; }
 .stamp-dialog { border: 0; border-radius: 8px; padding: 18px 20px; width: min(460px, calc(100vw - 32px)); box-shadow: 0 8px 30px rgba(0,0,0,.3); font-family: var(--font); }
 .stamp-dialog::backdrop { background: rgba(0,0,0,.35); }

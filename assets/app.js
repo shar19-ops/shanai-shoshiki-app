@@ -241,7 +241,7 @@
   function renderSelfStamps() {
     const svg = stampSvg();
     document.querySelectorAll('.self-stamp').forEach((el) => {
-      el.innerHTML = svg || '<span class="self-hint no-print">クリックで<br>押印設定</span>';
+      el.innerHTML = svg || (el.dataset.empty === '印' ? '<span class="stamp-mark">印</span>' : '<span class="self-hint no-print">クリックで<br>押印設定</span>');
     });
   }
 
@@ -342,6 +342,10 @@
     return wrapTitle(b, tbl);
   }
   function valueCell(it, span, rs, style) {
+    if (it.stampCell) {
+      return h('td', { class: 'stamp-cell', colspan: span, rowspan: rs, style },
+        h('div', { class: 'self-stamp', 'data-empty': '印', title: 'クリックで押印設定', onclick: openStampDialog }));
+    }
     if (it.text != null && !it.key) return h('td', { class: it.note ? 'note' : 'txt', colspan: span, rowspan: rs, style: style + (it.align ? `;text-align:${it.align}` : '') }, it.text);
     if (!it.key) return h('td', { colspan: span, rowspan: rs, style });
     return h('td', { colspan: span, rowspan: rs, style }, field(it));
