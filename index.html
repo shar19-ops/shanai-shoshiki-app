@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>社内書式アプリ</title>
+<link rel="icon" href="assets/logo-mark.jpg">
+<link rel="stylesheet" href="assets/app.css">
+<style>
+  .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
+  .intro { background: #fff; border-radius: 6px; padding: 12px 16px; font-size: 10pt; line-height: 1.7; margin-bottom: 14px; }
+  .search { width: 100%; font: inherit; font-size: 11pt; padding: 8px 12px; border: 1px solid #b8bfcc; border-radius: 6px; margin-bottom: 12px; }
+  .list { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 8px; }
+  .card {
+    display: flex; align-items: center; gap: 10px;
+    background: #fff; border-radius: 6px; padding: 10px 12px;
+    text-decoration: none; color: inherit; border: 1px solid transparent;
+  }
+  a.card:hover { border-color: var(--accent); box-shadow: 0 1px 4px rgba(31,63,143,.25); }
+  .card .no { font-size: 9pt; color: #fff; background: var(--accent); border-radius: 3px; padding: 2px 6px; white-space: nowrap; }
+  .card .t { font-size: 10.5pt; line-height: 1.35; }
+  .card.wip { opacity: .55; }
+  .card.wip .no { background: #888; }
+  .card .badge { margin-left: auto; font-size: 8pt; color: #666; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="toolbar"><div class="tb-title">社内書式アプリ　一般社内書類</div><button onclick="location.href='list.html'">配布用一覧</button></div>
+<div class="wrap">
+  <div class="intro">
+    帳票を選んで入力し、「印刷」ボタンで紙に出力して回送してください。<br>
+    入力内容はこのパソコンのブラウザ内にだけ一時保存されます（サーバーには送信されません）。共用PCでは印刷後に「クリア」してください。
+  </div>
+  <input class="search" type="search" placeholder="帳票名・番号で絞り込み" id="q">
+  <div class="list" id="list"></div>
+</div>
+<script src="forms/catalog.js"></script>
+<script>
+  (function () {
+    var list = document.getElementById('list');
+    function render(q) {
+      list.innerHTML = '';
+      CATALOG.forEach(function (c) {
+        if (q && (c.no + c.title).indexOf(q) < 0) return;
+        var el = document.createElement('a');
+        el.className = 'card';
+        el.href = 'form.html?id=' + c.id;
+        el.innerHTML = '<span class="no"></span><span class="t"></span>';
+        el.querySelector('.no').textContent = c.no;
+        el.querySelector('.t').textContent = c.title;
+        list.appendChild(el);
+      });
+    }
+    document.getElementById('q').addEventListener('input', function (e) { render(e.target.value.trim()); });
+    render('');
+  })();
+</script>
+</body>
+</html>

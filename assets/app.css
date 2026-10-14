@@ -1,0 +1,253 @@
+/* 社内書式アプリ 共通スタイル — 全帳票で同じ見た目にする */
+:root {
+  --ink: #1a1a1a;
+  --line: #333;
+  --line-weak: #9a9a9a;
+  --label-bg: #eef0f3;
+  --input-bg: #fff8d6;
+  --input-focus: #ffefa3;
+  --accent: #1f3f8f;
+  --toolbar-bg: #1f3f8f;
+  --font: "BIZ UDPGothic", "BIZ UDPゴシック", "Yu Gothic UI", "Meiryo", sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: #d9dde3;
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 10pt;
+}
+
+/* ---------- 画面上部のツールバー（印刷しない） ---------- */
+.toolbar {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 8px 16px;
+  background: var(--toolbar-bg); color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,.2);
+}
+.toolbar .tb-title { font-weight: bold; font-size: 11pt; margin-right: auto; }
+.toolbar .tb-title a { color: #fff; text-decoration: none; opacity: .8; font-weight: normal; }
+.toolbar button {
+  font: inherit; font-size: 10pt;
+  padding: 6px 14px; border: 1px solid rgba(255,255,255,.6); border-radius: 4px;
+  background: transparent; color: #fff; cursor: pointer;
+}
+.toolbar button.primary { background: #fff; color: var(--toolbar-bg); font-weight: bold; }
+.toolbar button:hover { background: rgba(255,255,255,.15); }
+.toolbar button.primary:hover { background: #e8ecf7; }
+.toolbar .saved { font-size: 9pt; opacity: .8; min-width: 7em; }
+
+/* ---------- 用紙 ---------- */
+.sheet {
+  background: #fff;
+  margin: 16px auto;
+  box-shadow: 0 2px 10px rgba(0,0,0,.25);
+  padding: 10mm 12mm 8mm;
+  display: flex; flex-direction: column;
+  position: relative;
+}
+.sheet.A4.portrait  { width: 210mm; min-height: 297mm; }
+.sheet.A4.landscape { width: 297mm; min-height: 210mm; }
+.sheet.A3.portrait  { width: 297mm; min-height: 420mm; }
+.sheet.A3.landscape { width: 420mm; min-height: 297mm; }
+.sheet.B4.landscape { width: 364mm; min-height: 257mm; }
+.sheet.B4.portrait  { width: 257mm; min-height: 364mm; }
+.sheet-body { flex: 1; display: flex; flex-direction: column; gap: 4mm; }
+
+/* ---------- ヘッダー：タイトル（左）＋押印欄（右） ---------- */
+.f-header {
+  display: flex; align-items: flex-start; gap: 6mm;
+  margin-bottom: 4mm;
+}
+.f-head-left { flex: 1; min-width: 0; }
+.f-code { font-size: 8pt; color: #555; letter-spacing: .05em; }
+.f-title {
+  font-size: 20pt; font-weight: bold; letter-spacing: .3em;
+  margin: 1mm 0 2mm;
+  padding-bottom: 1.5mm;
+  border-bottom: 3px double var(--line);
+  display: inline-block; min-width: 70mm;
+}
+.f-title.long { font-size: 17pt; letter-spacing: .15em; }
+.f-title.xlong { font-size: 15pt; letter-spacing: .05em; }
+.f-sub { font-size: 9pt; margin-left: .5em; letter-spacing: 0; font-weight: normal; }
+.f-meta { display: flex; flex-wrap: wrap; gap: 1.5mm 6mm; font-size: 9.5pt; }
+.f-meta .m-item { display: flex; align-items: baseline; gap: 2mm; }
+.f-meta .m-label { color: #333; white-space: nowrap; }
+.f-meta .m-val { border-bottom: 1px solid var(--line); min-width: 38mm; }
+
+/* 押印欄 */
+.stamps { display: flex; gap: 2mm; flex-shrink: 0; }
+.stamp-group { display: flex; border: 1.2px solid var(--line); }
+.stamp-group .sg-label {
+  writing-mode: vertical-rl; text-orientation: upright;
+  font-size: 8pt; letter-spacing: .15em;
+  background: var(--label-bg);
+  border-right: 1px solid var(--line);
+  padding: 1mm .8mm; display: flex; align-items: center; justify-content: center;
+}
+.stamp-box { width: 16mm; display: flex; flex-direction: column; }
+.stamp-box + .stamp-box { border-left: 1px solid var(--line); }
+.stamp-box .sb-label {
+  height: 5mm; line-height: 5mm; text-align: center;
+  font-size: 7.5pt; white-space: nowrap; overflow: hidden;
+  background: var(--label-bg); border-bottom: 1px solid var(--line);
+  letter-spacing: .05em;
+}
+.stamp-box .sb-area { height: 16mm; }
+.stamps.small .stamp-box { width: 14mm; }
+.stamps.small .stamp-box .sb-area { height: 14mm; }
+
+/* ---------- 項目表（ラベル＋入力） ---------- */
+table.grid {
+  width: 100%; border-collapse: collapse; table-layout: fixed;
+  border: 1.2px solid var(--line);
+}
+table.grid td, table.grid th {
+  border: 1px solid var(--line);
+  padding: 0; height: 8mm; vertical-align: middle;
+  font-weight: normal;
+}
+table.grid th, table.grid td.lbl {
+  background: var(--label-bg);
+  text-align: center; font-size: 9pt; padding: 0 1.5mm;
+  letter-spacing: .05em; line-height: 1.25;
+}
+table.grid td.lbl.left { text-align: left; }
+/* 必須記入欄（元Excelの色塗り欄） */
+table.grid td.lbl.req { background: #fbe0c6; }
+table.grid td.txt { padding: 0 2mm; font-size: 9pt; }
+table.grid td.note { padding: 1mm 2mm; font-size: 8pt; color: #333; white-space: pre-line; line-height: 1.5; }
+table.grid tr.thin td { height: 6mm; }
+table.grid tfoot td { border-top: 1.5px solid var(--line); }
+/* 項目の多い帳票用（登録メモ類） */
+table.grid.dense td, table.grid.dense th { height: 5mm; }
+table.grid.dense .date-wrap .pv { font-size: 8.5pt; }
+table.grid.dense td.lbl, table.grid.dense th { font-size: 8pt; letter-spacing: 0; padding: 0 1mm; }
+table.grid.dense td.lbl.left { padding-left: 1.5mm; }
+table.grid.dense .inp { font-size: 9pt; min-height: 4.8mm; }
+table.grid.dense .unit, table.grid.dense td.txt { font-size: 8pt; }
+table.grid.dense .checks label { font-size: 8.5pt; }
+table.grid.dense td.sec { background: #dfe4ec; font-weight: bold; text-align: left; padding-left: 2mm; font-size: 8.5pt; letter-spacing: .1em; }
+table.grid.dense tr.thin td { height: 4.4mm; }
+table.grid.dense tr.thin td.lbl { font-size: 7pt; }
+table.grid.dense tr.thin .inp { font-size: 7.5pt; min-height: 4mm; }
+.blk-title {
+  font-size: 10.5pt; font-weight: bold; margin: 0 0 1mm;
+  padding-left: 2mm; border-left: 4px solid var(--accent);
+}
+.cell-wrap { display: flex; align-items: center; gap: 1mm; padding: 0 1.5mm; height: 100%; }
+.cell-wrap .unit { white-space: nowrap; font-size: 9pt; }
+
+/* ---------- 入力部品 ---------- */
+.inp {
+  font: inherit; font-size: 10pt; color: var(--ink);
+  width: 100%; height: 100%; min-height: 7mm;
+  border: 0; outline: 0; margin: 0;
+  padding: 0 1.5mm;
+  background: var(--input-bg);
+}
+.inp:focus { background: var(--input-focus); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.inp.num { text-align: right; font-variant-numeric: tabular-nums; }
+.inp.center { text-align: center; }
+.inp.calc { background: transparent; }
+select.inp { appearance: none; -webkit-appearance: none; cursor: pointer; }
+textarea.inp {
+  resize: none; display: block; padding: 1mm 2mm;
+  line-height: 7mm;
+  background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(7mm - 1px), var(--line-weak) calc(7mm - 1px), var(--line-weak) 7mm);
+  background-color: var(--input-bg);
+  background-attachment: local;
+  background-position: 0 1mm;
+}
+textarea.inp.plain { background-image: none; line-height: 1.5; }
+.date-wrap { display: flex; align-items: center; height: 100%; }
+.date-wrap input[type=date] { flex: 1; }
+.pv { display: none; }
+table.grid .date-wrap .pv { text-align: right; font-size: 9.5pt; }
+
+/* チェック選択（□ 選択肢） */
+.checks { display: flex; flex-wrap: wrap; gap: .5mm 4mm; padding: 1mm 2mm; align-items: center; height: 100%; }
+.checks label { display: inline-flex; align-items: center; gap: 1mm; cursor: pointer; white-space: nowrap; font-size: 9.5pt; }
+.checks input { display: none; }
+.checks .box {
+  width: 3.6mm; height: 3.6mm; border: 1px solid var(--line);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 9pt; line-height: 1; background: var(--input-bg);
+}
+.checks input:checked + .box::after { content: "✓"; font-weight: bold; }
+
+/* 自由記述欄 */
+.free { border: 1.2px solid var(--line); display: flex; flex-direction: column; }
+.free .free-label {
+  background: var(--label-bg); border-bottom: 1px solid var(--line);
+  padding: 1mm 2mm; font-size: 9pt; letter-spacing: .1em;
+}
+.free textarea { flex: 1; }
+
+/* 画像欄 */
+.img-field {
+  position: relative; flex: 1; min-height: 40mm; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+  background: var(--input-bg); outline: 0;
+}
+.img-field:focus { box-shadow: inset 0 0 0 1.5px var(--accent); }
+.img-field .img-view { max-width: 100%; max-height: 100%; object-fit: contain; }
+.img-field .img-hint { color: #777; font-size: 9pt; }
+.img-field .img-del { position: absolute; top: 2mm; right: 2mm; font: inherit; font-size: 8pt; padding: 2px 8px; cursor: pointer; }
+.free .img-field { border-top: 0; }
+table.grid td textarea.inp { height: 100%; }
+
+/* 見積書 表紙 */
+.est-cover { display: flex; flex-direction: column; gap: 10mm; margin-top: 4mm; }
+.est-to { display: flex; align-items: flex-end; gap: 3mm; font-size: 12pt; }
+.est-to-line { width: 110mm; border-bottom: 1.5px solid var(--line); height: 9mm; }
+.est-to-line .inp { font-size: 13pt; }
+.est-company { align-self: flex-end; width: 92mm; }
+.est-company img { height: 9mm; display: block; margin-bottom: 2mm; }
+.est-addr { font-size: 8.5pt; line-height: 1.6; }
+
+/* 本文中の文章・注記 */
+.para { font-size: 10pt; line-height: 1.7; margin: 0; white-space: pre-wrap; }
+.notes { font-size: 8pt; line-height: 1.6; margin: 0; padding-left: 0; list-style: none; color: #222; }
+.addressee { font-size: 11pt; line-height: 1.8; }
+.addressee .addr-name { display: flex; align-items: center; gap: 2mm; }
+.addressee .addr-inp { width: 38mm; height: 7mm; border-bottom: 1px solid var(--line); }
+.addressee .addr-inp .inp { font-size: 11pt; min-height: 6.5mm; }
+.spacer { flex: 1; }
+
+/* 本文中の押印欄（総務部記入欄など） */
+.inline-stamps { display: flex; gap: 4mm; align-items: flex-end; flex-wrap: wrap; }
+.inline-stamps .is-title { font-size: 9pt; margin-bottom: 1mm; }
+.right { margin-left: auto; }
+
+/* ---------- フッター ---------- */
+.f-footer {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-top: 4mm; padding-top: 2mm;
+  border-top: 1px solid var(--line-weak);
+}
+.f-footer .brand { display: flex; align-items: center; gap: 3mm; }
+.f-footer .brand .mark { height: 6.5mm; }
+.f-footer .brand .name { height: 4mm; }
+.f-footer .f-ver { font-size: 7.5pt; color: #666; }
+
+/* ---------- 印刷 ---------- */
+@media print {
+  body { background: #fff; }
+  .toolbar, .no-print { display: none !important; }
+  .sheet { margin: 0; box-shadow: none; page-break-after: always; break-after: page; }
+  .sheet:last-child { page-break-after: auto; break-after: auto; }
+  .inp, textarea.inp, .checks .box { background-color: transparent !important; box-shadow: none !important; }
+  textarea.inp { background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(7mm - 1px), var(--line-weak) calc(7mm - 1px), var(--line-weak) 7mm); }
+  textarea.inp.plain { background-image: none; }
+  select.inp { color: var(--ink); }
+  .img-field { background: transparent; }
+  .inp::placeholder { color: transparent; }
+  .date-wrap input { display: none; }
+  .date-wrap .pv { display: block; width: 100%; padding: 0 1.5mm; white-space: nowrap; overflow: hidden; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
