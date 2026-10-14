@@ -69,8 +69,9 @@ body {
   margin: 1mm 0 2mm;
   padding-bottom: 1.5mm;
   border-bottom: 3px double var(--line);
-  display: inline-block; min-width: 70mm;
+  display: inline-block; min-width: min(70mm, 100%); white-space: nowrap;
 }
+/* 配布用一覧（list.html）用。帳票画面では app.js の fitTitles が自動で縮める */
 .f-title.long { font-size: 17pt; letter-spacing: .15em; }
 .f-title.xlong { font-size: 15pt; letter-spacing: .05em; }
 .f-sub { font-size: 9pt; margin-left: .5em; letter-spacing: 0; font-weight: normal; }
@@ -97,8 +98,15 @@ body {
   background: var(--label-bg); border-bottom: 1px solid var(--line);
   letter-spacing: .05em;
 }
-.stamp-box .sb-area { height: 16mm; }
-.stamps.small .stamp-box { width: 14mm; }
+.bottom-stamps { display: flex; justify-content: flex-end; align-items: flex-end; gap: 4mm; margin-top: 3mm; }
+.bottom-stamps .notes { flex: 1; }
+.stamp-box .sb-label.tight { font-size: 6.5pt; letter-spacing: 0; }
+.stamp-box .sb-area { height: 16mm; position: relative; }
+/* 兼務の役職名（工事本部長・RE部長・支店長など）は押印部に薄く印字 */
+.stamp-box .sb-roles {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  text-align: center; font-size: 6.5pt; line-height: 1.45; color: #b3bac6; pointer-events: none;
+}
 /* 本人欄のデート印 */
 /* 印の大きさは全帳票共通（標準の押印欄に合わせて直径14.4mm）。小さい欄でははみ出してよい */
 .self-stamp { display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: visible; }
@@ -124,7 +132,6 @@ table.grid td.stamp-cell .self-stamp { position: absolute; inset: 0; }
 .stamp-dialog .sd-empty { font-size: 8pt; color: #999; text-align: center; }
 .stamp-dialog .sd-btns { display: flex; justify-content: flex-end; margin-top: 14px; }
 .stamp-dialog .sd-btns button { font: inherit; padding: 6px 18px; border-radius: 4px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
-.stamps.small .stamp-box .sb-area { height: 14mm; }
 
 /* ---------- 項目表（ラベル＋入力） ---------- */
 table.grid {

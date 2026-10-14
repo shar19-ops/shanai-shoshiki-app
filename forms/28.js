@@ -3,11 +3,10 @@ FORM_DEFS['28'] = {
   code: '般-28', title: '業者コード登録票',
   selfStamp: '発行', // 本人欄（デート印を押す欄）
   meta: [{ label: '作成日', key: 'date', type: 'date' }],
+  bottomStamps: ['登録済検印'], // 下部（フッターの上）に置く押印欄
   stamps: [
     { boxes: ['承認', '確認', '確認', '確認', '確認', '発行'] },
-    { boxes: ['登録済検印'], width: 18 },
   ],
-  stampClass: 'small',
   blocks: [
     { type: 'grid', lalign: 'left', lw: 6, rows: [
       [{ label: '登録の区分', key: 'kubun', type: 'select', options: ['1：追加', '2：変更', '3：削除', '4：少額発注業者の再発注 ※5'], span: 12 }, { label: '業者の種別', key: 'shubetsu', type: 'select', options: ['1：経費', '2：工料', '3：外注品', '4：一般資材'], span: 12, lw: 4 }],

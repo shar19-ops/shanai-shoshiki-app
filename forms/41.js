@@ -9,7 +9,7 @@
     code: '般-41', title: '東電自家用申込依頼書',
     selfStamp: '依頼者', // 本人欄（デート印を押す欄）
     meta: [{ label: '受電開始希望日', key: 'juden', type: 'date' }],
-    stamps: [{ label: '承認', boxes: ['工事本部長\nRE部長', '工事長', '工事管理課長', '依頼者'] }],
+    stamps: [{ boxes: ['承認\n工事本部長\nRE部長', '工事長', '工事管理課長', '依頼者'] }],
     blocks: [
       { type: 'notes', items: ['■新設で高圧受電に限る（原則として受電の8ヶ月前までに依頼してください）'] },
       { type: 'grid', dense: true, rows: [

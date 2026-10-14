@@ -1,6 +1,9 @@
 // グリーンサイト依頼書（安全書類 依頼入力書）
 FORM_DEFS['42'] = {
   code: '般-42', title: 'グリーンサイト依頼書', subtitle: '（安全書類 依頼入力書）',
+  selfStamp: '依頼者', // 本人欄（デート印を押す欄）
+  // 元Excelの「印」シート：確認（本部長・RE部長）／確認（工事長・工事部長）／依頼者
+  stamps: [{ boxes: ['確認\n本部長\nRE部長', '確認\n工事長\n工事部長', '依頼者'] }],
   meta: [
     { label: '発行日', key: 'date', type: 'date' },
     { label: '入力完成希望日', key: 'kibo', type: 'date' },

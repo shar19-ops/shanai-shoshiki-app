@@ -16,9 +16,9 @@
     code: '般-05', title: '届　書',
     selfStamp: '印', // 本人欄は氏名横の「印」欄（stampCell）
     meta: [{ label: '提出日', key: 'date', type: 'date' }],
+    bottomStamps: ['登録済検印'], // 下部（フッターの上）に置く押印欄
     stamps: [
       { boxes: ['承認', '確認', '確認', '確認'] },
-      { boxes: ['登録済検印'], width: 18 },
     ],
     blocks: [
       { type: 'para', text: '下記のとおり、お届け致します。' },

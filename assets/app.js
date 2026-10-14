@@ -283,26 +283,40 @@
     if (!groups || !groups.length) return null;
     // 文字列配列だけなら1グループ扱い
     if (typeof groups[0] === 'string') groups = [{ boxes: groups }];
-    return h('div', { class: 'stamps ' + (cls || '') },
-      groups.map((g) => {
-        // 役職名が複数行のときはグループ内のラベル高さを揃える
-        const lines = Math.max(1, ...g.boxes.map((b) => String(b).split('\n').length));
-        const lh = lines > 1 ? `height:${lines * 2.8 + 1.2}mm;line-height:2.8mm;padding-top:.6mm;font-size:6.5pt;letter-spacing:0` : '';
-        return h('div', { class: 'stamp-group' },
-          g.label ? h('div', { class: 'sg-label' }, g.label) : null,
-          g.boxes.map((b) => h('div', { class: 'stamp-box', style: g.width ? `width:${g.width}mm` : '' },
-            h('div', { class: 'sb-label', style: lh }, ...String(b).split('\n').flatMap((x, i) => (i ? [h('br'), x] : [x]))),
-            def && def.selfStamp === b
-              ? h('div', { class: 'sb-area self-stamp', title: 'クリックで押印設定', onclick: openStampDialog })
-              : h('div', { class: 'sb-area' }))));
-      }));
+    // 枠の大きさは全帳票共通。'承認\n工事本部長\nRE部長' のように2行目以降があれば、
+    // 1行目を見出し、残り（兼務の役職名）を押印部に薄く印字する。
+    return h('div', { class: 'stamps' + (cls ? ' ' + cls : '') },
+      groups.map((g) => h('div', { class: 'stamp-group' },
+        g.label ? h('div', { class: 'sg-label' }, g.label) : null,
+        g.boxes.map((b) => {
+          const [head, ...roles] = String(b).split('\n');
+          const self = def && def.selfStamp === head;
+          return h('div', { class: 'stamp-box' },
+            h('div', { class: 'sb-label' + (head.length >= 6 ? ' tight' : '') }, head),
+            h('div', self ? { class: 'sb-area self-stamp', title: 'クリックで押印設定', onclick: openStampDialog } : { class: 'sb-area' },
+              roles.length ? h('div', { class: 'sb-roles' }, roles.flatMap((r, i) => (i ? [h('br'), r] : [r]))) : null));
+        }))));
+  }
+
+  // タイトルが押印欄とぶつかるときは、1行に収まるまで文字を縮める
+  function fitTitles() {
+    document.querySelectorAll('.f-title').forEach((el) => {
+      const box = el.parentElement;
+      let pt = 20;
+      el.style.fontSize = ''; el.style.letterSpacing = '';
+      while (el.scrollWidth > box.clientWidth && pt > 11) {
+        pt -= 0.5;
+        el.style.fontSize = pt + 'pt';
+        el.style.letterSpacing = pt < 16 ? '.04em' : '.15em';
+      }
+    });
   }
 
   function headerEl(d) {
     return h('div', { class: 'f-header' },
       h('div', { class: 'f-head-left' },
         h('div', { class: 'f-code' }, d.code),
-        h('div', { class: 'f-title' + (d.title.length >= 14 ? ' xlong' : d.title.length >= 10 ? ' long' : '') }, d.title, d.subtitle ? h('span', { class: 'f-sub' }, d.subtitle) : null),
+        h('div', { class: 'f-title' }, d.title, d.subtitle ? h('span', { class: 'f-sub' }, d.subtitle) : null),
         d.meta ? h('div', { class: 'f-meta' }, d.meta.map((m) => h('div', { class: 'm-item' },
           h('span', { class: 'm-label' }, m.label),
           h('span', { class: 'm-val', style: m.w ? `min-width:${m.w}mm` : '' }, field(m))))) : null),
@@ -430,7 +444,7 @@
     addressee: (b) => h('div', { class: 'addressee', style: b.style || '' }, b.lines.map((l) => h('div', null, l))),
     spacer: () => h('div', { class: 'spacer' }),
     stamps: (b) => h('div', { class: 'inline-stamps', style: b.align === 'right' ? 'justify-content:flex-end' : '' },
-      h('div', null, b.title ? h('div', { class: 'is-title' }, b.title) : null, stampsEl(b.groups, 'small'))),
+      h('div', null, b.title ? h('div', { class: 'is-title' }, b.title) : null, stampsEl(b.groups))),
     row: (b) => h('div', { style: `display:flex;gap:${b.gap ?? 4}mm;align-items:${b.align || 'stretch'}` },
       b.items.map((x) => h('div', { style: x.w ? `width:${x.w}%;flex-shrink:0` : 'flex:1' }, renderBlock(x)))),
     custom: (b) => b.render({ h, field, values, setVal }),
@@ -446,9 +460,20 @@
     const paper = page.paper || d.paper || 'A4';
     const orient = page.orientation || d.orientation || 'portrait';
     const pd = { ...d, ...page };
+    let blocks = page.blocks, bottom = null;
+    // 登録済検印など下部に置く押印欄（最後のページのみ）。
+    // 末尾が注意書き（後ろは余白だけ）なら、その横に並べて縦の段を増やさない。
+    if (pd.bottomStamps && page === (d.pages || [page]).slice(-1)[0]) {
+      let i = blocks.length - 1;
+      while (i >= 0 && blocks[i].type === 'spacer') i--;
+      const notes = i >= 0 && blocks[i].type === 'notes' ? blocks[i] : null;
+      if (notes) blocks = [...blocks.slice(0, i), ...blocks.slice(i + 1)];
+      bottom = h('div', { class: 'bottom-stamps' }, notes ? renderBlock(notes) : null, stampsEl(pd.bottomStamps));
+    }
     return h('div', { class: `sheet ${paper} ${orient}` },
       headerEl(pd),
-      h('div', { class: 'sheet-body' }, page.blocks.map(renderBlock)),
+      h('div', { class: 'sheet-body' }, blocks.map(renderBlock)),
+      bottom,
       h('div', { class: 'f-footer' },
         h('div', { class: 'brand' },
           h('img', { class: 'mark', src: 'assets/logo-mark.jpg', alt: '' }),
@@ -485,6 +510,8 @@
     pages.forEach((p) => root.append(sheetEl(def, p)));
     if (def.selfStamp) calcs.push(renderSelfStamps); // 日付の入力に追従
     recalc();
+    fitTitles();
+    if (document.fonts) document.fonts.ready.then(fitTitles);
   }
 
   window.ShoshikiApp = { boot, version: APP_VERSION, toNum, fmtNum };

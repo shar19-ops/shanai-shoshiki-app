@@ -9,7 +9,6 @@
       { boxes: ['社長', '本店長', '管理本部長', '経理部'] },
       { boxes: ['確認', '確認', '確認', '発行'] },
     ],
-    stampClass: 'small',
     blocks: [
       { type: 'grid', dense: true, rows: [
         [{ label: '会社コード', key: 'code', span: 12, req: true }, { span: 12 }],

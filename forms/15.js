@@ -14,7 +14,8 @@
     code: '般-15', title: '積算依頼登録メモ',
     selfStamp: '発行者', // 本人欄（デート印を押す欄）
     meta: [{ label: '依頼日', key: 'date', type: 'date' }],
-    stamps: [{ boxes: ['確認', '確認', '発行者'] }, { boxes: ['登録済検印'], width: 18 }],
+    bottomStamps: ['登録済検印'], // 下部（フッターの上）に置く押印欄
+    stamps: [{ boxes: ['確認', '確認', '発行者'] }],
     blocks: [
       { type: 'grid', dense: true, lalign: 'left', lw: 5, rows: [
         [{ label: '営業事業所', key: 'office', type: 'select', options: LISTS.officeCodes, span: 8 },

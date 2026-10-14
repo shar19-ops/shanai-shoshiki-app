@@ -6,7 +6,7 @@ FORM_DEFS['39'] = {
     { label: '区分', key: 'kubun', type: 'checks', options: ['共用', '住戸'], w: 34 },
     { label: '発行日', key: 'date', type: 'date' },
   ],
-  stamps: [{ boxes: ['工事本部長\nRE部長', '支店長', '工事長\n工事部長', '依頼者'] }],
+  stamps: [{ boxes: ['承認\n工事本部長\nRE部長', '支店長', '確認\n工事長\n工事部長', '依頼者'] }],
   blocks: [
     { type: 'notes', items: [
       '【注意事項】　1　期限ごとに1枚ずつ『作図依頼書』を作成。　2　CAD部で『作図依頼書』を受領後、作図を開始予定。',
