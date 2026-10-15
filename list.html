@@ -66,7 +66,6 @@
     background: var(--pop); color: var(--blue-1); font-weight: 800; font-size: 14pt;
     border-radius: 99px; padding: 2.8mm 7mm; box-shadow: 0 1.5mm 0 #d9a800; }
   .btn .arrow { font-size: 13pt; }
-  .url { margin-top: 3mm; font-size: 8pt; color: #5a6476; word-break: break-all; }
 
   /* 使い方3ステップ */
   .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; position: relative; z-index: 1; }
@@ -127,7 +126,6 @@
       <p class="lead">下のボタン（またはQRコード）から<b>帳票一覧</b>を開き、使いたい書類を選んでください。<br>
         書類が追加・修正されても、このご案内からいつでも最新の一覧が開けます。</p>
       <a class="btn" id="open"><span>帳票一覧を開く</span><span class="arrow">›</span></a>
-      <div class="url" id="url"></div>
     </div>
   </div>
 
@@ -179,7 +177,6 @@
     var q = qrcode(0, 'M'); q.addData(BASE); q.make();
     document.getElementById('qr').src = q.createDataURL(6, 0);
     var a = document.getElementById('open'); a.href = BASE;
-    document.getElementById('url').textContent = BASE;
     document.getElementById('notices').innerHTML = NOTICES.map(function (n) { return '<li>' + n + '</li>'; }).join('');
     var t = new Date();
     document.getElementById('date').textContent = t.getFullYear() + '年' + (t.getMonth() + 1) + '月 発行';
