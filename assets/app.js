@@ -100,9 +100,20 @@
 
     if (type === 'image') return imageField(f);
 
-    // 期間（日付〜日付）を1つの欄に。間に縦罫線を入れない
+    // 期間（日付〜日付、kind: 'time' なら時刻〜時刻）を1つの欄に。間に縦罫線を入れない
+    // dow: true なら日付の後ろに曜日（例：（木））を自動表示
     if (type === 'daterange') {
-      return h('div', { class: 'range-wrap' }, field({ key, type: 'date' }), h('span', { class: 'range-sep' }, '〜'), field({ key: f.key2, type: 'date' }));
+      const kind = f.kind || 'date';
+      const part = (k) => {
+        const parts = [field({ key: k, type: kind })];
+        if (f.dow) {
+          const w = h('span', { class: 'range-dow' });
+          calcs.push(() => { const iso = values[k]; w.textContent = iso ? '（' + '日月火水木金土'[new Date(iso + 'T00:00').getDay()] + '）' : '（　）'; });
+          parts.push(w);
+        }
+        return parts;
+      };
+      return h('div', { class: 'range-wrap' }, ...part(key), h('span', { class: 'range-sep' }, '〜'), ...part(f.key2));
     }
 
     if (type === 'checks' || type === 'radio') {

@@ -16,9 +16,9 @@ FORM_DEFS['52'] = {
     {
       type: 'table', key: 'items', rows: 11,
       columns: [
-        { label: '業者コード', key: 'vcode', w: 10, align: 'center' },
+        { label: '業者コード', key: 'vcode', w: 13, align: 'center' },
         { label: '代行支払先', key: 'payee', w: 20 },
-        { label: '摘　要', key: 'desc', w: 28 },
+        { label: '摘　要', key: 'desc', w: 25 },
         { label: '数量', key: 'qty', w: 7, type: 'number' },
         { label: '単位', key: 'unit', w: 7, align: 'center' },
         { label: '単価', key: 'price', w: 12, type: 'money' },
