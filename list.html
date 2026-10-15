@@ -7,18 +7,50 @@
 <link rel="icon" href="assets/logo-mark.jpg">
 <link rel="stylesheet" href="assets/app.css">
 <style>
-  /* 配布用一覧（A4縦・PDF化してリンク付きで配布） */
+  /* 配布用一覧（A4縦・PDF化してリンク付きで配布）。見た目はブラウザの帳票一覧に合わせる */
   @page { size: A4 portrait; margin: 0; }
-  .lst { width: 100%; border-collapse: collapse; table-layout: fixed; border: 1.2px solid var(--line); }
-  .lst th, .lst td { border: 1px solid var(--line); padding: 1mm 2mm; vertical-align: middle; }
-  .lst th { background: var(--label-bg); font-weight: normal; font-size: 9pt; height: 7mm; }
-  .lst td { height: 12.5mm; font-size: 10pt; }
-  .lst td.no { text-align: center; white-space: nowrap; }
-  .lst td.t { font-weight: bold; }
-  .lst td.u a { color: var(--accent); font-size: 8pt; word-break: break-all; }
-  .lst td.q { text-align: center; padding: .5mm; }
-  .lst td.q img { width: 11.5mm; height: 11.5mm; image-rendering: pixelated; display: block; margin: 0 auto; }
-  .lead { font-size: 9.5pt; line-height: 1.7; margin: 0 0 3mm; }
+  .lp {
+    width: 210mm; height: 297mm; margin: 16px auto; background: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,.25);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  /* ヘッダー：イメージカラーの青の帯（用紙の端まで） */
+  .lp-band {
+    background: linear-gradient(120deg, #1f3f8f 0%, #23489f 60%, #2b56b8 100%);
+    color: #fff; padding: 11mm 14mm 8mm; display: flex; align-items: center; gap: 8mm;
+  }
+  .lp-band .bt { flex: 1; min-width: 0; }
+  .lp-band .kicker { font-size: 9pt; letter-spacing: .25em; opacity: .85; }
+  .lp-band h1 { margin: 1.5mm 0 3mm; font-size: 24pt; letter-spacing: .12em; font-weight: bold; }
+  .lp-band .lead { font-size: 9.5pt; line-height: 1.75; opacity: .95; }
+  .lp-band .lead a { color: #fff; }
+  .lp-band .top-qr { text-decoration: none; background: #fff; border-radius: 3mm; padding: 2.5mm; text-align: center; color: #1f3f8f; font-size: 7.5pt; line-height: 1.3; }
+  .lp-band .top-qr img { width: 22mm; height: 22mm; display: block; image-rendering: pixelated; margin-bottom: 1mm; }
+  .lp-band.compact { padding: 7mm 14mm 5mm; }
+  .lp-band.compact h1 { font-size: 16pt; margin: 1mm 0 0; }
+  /* 本文：カード（ブラウザの一覧と同じ形） */
+  .lp-body { flex: 1; padding: 7mm 12mm 0; background: #eef1f6; }
+  .lp-meta { display: flex; justify-content: space-between; font-size: 8.5pt; color: #5a6476; margin-bottom: 3mm; }
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 2.6mm 3.5mm; }
+  .card {
+    display: flex; align-items: center; gap: 3mm; background: #fff;
+    border-radius: 2mm; padding: 2mm 2.5mm 2mm 3.5mm; text-decoration: none; color: inherit;
+    border: .3mm solid #dfe4ec; height: 17.5mm;
+  }
+  .card .no { font-size: 8pt; color: #fff; background: #1f3f8f; border-radius: 1mm; padding: .8mm 1.8mm; white-space: nowrap; }
+  .card .t { flex: 1; font-size: 10.5pt; line-height: 1.35; color: #1f3f8f; font-weight: bold; }
+  .card .t::after { content: " ›"; color: #8fa0c8; font-weight: normal; }
+  .card img { width: 13.5mm; height: 13.5mm; image-rendering: pixelated; flex-shrink: 0; }
+  .lp-foot { display: flex; align-items: center; justify-content: space-between; padding: 4mm 12mm 6mm; background: #eef1f6; }
+  .lp-foot .brand { display: flex; align-items: center; gap: 3mm; }
+  .lp-foot .brand .mark { height: 6.5mm; }
+  .lp-foot .brand .name { height: 4mm; }
+  .lp-foot .pg { font-size: 7.5pt; color: #6b7588; }
+  @media print {
+    body { background: #fff; }
+    .lp { margin: 0; box-shadow: none; page-break-after: always; break-after: page; }
+    .lp:last-child { page-break-after: auto; break-after: auto; }
+  }
 </style>
 </head>
 <body>
@@ -33,9 +65,9 @@
   (function () {
     // 公開URL（?base= で上書き可）
     var BASE = new URLSearchParams(location.search).get('base') || 'https://shar19-ops.github.io/shanai-shoshiki-app/';
-    var PER_PAGE = 16;
-    var today = new Date();
-    var dateStr = today.getFullYear() + '年' + (today.getMonth() + 1) + '月' + today.getDate() + '日';
+    var FIRST = 20, PER_PAGE = 26; // 1ページ目はヘッダーが大きいので少なめ
+    var t = new Date();
+    var dateStr = t.getFullYear() + '年' + (t.getMonth() + 1) + '月' + t.getDate() + '日';
 
     function qr(url) {
       var q = qrcode(0, 'M'); q.addData(url); q.make();
@@ -43,34 +75,31 @@
     }
     function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
+    var chunks = [CATALOG.slice(0, FIRST)];
+    for (var i = FIRST; i < CATALOG.length; i += PER_PAGE) chunks.push(CATALOG.slice(i, i + PER_PAGE));
     var root = document.getElementById('pages');
-    var total = Math.ceil(CATALOG.length / PER_PAGE);
-    for (var p = 0; p < total; p++) {
-      var items = CATALOG.slice(p * PER_PAGE, (p + 1) * PER_PAGE);
-      var rows = items.map(function (c) {
+    chunks.forEach(function (items, p) {
+      var cards = items.map(function (c) {
         var url = BASE + 'form.html?id=' + c.id;
-        return '<tr><td class="no">' + esc(c.no) + '</td><td class="t">' + esc(c.title) + '</td>' +
-          '<td class="u"><a href="' + esc(url) + '">' + esc(url) + '</a></td>' +
-          '<td class="q"><img alt="" src="' + qr(url) + '"></td></tr>';
+        // カード全体が書類名のリンク（URLの文字は出さない）
+        return '<a class="card" href="' + esc(url) + '"><span class="no">' + esc(c.no) + '</span>' +
+          '<span class="t">' + esc(c.title) + '</span><img alt="" src="' + qr(url) + '"></a>';
       }).join('');
-      var sheet = document.createElement('div');
-      sheet.className = 'sheet A4 portrait';
-      sheet.innerHTML =
-        '<div class="f-header"><div class="f-head-left">' +
-          '<div class="f-code">一般社内書類</div>' +
-          '<div class="f-title xlong">社内書式アプリ一覧</div>' +
-          '<div class="f-meta"><span>' + dateStr + ' 現在　（' + (p + 1) + ' / ' + total + '）</span></div>' +
-        '</div></div>' +
-        '<div class="sheet-body">' +
-          (p === 0 ? '<p class="lead">各書類名のリンク（またはQRコード）からアプリを開き、入力して「印刷」してください。印刷した書類はこれまでどおり紙で回送します。<br>' +
-            '帳票一覧のトップページ：<a href="' + esc(BASE) + '">' + esc(BASE) + '</a></p>' : '') +
-          '<table class="lst"><colgroup><col style="width:13%"><col style="width:33%"><col><col style="width:15mm"></colgroup>' +
-          '<thead><tr><th>番号</th><th>書類名</th><th>アプリのリンク</th><th>QR</th></tr></thead><tbody>' + rows + '</tbody></table>' +
-        '</div>' +
-        '<div class="f-footer"><div class="brand"><img class="mark" src="assets/logo-mark.jpg" alt=""><img class="name" src="assets/logo-name.png" alt="株式会社 雄電社"></div>' +
-        '<div class="f-ver">社内書式アプリ一覧</div></div>';
-      root.appendChild(sheet);
-    }
+      var band = p === 0
+        ? '<div class="lp-band"><div class="bt"><div class="kicker">一般社内書類</div><h1>社内書式アプリ一覧</h1>' +
+            '<div class="lead">書類名をクリック（またはQRコードを読み取り）すると、入力画面が開きます。<br>' +
+            '入力して「印刷」し、これまでどおり紙で回送してください。</div></div>' +
+            '<a class="top-qr" href="' + esc(BASE) + '"><img alt="" src="' + qr(BASE) + '">帳票一覧<br>トップページ</a></div>'
+        : '<div class="lp-band compact"><div class="bt"><div class="kicker">一般社内書類</div><h1>社内書式アプリ一覧</h1></div></div>';
+      var page = document.createElement('div');
+      page.className = 'lp';
+      page.innerHTML = band +
+        '<div class="lp-body"><div class="lp-meta"><span>' + dateStr + ' 現在　全' + CATALOG.length + '帳票</span><span>' + (p + 1) + ' / ' + chunks.length + '</span></div>' +
+        '<div class="cards">' + cards + '</div></div>' +
+        '<div class="lp-foot"><div class="brand"><img class="mark" src="assets/logo-mark.jpg" alt=""><img class="name" src="assets/logo-name.png" alt="株式会社 雄電社"></div>' +
+        '<div class="pg">' + esc(BASE) + '</div></div>';
+      root.appendChild(page);
+    });
   })();
 </script>
 </body>
