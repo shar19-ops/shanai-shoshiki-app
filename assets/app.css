@@ -276,6 +276,8 @@ table.grid td textarea.inp { height: 100%; }
 .f-footer .brand { display: flex; align-items: center; gap: 3mm; }
 .f-footer .brand .mark { height: 6.5mm; }
 .f-footer .brand .name { height: 4mm; }
+/* ローマ字のロゴタイプ（ホームページの「YUDENSHA」に近い書体） */
+.brand .word { font-family: "Montserrat", "Segoe UI", Arial, sans-serif; font-weight: 800; font-size: 12.5pt; letter-spacing: .07em; color: #1f3f8f; line-height: 1; }
 .f-footer .f-ver { font-size: 7.5pt; color: #666; }
 
 /* ---------- 印刷 ---------- */

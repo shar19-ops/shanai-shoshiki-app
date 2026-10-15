@@ -6,7 +6,7 @@
 <title>社内書式アプリのご案内</title>
 <link rel="icon" href="assets/logo-mark.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Montserrat:wght@800&display=swap">
 <style>
   /* 配布用のご案内（A4縦1枚）。帳票ごとのリンクは載せず、トップページ（帳票一覧）へ飛ぶだけにする。
      → 帳票を追加しても配り直し不要 */
@@ -94,7 +94,7 @@
   .foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 1; }
   .brand { display: flex; align-items: center; gap: 3mm; background: #fff; border-radius: 99px; padding: 1.6mm 5mm; }
   .brand .mark { height: 6.5mm; }
-  .brand .name { height: 4mm; }
+  .brand .word { font-family: "Montserrat", "Segoe UI", Arial, sans-serif; font-weight: 800; font-size: 12.5pt; letter-spacing: .07em; color: #1f3f8f; line-height: 1; }
   .foot .date { font-size: 8pt; opacity: .8; }
 
   @media print {
@@ -161,7 +161,7 @@
   </div>
 
   <div class="foot">
-    <div class="brand"><img class="mark" src="assets/logo-mark.jpg" alt=""><img class="name" src="assets/logo-name.png" alt="株式会社 雄電社"></div>
+    <div class="brand"><img class="mark" src="assets/logo-mark.jpg" alt=""><span class="word" title="株式会社 雄電社">YUDENSHA</span></div>
     <div class="date" id="date"></div>
   </div>
 </div>

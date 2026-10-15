@@ -501,7 +501,8 @@
       h('div', { class: 'f-footer' },
         h('div', { class: 'brand' },
           h('img', { class: 'mark', src: 'assets/logo-mark.jpg', alt: '' }),
-          h('img', { class: 'name', src: 'assets/logo-name.png', alt: '株式会社 雄電社' })),
+          // ロゴタイプはホームページと同じローマ字表記（書体は近いもの：Montserrat ExtraBold）
+          h('span', { class: 'word', title: '株式会社 雄電社' }, 'YUDENSHA')),
         h('div', { class: 'f-ver' }, `${pd.code}　${pd.title}`)));
   }
 
