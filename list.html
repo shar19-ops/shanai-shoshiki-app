@@ -82,20 +82,20 @@
   .step span { font-size: 8.5pt; line-height: 1.5; opacity: .95; }
 
   /* このアプリについて */
-  .about ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 2.2mm 5mm; }
-  .about li { display: flex; gap: 2.5mm; font-size: 9pt; line-height: 1.6; }
+  .about ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 1.6mm 5mm; }
+  .about li { display: flex; gap: 2.5mm; font-size: 9pt; line-height: 1.5; }
   .about .ic { width: 7.5mm; height: 7.5mm; border-radius: 2.2mm; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
   .about .ic svg { width: 4.6mm; height: 4.6mm; }
   .about li b { display: block; font-size: 10pt; color: var(--blue-1); }
 
 
   /* 伝票アプリ（別アプリ）へのリンク。URLの文字は見せない */
-  .slips .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; }
+  .slips .row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2.6mm; }
   .slip { display: flex; align-items: center; justify-content: center; gap: 1.5mm; text-decoration: none; text-align: center;
     background: var(--blue-2); color: #fff; font-weight: 800; font-size: 10.5pt; line-height: 1.3;
     border-radius: 3.5mm; padding: 2mm 2mm; box-shadow: 0 1.2mm 0 var(--blue-1); min-height: 11.5mm; }
   .slip small { display: block; font-size: 8pt; font-weight: 700; opacity: .85; }
-  .slips .manual { margin-left: auto; font-size: 9pt; font-weight: 700; }
+  .slips .manual { margin-left: auto; font-size: 8.5pt; font-weight: 700; color: var(--ink); }
   .slips .manual a { color: var(--blue-2); font-weight: 700; }
 
   /* お知らせ */
@@ -168,11 +168,12 @@
   </div>
 
   <div class="card slips">
-    <h2>伝票アプリ<span class="tag">こちらから開けます</span><span class="manual">📖 <a href="https://shar19-ops.github.io/transfer-slip-app/%E4%BC%9D%E7%A5%A8%E3%83%9E%E3%83%8B%E3%83%A5%E3%82%A2%E3%83%AB.html">操作マニュアル</a></span></h2>
+    <h2>伝票・原価計算書アプリ<span class="tag">こちらから開けます</span><span class="manual">📖 操作マニュアル：<a href="https://shar19-ops.github.io/transfer-slip-app/%E4%BC%9D%E7%A5%A8%E3%83%9E%E3%83%8B%E3%83%A5%E3%82%A2%E3%83%AB.html">伝票</a>／<a href="https://shar19-ops.github.io/genka-webapp/manual.html">原価計算書</a></span></h2>
     <div class="row">
       <a class="slip" href="https://shar19-ops.github.io/transfer-slip-app/%E6%8C%AF%E6%9B%BF%E4%BC%9D%E7%A5%A8.html">振替伝票 ›</a>
       <a class="slip" href="https://shar19-ops.github.io/shiharai-denpyo/%E6%94%AF%E6%89%95%E4%BC%9D%E7%A5%A8%E3%80%90%E4%B8%80%E8%88%AC%E7%AE%A1%E7%90%86%E8%B2%BB%E3%80%91.html"><span>支払伝票 ›<small>一般管理費</small></span></a>
       <a class="slip" href="https://shar19-ops.github.io/payment-slip-app/"><span>支払伝票 ›<small>未成工事用</small></span></a>
+      <a class="slip" href="https://shar19-ops.github.io/genka-webapp/">原価計算書 ›</a>
     </div>
   </div>
 
@@ -194,7 +195,7 @@
     var BASE = new URLSearchParams(location.search).get('base') || 'https://shar19-ops.github.io/shanai-shoshiki-app/';
     // 配布時のお知らせ
     var NOTICES = [
-      '伝票アプリは上のボタンから、その他の社内アプリは別紙「雄電社 社内アプリ一覧」からお使いください。',
+      '伝票・原価計算書アプリは上のボタンから、その他の社内アプリは別紙「雄電社 社内アプリ一覧」からお使いください。',
       'この書式は<em>2027年3月末</em>にて公開を終了する予定です。',
     ];
     var q = qrcode(0, 'M'); q.addData(BASE); q.make();
