@@ -31,6 +31,10 @@
   /* 本文：カード（ブラウザの一覧と同じ形） */
   .lp-body { flex: 1; padding: 7mm 12mm 0; background: #eef1f6; }
   .lp-meta { display: flex; justify-content: space-between; font-size: 8.5pt; color: #5a6476; margin-bottom: 3mm; }
+  /* お知らせ（1ページ目のみ） */
+  .notice { background: #fff; border-left: 1.2mm solid #1f3f8f; border-radius: 1.5mm; padding: 2.2mm 4mm; margin-bottom: 3.5mm; font-size: 9pt; line-height: 1.75; color: #1d2433; }
+  .notice .nt { font-weight: bold; color: #1f3f8f; margin-right: 2mm; }
+  .notice b { color: #b8341b; }
   .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 2.6mm 3.5mm; }
   .card {
     display: flex; align-items: center; gap: 3mm; background: #fff;
@@ -65,7 +69,12 @@
   (function () {
     // 公開URL（?base= で上書き可）
     var BASE = new URLSearchParams(location.search).get('base') || 'https://shar19-ops.github.io/shanai-shoshiki-app/';
-    var FIRST = 20, PER_PAGE = 26; // 1ページ目はヘッダーが大きいので少なめ
+    var FIRST = 18, PER_PAGE = 26; // 1ページ目はヘッダーとお知らせがあるので少なめ
+    // 配布時のお知らせ（1ページ目に表示）
+    var NOTICES = [
+      '伝票については別紙の「雄電社 社内アプリ一覧」からお使いください。',
+      'この書式は<b>2027年3月末</b>にて公開を終了する予定です。',
+    ];
     var t = new Date();
     var dateStr = t.getFullYear() + '年' + (t.getMonth() + 1) + '月' + t.getDate() + '日';
 
@@ -95,6 +104,7 @@
       page.className = 'lp';
       page.innerHTML = band +
         '<div class="lp-body"><div class="lp-meta"><span>' + dateStr + ' 現在　全' + CATALOG.length + '帳票</span><span>' + (p + 1) + ' / ' + chunks.length + '</span></div>' +
+        (p === 0 ? '<div class="notice">' + NOTICES.map(function (n) { return '<div><span class="nt">●</span>' + n + '</div>'; }).join('') + '</div>' : '') +
         '<div class="cards">' + cards + '</div></div>' +
         '<div class="lp-foot"><div class="brand"><img class="mark" src="assets/logo-mark.jpg" alt=""><img class="name" src="assets/logo-name.png" alt="株式会社 雄電社"></div>' +
         '<div class="pg">' + esc(BASE) + '</div></div>';
