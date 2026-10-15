@@ -10,7 +10,7 @@
       { boxes: ['確認', '確認', '確認', '発行'] },
     ],
     blocks: [
-      { type: 'grid', dense: true, rows: [
+      { type: 'grid', dense: true, rowH: 6, rows: [
         [{ label: '会社コード', key: 'code', span: 12, req: true }, { span: 12 }],
         [{ label: '取引先\n概況', span: 2, rs: 9, req: true }, { label: '商号', span: 2, rs: 2 }, { label: 'ｶﾅ', key: 'kana', lw: 2, span: 10 }, { label: '創業', key: 'sogyo', placeholder: '年月', lw: 2, span: 4 }, { label: '設立', key: 'setsuritsu', placeholder: '年月', lw: 2, span: 4 }],
         [{ key: 'shogo', span: 12 }, { span: 8 }],

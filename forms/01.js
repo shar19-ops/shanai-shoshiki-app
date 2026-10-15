@@ -25,8 +25,7 @@
       { type: 'row', items: [
         { type: 'notes', items: ['※ 1週間ごとに回送すること。'] },
         { type: 'grid', w: 45, rows: [
-          [{ label: '内訳', span: 4, rs: 3 }, { label: '交通費', key: 'kotsu', type: 'money', unit: '円', span: 20, lw: 6 }],
-          [{ label: '電話代', key: 'tel', type: 'money', unit: '円', span: 20, lw: 6 }],
+          [{ label: '内訳', span: 4, rs: 2 }, { label: '交通費', key: 'kotsu', type: 'money', unit: '円', span: 20, lw: 6 }],
           [{ label: 'その他', key: 'other', type: 'money', unit: '円', span: 20, lw: 6 }],
         ] },
       ] },

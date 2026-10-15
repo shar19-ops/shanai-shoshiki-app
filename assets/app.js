@@ -338,7 +338,8 @@
       const items = Array.isArray(row) ? row : row.items;
       items.forEach((it) => {
         const rs = it.rs || null;
-        const style = it.h ? `height:${it.h}mm` : '';
+        // 行の高さ：項目ごとの h、なければ表全体の rowH（行間をそろえたいとき）
+        const style = it.h ? `height:${it.h}mm` : b.rowH ? `height:${b.rowH}mm` : '';
         if (it.label != null && it.label !== false) {
           // key も text も無い項目はラベル単独（span 全体がラベル）
           const labelOnly = !it.key && it.text == null;

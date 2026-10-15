@@ -242,6 +242,12 @@ table.grid td textarea.inp { height: 100%; }
 .est-company img { height: 9mm; display: block; margin-bottom: 2mm; }
 .est-addr { font-size: 8.5pt; line-height: 1.6; }
 
+/* 般-25 の★・■注記（原本どおり5列、罫線なし） */
+.flow-notes { font-size: 8.5pt; line-height: 1.65; }
+.flow-notes .fn-star { margin-bottom: 1mm; }
+.flow-notes .fn-cols { display: grid; grid-template-columns: 1fr 1fr 2.3fr 1fr 1.6fr; gap: 0 5mm; }
+.flow-notes .fn-cols > div { white-space: nowrap; }
+
 /* 本文中の文章・注記 */
 .para { font-size: 10pt; line-height: 1.7; margin: 0; white-space: pre-wrap; }
 .notes { font-size: 8pt; line-height: 1.6; margin: 0; padding-left: 0; list-style: none; color: #222; }

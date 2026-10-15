@@ -4,7 +4,7 @@ FORM_DEFS['25'] = {
   meta: [{ label: '作成日', key: 'date', type: 'date' }],
   blocks: [
     {
-      type: 'table', key: 'rows', rows: 12, rowH: 8,
+      type: 'table', key: 'rows', rows: 12, rowH: 7.2,
       columns: [
         { label: 'No', key: 'no', w: 3, rowNo: true },
         { label: '件　名', key: 'subject', w: 16 },
@@ -23,12 +23,17 @@ FORM_DEFS['25'] = {
       ],
     },
     { type: 'notes', items: ['※日付欄は「26/4/1」のように記入。'] },
-    { type: 'grid', dense: true, lalign: 'left', rows: [
-      [{ text: '★作図協力業者リスト＝NET安価業者にて選定' }],
-      [{ text: '■図面枚数・■設計金額・■設計工期 確定後業連発行', span: 6 }, { text: '■業連承認受理後発行 → 設計依頼書と命令書発行', span: 6 },
-        { text: '■取決後発行 → 契約', span: 4 }, { text: '■最終月に担当者と協議　設計料請求', span: 4 }, { text: '■設計済みか？　設計料外注請求書回送済みか？', span: 4 }],
-      [{ text: '※100万円以上＝研究開発費7％必要　※命令書発行時、作図業連（承認版）と工事経費（収入印紙）を添付　※契約用としてなら命令書発行が先' }],
-    ] },
+    // 原本の注記（★・■）を、原本と同じ5列の並び・罫線なしで表示
+    { type: 'custom', render: ({ h }) => h('div', { class: 'flow-notes' },
+      h('div', { class: 'fn-star' }, '★作図協力業者リスト＝NET安価業者にて選定'),
+      h('div', { class: 'fn-cols' }, [
+        ['■図面枚数', '■設計金額', '■設計工期', '　確定後業連発行'],
+        ['■業連承認', '　受理後発行', '　→設計依頼書と', '　　命令書発行'],
+        ['■取決後発行', '　→契約', '※100万円以上＝', '　研究開発費7％必要',
+          '※命令書発行時、作図業連（承認版）と工事経費（収入印紙）を添付', '※契約用としてなら命令書発行が先'],
+        ['■最終月に', '　担当者と協議', '　設計料請求'],
+        ['■設計済みか？', '　設計料外注請求書回送済みか？'],
+      ].map((lines) => h('div', null, lines.map((t) => h('div', null, t)))))) },
     { type: 'spacer' },
   ],
 };
