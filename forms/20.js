@@ -1,5 +1,6 @@
 FORM_DEFS['20'] = {
   code: '般-20', title: '稟議書', subtitle: '（小）',
+  selfStamp: '作成', // 本人欄（デート印を押す欄）
   meta: [{ label: '作成日', key: 'date', type: 'date' }],
   stamps: [{ boxes: ['承認', '役員', '部・店長', '課長', '作成'] }],
   blocks: [

@@ -1,12 +1,12 @@
 // 得意先コード登録（変更）票
 FORM_DEFS['27'] = {
   code: '般-27', title: '得意先コード登録（変更）票',
+  selfStamp: '発行', // 本人欄（デート印を押す欄）
   meta: [{ label: '作成日', key: 'date', type: 'date' }],
+  bottomStamps: ['登録済検印'], // 下部（フッターの上）に置く押印欄
   stamps: [
     { boxes: ['承認', '確認', '確認', '確認', '確認', '発行'] },
-    { boxes: ['登録済検印'], width: 18 },
   ],
-  stampClass: 'small',
   blocks: [
     { type: 'grid', lalign: 'left', lw: 6, rows: [
       [{ label: '登録の区分', key: 'kubun', type: 'select', options: ['1：追加', '2：変更', '3：削除', '4：少額受注の解除'], span: 12 }, { span: 12 }],

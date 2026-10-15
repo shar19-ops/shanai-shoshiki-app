@@ -1,5 +1,6 @@
 FORM_DEFS['06'] = {
   code: '般-06', title: '業務連絡書',
+  selfStamp: '発行', stampDate: 'issued', // 本人欄（デート印）と、その日付に使う項目
   meta: [
     { label: '発行日', key: 'issued', type: 'date' },
     { label: '回答日', key: 'answered', type: 'date' },

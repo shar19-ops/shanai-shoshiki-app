@@ -1,12 +1,12 @@
 // 業態調査依頼書
 FORM_DEFS['30'] = {
   code: '般-30', title: '業態調査依頼書',
+  selfStamp: '発行', // 本人欄（デート印を押す欄）
   meta: [{ label: '作成日', key: 'date', type: 'date' }],
   stamps: [
     { label: '総務部', boxes: ['確認', '確認'] },
     { boxes: ['承認', '確認', '確認', '確認', '発行'] },
   ],
-  stampClass: 'small',
   blocks: [
     { type: 'grid', lw: 5, rows: [
       [{ label: '工　番', key: 'koban', span: 10 }, { label: '件　名', key: 'subject', span: 14, lw: 3 }],

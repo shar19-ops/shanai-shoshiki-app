@@ -1,12 +1,12 @@
 // 請求書作成依頼書
 FORM_DEFS['29'] = {
   code: '般-29', title: '請求書作成依頼書',
+  selfStamp: '依頼者', // 本人欄（デート印を押す欄）
   meta: [
     { label: '請求月', key: 'month', type: 'ym' },
     { label: '作成日', key: 'date', type: 'date' },
   ],
-  stamps: [{ boxes: ['経理部長', '経理部', '工事本部長\nRE部長', '工事部長\n工事長', '工事課長', '依頼者'] }],
-  stampClass: 'small',
+  stamps: [{ boxes: ['経理部長', '経理部', '承認\n工事本部長\nRE部長', '確認\n工事部長\n工事長', '工事課長', '依頼者'] }],
   blocks: [
     { type: 'grid', lw: 6, rows: [
       [{ label: '工　番', key: 'koban', span: 12 }, { label: '件　名', key: 'subject', span: 12, lw: 4 }],

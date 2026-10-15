@@ -9,9 +9,10 @@
 
   FORM_DEFS['48'] = {
     code: '般-48', title: '入札結果報告書',
+    selfStamp: '発行者', // 本人欄（デート印を押す欄）
     meta: [{ label: '報告日', key: 'date', type: 'date' }],
-    stamps: [{ boxes: ['社長', '本店長', '確認', '確認', '発行者'] }, { boxes: ['登録済検印'], width: 18 }],
-    stampClass: 'small',
+    bottomStamps: ['登録済検印'], // 下部（フッターの上）に置く押印欄
+    stamps: [{ boxes: ['社長', '本店長', '確認', '確認', '発行者'] }],
     blocks: [
       { type: 'grid', dense: true, lalign: 'left', lw: 5, rows: [
         [{ label: '営業事業所', key: 'office', type: 'select', options: LISTS.officeCodes, span: 10 }, { label: '見積コード', key: 'mitsuCd', span: 14, lw: 4, placeholder: '物件情報登録済みの場合のみ記入' }],

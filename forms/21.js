@@ -12,13 +12,14 @@
 
   FORM_DEFS['21'] = {
     code: '般-21', title: '積算依頼物件　確認事項',
+    selfStamp: '営業担当', // 本人欄（デート印を押す欄）
     meta: [{ label: '作成日', key: 'date', type: 'date' }],
-    stamps: [{ boxes: ['見積部確認', '営業担当'], width: 18 }],
+    stamps: [{ boxes: ['見積部確認', '営業担当'] }],
     blocks: [
       { type: 'grid', rows: [
         [{ label: '件　名', key: 'subject', span: 14 }, { label: 'ゼネコン', key: 'gc', span: 10 }],
       ] },
-      { type: 'grid', dense: true, lalign: 'left', rows: [
+      { type: 'grid', dense: true, rowH: 6.5, lalign: 'left', rows: [
         [{ label: '項　目', span: 6 }, { label: '確認事項', span: 9 }, { label: '確認', span: 2 }, { label: '備考', span: 7 }],
         row('1. 官庁・民間識別', 'kanmin', { type: 'select', options: ['官庁', '公団', '民間'] }),
         row('2. 建物構造', 'kozo', { suggest: ['RC', 'SRC', 'S造', 'その他'] }),

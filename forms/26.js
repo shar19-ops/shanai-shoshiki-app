@@ -1,12 +1,12 @@
 // 工期・施工部署・工事担当者変更届
 FORM_DEFS['26'] = {
   code: '般-26', title: '工期・施工部署・工事担当者変更届',
+  selfStamp: '発行', // 本人欄（デート印を押す欄）
   meta: [{ label: '作成日', key: 'date', type: 'date' }],
+  bottomStamps: ['登録済検印'], // 下部（フッターの上）に置く押印欄
   stamps: [
-    { boxes: ['本店長', '確認', '承認\n工事本部長\nRE部長/支店長', '確認', '発行'] },
-    { boxes: ['登録済検印'], width: 18 },
+    { boxes: ['本店長', '確認', '承認\n工事本部長\nRE部長\n支店長', '確認', '発行'] },
   ],
-  stampClass: 'small',
   blocks: [
     { type: 'grid', rows: [
       [{ label: '事業所', key: 'office', type: 'select', options: LISTS.officeCodes, span: 10 }, { span: 14 }],

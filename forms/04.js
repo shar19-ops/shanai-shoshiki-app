@@ -1,5 +1,6 @@
 FORM_DEFS['04'] = {
   code: '般-04', title: '物品購入要求書',
+  selfStamp: '要求者', // 本人欄（デート印を押す欄）
   meta: [
     { label: '作成日', key: 'date', type: 'date' },
     { label: '事業所名', key: 'office', type: 'select', options: LISTS.offices, default: '本店', w: 32 },

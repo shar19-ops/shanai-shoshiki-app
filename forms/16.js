@@ -12,10 +12,12 @@
 
   FORM_DEFS['16'] = {
     code: '般-16', title: '設計依頼登録メモ',
+    selfStamp: '発行者', // 本人欄（デート印を押す欄）
     meta: [{ label: '依頼日', key: 'date', type: 'date' }],
-    stamps: [{ boxes: ['確認', '確認', '発行者'] }, { boxes: ['登録済検印'], width: 18 }],
+    bottomStamps: ['登録済検印'], // 下部（フッターの上）に置く押印欄
+    stamps: [{ boxes: ['確認', '確認', '発行者'] }],
     blocks: [
-      { type: 'grid', dense: true, lalign: 'left', lw: 5, rows: [
+      { type: 'grid', dense: true, rowH: 6.2, lalign: 'left', lw: 5, rows: [
         [{ label: '営業事業所', key: 'office', type: 'select', options: LISTS.officeCodes, span: 8 },
           { label: '見積物件コード', key: 'mitsuCd', span: 8, lw: 4 }, { label: '関連物件コード', key: 'relCd', span: 8, lw: 4 }],
         [{ label: '関連物件名称', key: 'relName', span: 24 }],

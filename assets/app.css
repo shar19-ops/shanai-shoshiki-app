@@ -69,8 +69,9 @@ body {
   margin: 1mm 0 2mm;
   padding-bottom: 1.5mm;
   border-bottom: 3px double var(--line);
-  display: inline-block; min-width: 70mm;
+  display: inline-block; min-width: min(70mm, 100%); white-space: nowrap;
 }
+/* 配布用一覧（list.html）用。帳票画面では app.js の fitTitles が自動で縮める */
 .f-title.long { font-size: 17pt; letter-spacing: .15em; }
 .f-title.xlong { font-size: 15pt; letter-spacing: .05em; }
 .f-sub { font-size: 9pt; margin-left: .5em; letter-spacing: 0; font-weight: normal; }
@@ -97,9 +98,40 @@ body {
   background: var(--label-bg); border-bottom: 1px solid var(--line);
   letter-spacing: .05em;
 }
-.stamp-box .sb-area { height: 16mm; }
-.stamps.small .stamp-box { width: 14mm; }
-.stamps.small .stamp-box .sb-area { height: 14mm; }
+.bottom-stamps { display: flex; justify-content: flex-end; align-items: flex-end; gap: 4mm; margin-top: 3mm; }
+.bottom-stamps .notes { flex: 1; }
+.stamp-box .sb-label.tight { font-size: 6.5pt; letter-spacing: 0; }
+.stamp-box .sb-area { height: 16mm; position: relative; }
+/* 兼務の役職名（工事本部長・RE部長・支店長など）は押印部に薄く印字 */
+.stamp-box .sb-roles {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  text-align: center; font-size: 6.5pt; line-height: 1.45; color: #b3bac6; pointer-events: none;
+}
+/* 本人欄のデート印 */
+/* 印の大きさは全帳票共通（標準の押印欄に合わせて直径14.4mm）。小さい欄でははみ出してよい */
+.self-stamp { display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: visible; }
+.self-stamp:hover { background: #f3f6fc; }
+.self-stamp svg { width: 14.4mm; height: 14.4mm; flex-shrink: 0; display: block; overflow: visible; position: relative; z-index: 1; }
+/* 本文中の「氏名［　］印」欄 */
+table.grid td.stamp-cell { position: relative; overflow: visible; }
+table.grid td.stamp-cell .self-stamp { position: absolute; inset: 0; }
+.stamp-mark { font-size: 9pt; }
+.self-hint { font-size: 6.5pt; color: #8a94a6; text-align: center; line-height: 1.3; }
+.stamp-dialog { border: 0; border-radius: 8px; padding: 18px 20px; width: min(460px, calc(100vw - 32px)); box-shadow: 0 8px 30px rgba(0,0,0,.3); font-family: var(--font); }
+.stamp-dialog::backdrop { background: rgba(0,0,0,.35); }
+.stamp-dialog h3 { margin: 0 0 6px; font-size: 12pt; }
+.stamp-dialog .sd-note { margin: 0 0 12px; font-size: 9pt; color: #555; line-height: 1.6; }
+.stamp-dialog .sd-body { display: flex; gap: 16px; align-items: center; }
+.stamp-dialog .sd-fields { flex: 1; display: flex; flex-direction: column; gap: 9px; font-size: 10pt; }
+.stamp-dialog .sd-fields > label { display: flex; align-items: center; gap: 8px; }
+.stamp-dialog input[type=text], .stamp-dialog select { font: inherit; padding: 4px 6px; border: 1px solid #b8bfcc; border-radius: 4px; flex: 1; }
+.stamp-dialog .sd-colors { display: flex; gap: 12px; align-items: center; }
+.stamp-dialog .sd-colors label { display: flex; align-items: center; gap: 4px; }
+.stamp-dialog .sd-prev { width: 96px; height: 96px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: 1px solid #e0e6ef; border-radius: 6px; background: #fafcff; }
+.stamp-dialog .sd-prev svg { width: 84px; height: 84px; }
+.stamp-dialog .sd-empty { font-size: 8pt; color: #999; text-align: center; }
+.stamp-dialog .sd-btns { display: flex; justify-content: flex-end; margin-top: 14px; }
+.stamp-dialog .sd-btns button { font: inherit; padding: 6px 18px; border-radius: 4px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
 
 /* ---------- 項目表（ラベル＋入力） ---------- */
 table.grid {
@@ -209,6 +241,12 @@ table.grid td textarea.inp { height: 100%; }
 .est-company { align-self: flex-end; width: 92mm; }
 .est-company img { height: 9mm; display: block; margin-bottom: 2mm; }
 .est-addr { font-size: 8.5pt; line-height: 1.6; }
+
+/* 般-25 の★・■注記（原本どおり5列、罫線なし） */
+.flow-notes { font-size: 8.5pt; line-height: 1.65; }
+.flow-notes .fn-star { margin-bottom: 1mm; }
+.flow-notes .fn-cols { display: grid; grid-template-columns: 1fr 1fr 2.3fr 1fr 1.6fr; gap: 0 5mm; }
+.flow-notes .fn-cols > div { white-space: nowrap; }
 
 /* 本文中の文章・注記 */
 .para { font-size: 10pt; line-height: 1.7; margin: 0; white-space: pre-wrap; }

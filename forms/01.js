@@ -3,6 +3,7 @@
   const DOW = ['月', '火', '水', '木', '金', '土', '日'];
   FORM_DEFS['01'] = {
     code: '般-01', title: '営業活動報告書', subtitle: '（行先・経費）',
+    selfStamp: '発行', // 本人欄（デート印を押す欄）
     meta: [
       { label: '週の開始日（月）', key: 'week', type: 'date' },
       { label: '氏名', key: 'name', w: 40 },
@@ -24,8 +25,7 @@
       { type: 'row', items: [
         { type: 'notes', items: ['※ 1週間ごとに回送すること。'] },
         { type: 'grid', w: 45, rows: [
-          [{ label: '内訳', span: 4, rs: 3 }, { label: '交通費', key: 'kotsu', type: 'money', unit: '円', span: 20, lw: 6 }],
-          [{ label: '電話代', key: 'tel', type: 'money', unit: '円', span: 20, lw: 6 }],
+          [{ label: '内訳', span: 4, rs: 2 }, { label: '交通費', key: 'kotsu', type: 'money', unit: '円', span: 20, lw: 6 }],
           [{ label: 'その他', key: 'other', type: 'money', unit: '円', span: 20, lw: 6 }],
         ] },
       ] },

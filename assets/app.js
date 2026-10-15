@@ -210,29 +210,113 @@
     return box;
   }
 
+  // ---------- 本人欄のデート印 ----------
+  // 苗字・役職・色の設定は全帳票共通で1つだけ持つ。押すのは def.selfStamp の欄だけ（承認欄などは手押し）。
+  const STAMP_KEY = STORE_PREFIX + '_stamp';
+  const TITLES = ['', '副長', '課長', '工事長', '支店長', '部長', '本部長', '取締役', '常務', '本店長'];
+  // 伝票アプリと同じ：課長以下は黒、工事長以上は朱
+  const TITLE_COLOR = { '': 'black', '副長': 'black', '課長': 'black' };
+  const STAMP_DEFAULT = { enabled: true, sei: '', title: '', color: 'black', office: '' };
+  let stampCfg = { ...STAMP_DEFAULT };
+  try { stampCfg = { ...STAMP_DEFAULT, ...JSON.parse(localStorage.getItem(STAMP_KEY) || '{}') }; } catch (e) { /* 既定値のまま */ }
+
+  function saveStampCfg() {
+    try { localStorage.setItem(STAMP_KEY, JSON.stringify(stampCfg)); } catch (e) { /* noop */ }
+    renderSelfStamps();
+  }
+  // 日付は帳票の作成日・発行日（def.stampDate、既定 'date'）。未入力なら今日。
+  function stampDate() {
+    const iso = values[def.stampDate || 'date'];
+    if (/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) { const [y, m, d] = iso.split('-').map(Number); return { year: y, month: m, day: d }; }
+    return new Date();
+  }
+  function stampSvg() {
+    const c = stampCfg;
+    if (!c.enabled || !c.sei) return '';
+    // 役職なし：苗字を上下に分割／役職あり：上に苗字・下に役職／支店長：上に事業所名（「支店」を除く）
+    const names = c.title === '支店長' ? { nameTop: (values.office || c.office || '').replace(/支店$/, ''), nameBottom: '支店長' }
+      : c.title ? { nameTop: c.sei, nameBottom: c.title } : { name: c.sei };
+    return DateStamp.svg({ ...names, date: stampDate(), color: c.color });
+  }
+  function renderSelfStamps() {
+    const svg = stampSvg();
+    document.querySelectorAll('.self-stamp').forEach((el) => {
+      el.innerHTML = svg || (el.dataset.empty === '印' ? '<span class="stamp-mark">印</span>' : '<span class="self-hint no-print">クリックで<br>押印設定</span>');
+    });
+  }
+
+  function openStampDialog() {
+    const prev = h('div', { class: 'sd-prev' });
+    const upd = () => { prev.innerHTML = stampSvg() || '<span class="sd-empty">苗字を入れると<br>表示されます</span>'; };
+    const set = (k, v) => { stampCfg[k] = v; saveStampCfg(); upd(); };
+    const colors = ['black', 'red'].map((c) => h('input', { type: 'radio', name: 'sd_color', value: c, checked: stampCfg.color === c, onchange: () => set('color', c) }));
+    const officeRow = h('label', { style: stampCfg.title === '支店長' ? '' : 'display:none' }, '事業所',
+      h('select', { onchange: (e) => set('office', e.target.value) },
+        LISTS.offices.filter((o) => o !== '本店').map((o) => h('option', { value: o, selected: o === stampCfg.office }, o))));
+    const dlg = h('dialog', { class: 'stamp-dialog' }, h('form', { method: 'dialog' },
+      h('h3', null, '押印設定（本人欄のデート印）'),
+      h('p', { class: 'sd-note' }, '全帳票共通の設定です（このPCのブラウザにだけ保存）。日付は帳票の作成日・発行日、未入力なら今日の日付になります。承認・確認欄には押されません。'),
+      h('div', { class: 'sd-body' },
+        h('div', { class: 'sd-fields' },
+          h('label', null, h('input', { type: 'checkbox', checked: stampCfg.enabled, onchange: (e) => set('enabled', e.target.checked) }), 'デート印を表示する'),
+          h('label', null, '苗字', h('input', { type: 'text', value: stampCfg.sei, maxlength: 4, placeholder: '例：佐藤', oninput: (e) => set('sei', e.target.value.trim()) })),
+          h('label', null, '役職', h('select', { onchange: (e) => {
+            const t = e.target.value;
+            stampCfg.color = TITLE_COLOR[t] || 'red';
+            colors.forEach((r) => { r.checked = r.value === stampCfg.color; });
+            if (t === '支店長' && !stampCfg.office) stampCfg.office = LISTS.offices[1];
+            officeRow.style.display = t === '支店長' ? '' : 'none';
+            set('title', t);
+          } }, TITLES.map((t) => h('option', { value: t, selected: t === stampCfg.title }, t || '（なし）')))),
+          officeRow,
+          h('div', { class: 'sd-colors' }, '色', h('label', null, colors[0], '黒'), h('label', null, colors[1], '朱（赤）'))),
+        prev),
+      h('div', { class: 'sd-btns' }, h('button', { value: 'close', class: 'primary' }, '閉じる'))));
+    dlg.addEventListener('close', () => dlg.remove());
+    document.body.append(dlg);
+    dlg.showModal();
+    upd();
+  }
+
   // ---------- ヘッダー ----------
   function stampsEl(groups, cls) {
     if (!groups || !groups.length) return null;
     // 文字列配列だけなら1グループ扱い
     if (typeof groups[0] === 'string') groups = [{ boxes: groups }];
-    return h('div', { class: 'stamps ' + (cls || '') },
-      groups.map((g) => {
-        // 役職名が複数行のときはグループ内のラベル高さを揃える
-        const lines = Math.max(1, ...g.boxes.map((b) => String(b).split('\n').length));
-        const lh = lines > 1 ? `height:${lines * 2.8 + 1.2}mm;line-height:2.8mm;padding-top:.6mm;font-size:6.5pt;letter-spacing:0` : '';
-        return h('div', { class: 'stamp-group' },
-          g.label ? h('div', { class: 'sg-label' }, g.label) : null,
-          g.boxes.map((b) => h('div', { class: 'stamp-box', style: g.width ? `width:${g.width}mm` : '' },
-            h('div', { class: 'sb-label', style: lh }, ...String(b).split('\n').flatMap((x, i) => (i ? [h('br'), x] : [x]))),
-            h('div', { class: 'sb-area' }))));
-      }));
+    // 枠の大きさは全帳票共通。'承認\n工事本部長\nRE部長' のように2行目以降があれば、
+    // 1行目を見出し、残り（兼務の役職名）を押印部に薄く印字する。
+    return h('div', { class: 'stamps' + (cls ? ' ' + cls : '') },
+      groups.map((g) => h('div', { class: 'stamp-group' },
+        g.label ? h('div', { class: 'sg-label' }, g.label) : null,
+        g.boxes.map((b) => {
+          const [head, ...roles] = String(b).split('\n');
+          const self = def && def.selfStamp === head;
+          return h('div', { class: 'stamp-box' },
+            h('div', { class: 'sb-label' + (head.length >= 6 ? ' tight' : '') }, head),
+            h('div', self ? { class: 'sb-area self-stamp', title: 'クリックで押印設定', onclick: openStampDialog } : { class: 'sb-area' },
+              roles.length ? h('div', { class: 'sb-roles' }, roles.flatMap((r, i) => (i ? [h('br'), r] : [r]))) : null));
+        }))));
+  }
+
+  // タイトルが押印欄とぶつかるときは、1行に収まるまで文字を縮める
+  function fitTitles() {
+    document.querySelectorAll('.f-title').forEach((el) => {
+      const box = el.parentElement;
+      let pt = 20;
+      el.style.fontSize = ''; el.style.letterSpacing = '';
+      while (el.scrollWidth > box.clientWidth && pt > 11) {
+        pt -= 0.5;
+        el.style.fontSize = pt + 'pt';
+        el.style.letterSpacing = pt < 16 ? '.04em' : '.15em';
+      }
+    });
   }
 
   function headerEl(d) {
     return h('div', { class: 'f-header' },
       h('div', { class: 'f-head-left' },
         h('div', { class: 'f-code' }, d.code),
-        h('div', { class: 'f-title' + (d.title.length >= 14 ? ' xlong' : d.title.length >= 10 ? ' long' : '') }, d.title, d.subtitle ? h('span', { class: 'f-sub' }, d.subtitle) : null),
+        h('div', { class: 'f-title' }, d.title, d.subtitle ? h('span', { class: 'f-sub' }, d.subtitle) : null),
         d.meta ? h('div', { class: 'f-meta' }, d.meta.map((m) => h('div', { class: 'm-item' },
           h('span', { class: 'm-label' }, m.label),
           h('span', { class: 'm-val', style: m.w ? `min-width:${m.w}mm` : '' }, field(m))))) : null),
@@ -254,7 +338,8 @@
       const items = Array.isArray(row) ? row : row.items;
       items.forEach((it) => {
         const rs = it.rs || null;
-        const style = it.h ? `height:${it.h}mm` : '';
+        // 行の高さ：項目ごとの h、なければ表全体の rowH（行間をそろえたいとき）
+        const style = it.h ? `height:${it.h}mm` : b.rowH ? `height:${b.rowH}mm` : '';
         if (it.label != null && it.label !== false) {
           // key も text も無い項目はラベル単独（span 全体がラベル）
           const labelOnly = !it.key && it.text == null;
@@ -272,6 +357,10 @@
     return wrapTitle(b, tbl);
   }
   function valueCell(it, span, rs, style) {
+    if (it.stampCell) {
+      return h('td', { class: 'stamp-cell', colspan: span, rowspan: rs, style },
+        h('div', { class: 'self-stamp', 'data-empty': '印', title: 'クリックで押印設定', onclick: openStampDialog }));
+    }
     if (it.text != null && !it.key) return h('td', { class: it.note ? 'note' : 'txt', colspan: span, rowspan: rs, style: style + (it.align ? `;text-align:${it.align}` : '') }, it.text);
     if (!it.key) return h('td', { colspan: span, rowspan: rs, style });
     return h('td', { colspan: span, rowspan: rs, style }, field(it));
@@ -356,7 +445,7 @@
     addressee: (b) => h('div', { class: 'addressee', style: b.style || '' }, b.lines.map((l) => h('div', null, l))),
     spacer: () => h('div', { class: 'spacer' }),
     stamps: (b) => h('div', { class: 'inline-stamps', style: b.align === 'right' ? 'justify-content:flex-end' : '' },
-      h('div', null, b.title ? h('div', { class: 'is-title' }, b.title) : null, stampsEl(b.groups, 'small'))),
+      h('div', null, b.title ? h('div', { class: 'is-title' }, b.title) : null, stampsEl(b.groups))),
     row: (b) => h('div', { style: `display:flex;gap:${b.gap ?? 4}mm;align-items:${b.align || 'stretch'}` },
       b.items.map((x) => h('div', { style: x.w ? `width:${x.w}%;flex-shrink:0` : 'flex:1' }, renderBlock(x)))),
     custom: (b) => b.render({ h, field, values, setVal }),
@@ -372,9 +461,20 @@
     const paper = page.paper || d.paper || 'A4';
     const orient = page.orientation || d.orientation || 'portrait';
     const pd = { ...d, ...page };
+    let blocks = page.blocks, bottom = null;
+    // 登録済検印など下部に置く押印欄（最後のページのみ）。
+    // 末尾が注意書き（後ろは余白だけ）なら、その横に並べて縦の段を増やさない。
+    if (pd.bottomStamps && page === (d.pages || [page]).slice(-1)[0]) {
+      let i = blocks.length - 1;
+      while (i >= 0 && blocks[i].type === 'spacer') i--;
+      const notes = i >= 0 && blocks[i].type === 'notes' ? blocks[i] : null;
+      if (notes) blocks = [...blocks.slice(0, i), ...blocks.slice(i + 1)];
+      bottom = h('div', { class: 'bottom-stamps' }, notes ? renderBlock(notes) : null, stampsEl(pd.bottomStamps));
+    }
     return h('div', { class: `sheet ${paper} ${orient}` },
       headerEl(pd),
-      h('div', { class: 'sheet-body' }, page.blocks.map(renderBlock)),
+      h('div', { class: 'sheet-body' }, blocks.map(renderBlock)),
+      bottom,
       h('div', { class: 'f-footer' },
         h('div', { class: 'brand' },
           h('img', { class: 'mark', src: 'assets/logo-mark.jpg', alt: '' }),
@@ -405,10 +505,14 @@
         try { localStorage.removeItem(storeKey); } catch (e) { /* noop */ }
         location.reload();
       } }, 'クリア'),
+      def.selfStamp ? h('button', { onclick: openStampDialog }, '押印設定') : null,
       h('button', { class: 'primary', onclick: () => window.print() }, '印刷')));
     const pages = def.pages || [{ blocks: def.blocks }];
     pages.forEach((p) => root.append(sheetEl(def, p)));
+    if (def.selfStamp) calcs.push(renderSelfStamps); // 日付の入力に追従
     recalc();
+    fitTitles();
+    if (document.fonts) document.fonts.ready.then(fitTitles);
   }
 
   window.ShoshikiApp = { boot, version: APP_VERSION, toNum, fmtNum };
