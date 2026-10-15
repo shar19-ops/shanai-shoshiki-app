@@ -199,6 +199,10 @@ textarea.inp.plain { background-image: none; line-height: 1.5; }
 .date-wrap { display: flex; align-items: center; height: 100%; }
 .date-wrap input[type=date] { flex: 1; }
 .pv { display: none; }
+/* 期間（日付〜日付） */
+.range-wrap { display: flex; align-items: center; height: 100%; }
+.range-wrap .date-wrap { flex: 1; }
+.range-sep { padding: 0 1.5mm; }
 table.grid .date-wrap .pv { text-align: right; font-size: 9.5pt; }
 
 /* チェック選択（□ 選択肢） */
