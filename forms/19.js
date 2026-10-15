@@ -9,7 +9,7 @@ FORM_DEFS['19'] = {
   blocks: [
     { type: 'grid', rows: [
       [{ label: '受付No', key: 'recvNo', span: 8 }, { label: '受付日', key: 'recvDate', type: 'date', span: 8 }, { label: '決裁No', key: 'no', span: 8, prefix: '第', unit: '号' }],
-      [{ label: '決裁日', key: 'decided', type: 'date', span: 8 }, { label: '起案部署', key: 'dept', span: 8 }, { label: '起案者', key: 'author', span: 6 }, { text: '印', span: 2, align: 'center' }],
+      [{ label: '決裁日', key: 'decided', type: 'date', span: 8 }, { label: '起案部署', key: 'dept', span: 7, lw: 3 }, { label: '起案者', key: 'author', span: 9, lw: 3, unit: '印' }],
       [{ label: '添付書類', key: 'attach' }],
       [{ label: '件　名', key: 'subject', h: 10 }],
     ] },

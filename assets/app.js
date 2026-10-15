@@ -100,6 +100,22 @@
 
     if (type === 'image') return imageField(f);
 
+    // 期間（日付〜日付、kind: 'time' なら時刻〜時刻）を1つの欄に。間に縦罫線を入れない
+    // dow: true なら日付の後ろに曜日（例：（木））を自動表示
+    if (type === 'daterange') {
+      const kind = f.kind || 'date';
+      const part = (k) => {
+        const parts = [field({ key: k, type: kind })];
+        if (f.dow) {
+          const w = h('span', { class: 'range-dow' });
+          calcs.push(() => { const iso = values[k]; w.textContent = iso ? '（' + '日月火水木金土'[new Date(iso + 'T00:00').getDay()] + '）' : '（　）'; });
+          parts.push(w);
+        }
+        return parts;
+      };
+      return h('div', { class: 'range-wrap' }, ...part(key), h('span', { class: 'range-sep' }, '〜'), ...part(f.key2));
+    }
+
     if (type === 'checks' || type === 'radio') {
       const multi = type === 'checks';
       const cur = new Set(multi ? (Array.isArray(v) ? v : []) : [v]);
@@ -125,10 +141,17 @@
     }
 
     if (type === 'select') {
-      el = h('select', { class: 'inp' + (f.align === 'center' ? ' center' : ''), onchange: (e) => setVal(key, e.target.value) },
-        h('option', { value: '' }, ''),
-        // options は 'A' または ['値', '表示名']
-        f.options.map((o) => { const [ov, ol] = Array.isArray(o) ? o : [o, o]; return h('option', { value: ov, selected: ov === v }, ol); }));
+      // options は 'A' または ['値', '表示名']。codeOnly なら選んだ後は値（コード）だけを表示し、一覧を開いたときだけ表示名を出す
+      const opts = f.options.map((o) => (Array.isArray(o) ? o : [o, o]));
+      const labels = (full) => [...el.options].slice(1).forEach((op, i) => { op.textContent = full ? opts[i][1] : opts[i][0]; });
+      el = h('select', {
+        class: 'inp' + (f.align === 'center' ? ' center' : ''),
+        onchange: (e) => { setVal(key, e.target.value); if (f.codeOnly) labels(false); },
+        onmousedown: f.codeOnly ? () => labels(true) : null,
+        onkeydown: f.codeOnly ? () => labels(true) : null,
+        onblur: f.codeOnly ? () => labels(false) : null,
+      }, h('option', { value: '' }, ''), opts.map(([ov, ol]) => h('option', { value: ov, selected: ov === v }, f.codeOnly ? ov : ol)));
+      if (f.codeOnly) window.addEventListener('beforeprint', () => labels(false)); // 印刷は必ずコードだけ
     } else if (type === 'textarea') {
       const lines = f.lines || 4;
       el = h('textarea', {
@@ -139,7 +162,7 @@
       });
       el.value = v;
     } else if (type === 'calc') {
-      el = h('input', { class: 'inp num calc', readonly: true, tabindex: -1 });
+      el = h('input', { class: 'inp calc' + (f.align === 'left' ? '' : ' num'), readonly: true, tabindex: -1 });
       if (f.align === 'center') el.classList.add('center');
       calcs.push(() => {
         const n = f.calc(getNum, values);
