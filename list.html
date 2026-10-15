@@ -4,7 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>社内書式アプリのご案内</title>
-<link rel="icon" href="assets/logo-mark.jpg">
+<link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1f3f8f">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Montserrat:wght@800&display=swap">
 <style>
@@ -31,7 +35,7 @@
     position: relative; overflow: hidden;
     width: 210mm; height: 297mm; margin: 16px auto; padding: 14mm 14mm 10mm;
     background: linear-gradient(160deg, var(--blue-1) 0%, var(--blue-2) 30%, var(--blue-3) 72%, var(--blue-4) 100%);
-    color: #fff; display: flex; flex-direction: column; gap: 5mm;
+    color: #fff; display: flex; flex-direction: column; gap: 4mm;
     box-shadow: 0 2px 10px rgba(0,0,0,.25);
   }
   /* 背景の水玉（ポップな飾り） */
@@ -47,18 +51,18 @@
   .head { position: relative; z-index: 1; }
   .kicker { display: inline-block; font-size: 9.5pt; font-weight: 700; letter-spacing: .12em;
     background: rgba(255,255,255,.16); border-radius: 99px; padding: 1.2mm 4mm; }
-  h1 { margin: 3.5mm 0 1.5mm; font-size: 36pt; font-weight: 800; letter-spacing: .06em; line-height: 1.15; }
+  h1 { margin: 2.5mm 0 1mm; font-size: 32pt; font-weight: 800; letter-spacing: .06em; line-height: 1.15; }
   h1 .hl { color: var(--pop); }
   .catch { font-size: 13pt; font-weight: 700; opacity: .95; }
 
-  .card { position: relative; z-index: 1; background: #fff; color: var(--ink); border-radius: 6mm; padding: 5mm 6mm;
+  .card { position: relative; z-index: 1; background: #fff; color: var(--ink); border-radius: 6mm; padding: 4mm 6mm;
     box-shadow: 0 2.5mm 0 rgba(10,25,70,.25); }
   .card h2 { margin: 0 0 3mm; font-size: 13pt; font-weight: 800; color: var(--blue-2); display: flex; align-items: center; gap: 2.5mm; }
   .card h2 .tag { font-size: 8.5pt; color: var(--blue-2); background: #e6eeff; border-radius: 99px; padding: .6mm 3mm; font-weight: 700; }
 
   /* アプリを開く（QR＋ボタン） */
   .open { display: flex; align-items: center; gap: 7mm; }
-  .open .qr { width: 40mm; height: 40mm; padding: 2mm; border-radius: 3mm; border: .8mm solid #e6eeff; flex-shrink: 0; }
+  .open .qr { width: 34mm; height: 34mm; padding: 2mm; border-radius: 3mm; border: .8mm solid #e6eeff; flex-shrink: 0; }
   .open .qr img { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
   .open .txt { flex: 1; }
   .open .lead { font-size: 10.5pt; line-height: 1.7; margin: 0 0 3.5mm; }
@@ -69,25 +73,35 @@
 
   /* 使い方3ステップ */
   .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; position: relative; z-index: 1; }
-  .step { background: rgba(255,255,255,.14); border: .4mm solid rgba(255,255,255,.35); border-radius: 5mm; padding: 4mm 4mm 3.5mm; }
+  .step { background: rgba(255,255,255,.14); border: .4mm solid rgba(255,255,255,.35); border-radius: 5mm; padding: 2.6mm 3.5mm; display: flex; gap: 2.5mm; align-items: flex-start; }
   .step .n { width: 9mm; height: 9mm; border-radius: 50%; background: var(--pop); color: var(--blue-1);
-    font-weight: 800; font-size: 12pt; display: flex; align-items: center; justify-content: center; margin-bottom: 2mm; }
+    font-weight: 800; font-size: 12pt; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .step:nth-child(2) .n { background: var(--mint); }
   .step:nth-child(3) .n { background: var(--pop-2); color: #fff; }
-  .step b { display: block; font-size: 12pt; margin-bottom: 1mm; }
-  .step span { font-size: 9pt; line-height: 1.6; opacity: .95; }
+  .step b { display: block; font-size: 11pt; margin-bottom: .5mm; }
+  .step span { font-size: 8.5pt; line-height: 1.5; opacity: .95; }
 
   /* このアプリについて */
-  .about ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 3mm 5mm; }
-  .about li { display: flex; gap: 2.5mm; font-size: 9pt; line-height: 1.6; }
+  .about ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 1.6mm 5mm; }
+  .about li { display: flex; gap: 2.5mm; font-size: 9pt; line-height: 1.5; }
   .about .ic { width: 7.5mm; height: 7.5mm; border-radius: 2.2mm; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
   .about .ic svg { width: 4.6mm; height: 4.6mm; }
   .about li b { display: block; font-size: 10pt; color: var(--blue-1); }
 
+
+  /* 伝票アプリ（別アプリ）へのリンク。URLの文字は見せない */
+  .slips .row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2.6mm; }
+  .slip { display: flex; align-items: center; justify-content: center; gap: 1.5mm; text-decoration: none; text-align: center;
+    background: var(--blue-2); color: #fff; font-weight: 800; font-size: 10.5pt; line-height: 1.3;
+    border-radius: 3.5mm; padding: 2mm 2mm; box-shadow: 0 1.2mm 0 var(--blue-1); min-height: 11.5mm; }
+  .slip small { display: block; font-size: 8pt; font-weight: 700; opacity: .85; }
+  .slips .manual { margin-left: auto; font-size: 8.5pt; font-weight: 700; color: var(--ink); }
+  .slips .manual a { color: var(--blue-2); font-weight: 700; }
+
   /* お知らせ */
   .notice { background: var(--pop); color: var(--blue-1); }
-  .notice h2 { color: var(--blue-1); }
-  .notice ul { margin: 0; padding-left: 5mm; font-size: 10pt; line-height: 1.75; font-weight: 700; }
+  .notice h2 { color: var(--blue-1); margin-bottom: 1.5mm; }
+  .notice ul { margin: 0; padding-left: 5mm; font-size: 9.5pt; line-height: 1.65; font-weight: 700; }
   .notice em { font-style: normal; background: #fff; border-radius: 1.5mm; padding: 0 1.5mm; color: #c8341b; }
 
   .foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 1; }
@@ -130,9 +144,9 @@
   </div>
 
   <div class="steps">
-    <div class="step"><div class="n">1</div><b>開く</b><span>帳票一覧から書類を選ぶ</span></div>
-    <div class="step"><div class="n">2</div><b>入力</b><span>入力内容は自動で下書き保存。日付・合計などは自動計算</span></div>
-    <div class="step"><div class="n">3</div><b>印刷して回送</b><span>「印刷」で出力し、これまでどおり紙で回送・押印</span></div>
+    <div class="step"><div class="n">1</div><div><b>開く</b><span>帳票一覧から書類を選ぶ</span></div></div>
+    <div class="step"><div class="n">2</div><div><b>入力</b><span>自動で下書き保存。合計などは自動計算</span></div></div>
+    <div class="step"><div class="n">3</div><div><b>印刷して回送</b><span>これまでどおり紙で回送・押印</span></div></div>
   </div>
 
   <div class="card about">
@@ -153,6 +167,16 @@
     </ul>
   </div>
 
+  <div class="card slips">
+    <h2>伝票・原価計算書アプリ<span class="tag">こちらから開けます</span><span class="manual">📖 操作マニュアル：<a href="https://shar19-ops.github.io/transfer-slip-app/%E4%BC%9D%E7%A5%A8%E3%83%9E%E3%83%8B%E3%83%A5%E3%82%A2%E3%83%AB.html">伝票</a>／<a href="https://shar19-ops.github.io/genka-webapp/manual.html">原価計算書</a></span></h2>
+    <div class="row">
+      <a class="slip" href="https://shar19-ops.github.io/transfer-slip-app/%E6%8C%AF%E6%9B%BF%E4%BC%9D%E7%A5%A8.html">振替伝票 ›</a>
+      <a class="slip" href="https://shar19-ops.github.io/shiharai-denpyo/%E6%94%AF%E6%89%95%E4%BC%9D%E7%A5%A8%E3%80%90%E4%B8%80%E8%88%AC%E7%AE%A1%E7%90%86%E8%B2%BB%E3%80%91.html"><span>支払伝票 ›<small>一般管理費</small></span></a>
+      <a class="slip" href="https://shar19-ops.github.io/payment-slip-app/"><span>支払伝票 ›<small>未成工事用</small></span></a>
+      <a class="slip" href="https://shar19-ops.github.io/genka-webapp/">原価計算書 ›</a>
+    </div>
+  </div>
+
   <div class="card notice">
     <h2>お知らせ</h2>
     <ul id="notices"></ul>
@@ -171,7 +195,7 @@
     var BASE = new URLSearchParams(location.search).get('base') || 'https://shar19-ops.github.io/shanai-shoshiki-app/';
     // 配布時のお知らせ
     var NOTICES = [
-      '伝票については別紙の「雄電社 社内アプリ一覧」からお使いください。',
+      '伝票・原価計算書アプリは上のボタンから、その他の社内アプリは別紙「雄電社 社内アプリ一覧」からお使いください。',
       'この書式は<em>2027年3月末</em>にて公開を終了する予定です。',
     ];
     var q = qrcode(0, 'M'); q.addData(BASE); q.make();
