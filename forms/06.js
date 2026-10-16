@@ -5,6 +5,7 @@ FORM_DEFS['06'] = {
     { label: '発行日', key: 'issued', type: 'date' },
     { label: '回答日', key: 'answered', type: 'date' },
   ],
+  stampClass: 'stack', // 押印欄は上下2段（回送先／発行）
   stamps: [
     { label: '回送先', boxes: ['承認', '確認', '責任者'] },
     { label: '発行', boxes: ['確認', '確認', '発行'] },
