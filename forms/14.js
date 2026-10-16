@@ -30,6 +30,8 @@
     for (let r = 1; r <= ROWS; r++) s += n(`a.${r}.${k}`) + n(`b.${r}.${k}`);
     return s;
   };
+  // 消費税 ＝ 電気工事（発注額の合計）× 税率（taxRate、％）
+  const taxOf = (n) => Math.floor(sumBoth('hachu')(n) * n('taxRate') / 100);
   // 代表区分：K50 があれば K50、無ければ1行目の区分
   const daihyo = (n, v) => {
     const codes = [];
@@ -61,8 +63,9 @@
       // 金額の欄は別の表にして入力欄を広くとる（1項目＝ラベル3列＋入力5列）
       { type: 'grid', lw: 3, rows: [
         [{ label: '電気工事', key: 'denki', type: 'calc', calc: sumBoth('hachu'), unit: '円', span: 8 },
-          { label: '消費税', key: 'tax', type: 'calc', calc: (n) => Math.floor(sumBoth('hachu')(n) * 0.1), unit: '円', span: 8 },
-          { label: '注文金額', key: 'total', type: 'calc', calc: (n) => sumBoth('hachu')(n) + Math.floor(sumBoth('hachu')(n) * 0.1), unit: '円', span: 8 }],
+          // 消費税は般-29と同じ仕組み：見出しの中で税率を指定（初期値10％）、1円未満切り捨て
+          { label: '消費税', labelField: { key: 'taxRate', type: 'number', default: '10', unit2: '％' }, key: 'tax', type: 'calc', calc: taxOf, unit: '円', span: 8 },
+          { label: '注文金額', key: 'total', type: 'calc', calc: (n) => sumBoth('hachu')(n) + taxOf(n), unit: '円', span: 8 }],
         [{ label: '内訳　現金', key: 'cash', type: 'money', unit: '円', span: 8 },
           { label: '内訳　手形', key: 'tegata', type: 'calc', unit: '円', span: 8, calc: (n, v) => (v.cash ? sumBoth('hachu')(n) - n('cash') : '') },
           { label: '法定福利費', key: 'fukuri', type: 'money', unit: '円', span: 8 }],
