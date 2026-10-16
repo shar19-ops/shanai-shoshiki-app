@@ -14,8 +14,8 @@
         [{ label: '所属組織', key: 'org', type: 'select', options: ['第一工事本部', '第二工事本部', 'RE部', '横浜支店', '東関東支店', '北関東支店', '大阪支店', '名古屋支店', '仙台支店'], span: 12 }, { span: 12 }],
         [{ label: '現場担当者', key: 'tanto', span: 12 }, { label: '現場管理者', key: 'kanri', span: 12 }],
         [{ label: '現場メンバー', key: 'members', type: 'textarea', plain: true, lines: 2, placeholder: '例：雄電 太郎・雄電 花子・〇〇 〇〇（外注）' }],
-        [{ label: '工　期', key: 'kFrom', type: 'date', span: 13 }, { label: '〜', key: 'kTo', type: 'date', lw: 1, span: 11 }],
-        [{ label: '現場表示期間', key: 'hFrom', type: 'date', span: 13 }, { label: '〜', key: 'hTo', type: 'date', lw: 1, span: 11 }],
+        [{ label: '工　期', key: 'kFrom', key2: 'kTo', type: 'daterange', span: 24 }], // 「〜」の両側に罫線なし
+        [{ label: '現場表示期間', key: 'hFrom', key2: 'hTo', type: 'daterange', span: 24 }],
       ] },
       {
         type: 'table', key: 'm', rows: 14, rowH: 6.2, title: 'メンバー',
