@@ -366,7 +366,8 @@
   function gridBlock(b) {
     const cols = b.cols || 24;
     const tbl = h('table', { class: 'grid' + (b.dense ? ' dense' : '') },
-      h('colgroup', null, Array.from({ length: cols }, () => h('col'))));
+      // colWidths：列幅を個別に指定（例 ['31mm', null] で見出し列だけ固定幅）。未指定なら等幅
+      h('colgroup', null, Array.from({ length: cols }, (_, i) => h('col', { style: b.colWidths && b.colWidths[i] ? `width:${b.colWidths[i]}` : null }))));
     const tb = h('tbody');
     b.rows.forEach((row) => {
       // 見出し行：'■ 物件情報' のような文字列だけの行
