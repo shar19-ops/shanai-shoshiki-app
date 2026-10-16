@@ -11,7 +11,7 @@ FORM_DEFS['19'] = {
       [{ label: '受付No', key: 'recvNo', span: 8 }, { label: '受付日', key: 'recvDate', type: 'date', span: 8 }, { label: '決裁No', key: 'no', span: 8, prefix: '第', unit: '号' }],
       [{ label: '決裁日', key: 'decided', type: 'date', span: 8 }, { label: '起案部署', key: 'dept', span: 7, lw: 3 }, { label: '起案者', key: 'author', span: 9, lw: 3, unit: '印' }],
       [{ label: '添付書類', key: 'attach' }],
-      [{ label: '件　名', key: 'subject', h: 10 }],
+      [{ label: '件　名', key: 'subject', type: 'textarea', lines: 2 }], // 2行書ける高さ
     ] },
     { type: 'free', label: '稟議理由', key: 'reason', lines: 17, grow: true },
     { type: 'free', label: '意見欄', key: 'opinion', lines: 6 },

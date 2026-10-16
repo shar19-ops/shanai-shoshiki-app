@@ -18,7 +18,7 @@
         [{ label: '営業事業所', key: 'office', type: 'select', options: LISTS.officeCodes, span: 10 }, { label: '見積コード', key: 'mitsuCd', span: 14, lw: 4, placeholder: '物件情報登録済みの場合のみ記入' }],
         [it('01', '物件名称', 'name', { span: 24, placeholder: '30文字以内', maxlength: 30 })],
         [it('02', '物件略称(ｶﾀｶﾅ)', 'kana', { span: 24, placeholder: '30文字以内', maxlength: 30 })],
-        [it('03', '予想工期', 'kFrom', { type: 'date' }), { label: '〜', key: 'kTo', type: 'date', span: 12, lw: 1 }],
+        [it('03', '予想工期', 'kFrom', { key2: 'kTo', type: 'daterange', span: 24 })], // 「〜」の両側に罫線なし
         [...code('04', '施工地区', 'area'), it('05', '工事場所', 'place', { placeholder: '漢字・30文字以内' })],
         [...code('06', '施主', 'seshu'), ...code('07', '設計事務所', 'sekkei')],
         [...code('08', '建設会社', 'kensetsu'), it('09', '請負形態', 'ukeoi', { type: 'select', options: ['単体', 'JV'], span: 6 }),

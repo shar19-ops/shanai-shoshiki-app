@@ -323,6 +323,18 @@
 
   // タイトルが押印欄とぶつかるときは、1行に収まるまで文字を縮める
   function fitTitles() {
+    // 押印欄が2段に折り返したときは、いちばん広い段の幅まで縮めてタイトル側に場所を譲る
+    document.querySelectorAll('.f-header .stamps').forEach((st) => {
+      st.style.width = '';
+      const rows = {};
+      st.querySelectorAll(':scope > .stamp-group').forEach((g) => {
+        const r = g.getBoundingClientRect(), k = Math.round(r.top);
+        rows[k] = rows[k] || { l: r.left, r: r.right };
+        rows[k].l = Math.min(rows[k].l, r.left); rows[k].r = Math.max(rows[k].r, r.right);
+      });
+      const widths = Object.values(rows).map((x) => x.r - x.l);
+      if (widths.length > 1) st.style.width = Math.ceil(Math.max(...widths)) + 'px';
+    });
     document.querySelectorAll('.f-title').forEach((el) => {
       const box = el.parentElement;
       let pt = 20;
@@ -340,9 +352,12 @@
       h('div', { class: 'f-head-left' },
         h('div', { class: 'f-code' }, d.code),
         h('div', { class: 'f-title' }, d.title, d.subtitle ? h('span', { class: 'f-sub' }, d.subtitle) : null),
-        d.meta ? h('div', { class: 'f-meta' }, d.meta.map((m) => h('div', { class: 'm-item' },
+        // meta の right: true は押印欄側（右端）に寄せる
+        d.meta ? h('div', { class: 'f-meta' }, d.meta.map((m) => h('div', { class: 'm-item' + (m.right ? ' right' : '') },
           h('span', { class: 'm-label' }, m.label),
-          h('span', { class: 'm-val', style: m.w ? `min-width:${m.w}mm` : '' }, field(m))))) : null),
+          h('span', { class: 'm-val', style: m.w ? `min-width:${m.w}mm` : '' }, field(m))))) : null,
+        // headBlocks：タイトルの下（押印欄の左側の空き）に置く項目。下端を押印欄の下端にそろえる
+        d.headBlocks ? h('div', { class: 'head-blocks' }, d.headBlocks.map(renderBlock)) : null),
       stampsEl(d.stamps, d.stampClass));
   }
 
@@ -352,7 +367,8 @@
   function gridBlock(b) {
     const cols = b.cols || 24;
     const tbl = h('table', { class: 'grid' + (b.dense ? ' dense' : '') },
-      h('colgroup', null, Array.from({ length: cols }, () => h('col'))));
+      // colWidths：列幅を個別に指定（例 ['31mm', null] で見出し列だけ固定幅）。未指定なら等幅
+      h('colgroup', null, Array.from({ length: cols }, (_, i) => h('col', { style: b.colWidths && b.colWidths[i] ? `width:${b.colWidths[i]}` : null }))));
     const tb = h('tbody');
     b.rows.forEach((row) => {
       // 見出し行：'■ 物件情報' のような文字列だけの行
@@ -367,7 +383,9 @@
           // key も text も無い項目はラベル単独（span 全体がラベル）
           const labelOnly = !it.key && it.text == null;
           const lw = labelOnly ? (it.span || cols) : (it.lw ?? b.lw ?? 4);
-          tr.append(h('td', { class: 'lbl' + ((it.lalign || b.lalign) === 'left' ? ' left' : '') + (it.req ? ' req' : ''), colspan: lw, rowspan: rs, style }, ...String(it.label).split('\n').flatMap((s, i) => i ? [h('br'), s] : [s])));
+          // labelField：見出しの中に置く小さな入力欄（例：消費税額（10 ％）の税率）
+          const lf = it.labelField ? h('span', { class: 'lbl-field' }, '（', field({ ...it.labelField, align: 'center' }), it.labelField.unit2 || '', '）') : null;
+          tr.append(h('td', { class: 'lbl' + ((it.lalign || b.lalign) === 'left' ? ' left' : '') + (it.req ? ' req' : ''), colspan: lw, rowspan: rs, style }, ...String(it.label).split('\n').flatMap((s, i) => i ? [h('br'), s] : [s]), lf));
           const rest = (it.span || cols) - lw;
           if (rest > 0) tr.append(valueCell(it, rest, rs, style));
         } else {

@@ -4,7 +4,8 @@
   FORM_DEFS['43'] = {
     code: '般-43', title: 'スパイダープラス閲覧・編集依頼書',
     meta: [{ label: '依頼日', key: 'date', type: 'date' }],
-    stamps: [{ boxes: ['追加者'] }],
+    // 承認ルートと関係ない欄は表の下（bottomStamps）
+    bottomStamps: ['追加者'],
     blocks: [
       { type: 'grid', dense: true, lw: 4, rows: [
         [{ label: '工事番号', key: 'koban', span: 12 }, { label: '依頼内容', key: 'irai', type: 'select', options: ['新規', '追加', '消去', '再閲覧'], span: 12 }],

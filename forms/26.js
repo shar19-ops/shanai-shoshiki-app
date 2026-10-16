@@ -5,7 +5,7 @@ FORM_DEFS['26'] = {
   meta: [{ label: '作成日', key: 'date', type: 'date' }],
   bottomStamps: ['登録済検印'], // 下部（フッターの上）に置く押印欄
   stamps: [
-    { boxes: ['本店長', '確認', '承認\n工事本部長\nRE部長\n支店長', '確認', '発行'] },
+    { boxes: ['本店長', '承認\n工事本部長\nRE部長\n支店長', '確認', '発行'] },
   ],
   blocks: [
     { type: 'grid', rows: [

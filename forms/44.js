@@ -2,7 +2,8 @@
 FORM_DEFS['44'] = {
   code: '般-44', title: 'スパイダープラス電気パック使用申込書',
   meta: [{ label: '作成日', key: 'date', type: 'date' }],
-  stamps: [{ boxes: ['借与者', '受取人'] }],
+  // 承認ルートと関係ない欄は表の下（bottomStamps）
+  bottomStamps: ['借与者', '受取人'],
   blocks: [
     { type: 'para', text: '【照度測定、コンセント試験、幹線・負荷試験（絶縁測定）】', style: 'font-weight:bold' },
     { type: 'grid', rows: [

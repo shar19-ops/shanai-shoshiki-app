@@ -8,6 +8,8 @@
   --input-focus: #ffefa3;
   --accent: #1f3f8f;
   --toolbar-bg: #1f3f8f;
+  /* 記述欄の罫線（7mm間隔）。グラデーションの1px線は印刷で欠けるのでSVGで描く */
+  --rule-line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='7' viewBox='0 0 100 7' preserveAspectRatio='none'%3E%3Crect x='0' y='6.6' width='100' height='0.3' fill='%239a9a9a'/%3E%3C/svg%3E");
   --font: "BIZ UDPGothic", "BIZ UDPゴシック", "Yu Gothic UI", "Meiryo", sans-serif;
 }
 
@@ -62,7 +64,8 @@ body {
   display: flex; align-items: flex-start; gap: 6mm;
   margin-bottom: 4mm;
 }
-.f-head-left { flex: 1; min-width: 0; }
+.f-head-left { flex: 1; min-width: 0; align-self: stretch; display: flex; flex-direction: column; align-items: flex-start; }
+.f-head-left .head-blocks { margin-top: auto; padding-top: 3mm; align-self: stretch; }
 .f-code { font-size: 8pt; color: #555; letter-spacing: .05em; }
 .f-title {
   font-size: 20pt; font-weight: bold; letter-spacing: .3em;
@@ -76,12 +79,18 @@ body {
 .f-title.xlong { font-size: 15pt; letter-spacing: .05em; }
 .f-sub { font-size: 9pt; margin-left: .5em; letter-spacing: 0; font-weight: normal; }
 .f-meta { display: flex; flex-wrap: wrap; gap: 1.5mm 6mm; font-size: 9.5pt; }
+.f-meta { align-self: stretch; }
 .f-meta .m-item { display: flex; align-items: baseline; gap: 2mm; }
+.f-meta .m-item.right { margin-left: auto; }
 .f-meta .m-label { color: #333; white-space: nowrap; }
 .f-meta .m-val { border-bottom: 1px solid var(--line); min-width: 38mm; }
 
 /* 押印欄 */
-.stamps { display: flex; gap: 2mm; flex-shrink: 0; }
+/* 押印欄：入りきらないときは上下2段に折り返す（右寄せ） */
+.stamps { display: flex; gap: 2mm; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; max-width: 140mm; }
+.sheet.landscape .stamps { max-width: 200mm; }
+/* stampClass: 'stack' … 押印欄のグループを必ず上下に並べる */
+.stamps.stack { flex-direction: column; align-items: flex-end; }
 .stamp-group { display: flex; border: 1.2px solid var(--line); }
 .stamp-group .sg-label {
   writing-mode: vertical-rl; text-orientation: upright;
@@ -90,7 +99,7 @@ body {
   border-right: 1px solid var(--line);
   padding: 1mm .8mm; display: flex; align-items: center; justify-content: center;
 }
-.stamp-box { width: 16mm; display: flex; flex-direction: column; }
+.stamp-box { width: 20mm; display: flex; flex-direction: column; }
 .stamp-box + .stamp-box { border-left: 1px solid var(--line); }
 .stamp-box .sb-label {
   height: 5mm; line-height: 5mm; text-align: center;
@@ -101,14 +110,14 @@ body {
 .bottom-stamps { display: flex; justify-content: flex-end; align-items: flex-end; gap: 4mm; margin-top: 3mm; }
 .bottom-stamps .notes { flex: 1; }
 .stamp-box .sb-label.tight { font-size: 6.5pt; letter-spacing: 0; }
-.stamp-box .sb-area { height: 16mm; position: relative; }
+.stamp-box .sb-area { height: 20mm; position: relative; }
 /* 兼務の役職名（工事本部長・RE部長・支店長など）は押印部に薄く印字 */
 .stamp-box .sb-roles {
   position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
   text-align: center; font-size: 6.5pt; line-height: 1.45; color: #b3bac6; pointer-events: none;
 }
 /* 本人欄のデート印 */
-/* 印の大きさは全帳票共通（標準の押印欄に合わせて直径14.4mm）。小さい欄でははみ出してよい */
+/* 印の大きさは全帳票共通（直径14.4mm）。押印欄は20mm角。本文中の小さい欄ではみ出してよい */
 .self-stamp { display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: visible; }
 .self-stamp:hover { background: #f3f6fc; }
 .self-stamp svg { width: 14.4mm; height: 14.4mm; flex-shrink: 0; display: block; overflow: visible; position: relative; z-index: 1; }
@@ -149,6 +158,9 @@ table.grid th, table.grid td.lbl {
   letter-spacing: .05em; line-height: 1.25;
 }
 table.grid td.lbl.left { text-align: left; }
+/* 見出しの中の小さな入力欄（税率など） */
+.lbl-field { display: inline-flex; align-items: center; white-space: nowrap; }
+.lbl-field .inp { width: 9mm; min-height: 5mm; height: 5mm; padding: 0 .5mm; font-size: 9pt; }
 /* 必須記入欄（元Excelの色塗り欄） */
 table.grid td.lbl.req { background: #fbe0c6; }
 table.grid td.txt { padding: 0 2mm; font-size: 9pt; }
@@ -182,7 +194,7 @@ table.grid.dense tr.thin .inp { font-size: 7.5pt; min-height: 4mm; }
   padding: 0 1.5mm;
   background: var(--input-bg);
 }
-.inp:focus { background: var(--input-focus); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.inp:focus { background-color: var(--input-focus); box-shadow: inset 0 0 0 1.5px var(--accent); }
 .inp.num { text-align: right; font-variant-numeric: tabular-nums; }
 .inp.center { text-align: center; }
 .inp.calc { background: transparent; }
@@ -190,10 +202,11 @@ select.inp { appearance: none; -webkit-appearance: none; cursor: pointer; }
 textarea.inp {
   resize: none; display: block; padding: 1mm 2mm;
   line-height: 7mm;
-  background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(7mm - 1px), var(--line-weak) calc(7mm - 1px), var(--line-weak) 7mm);
+  background-image: var(--rule-line);
   background-color: var(--input-bg);
   background-attachment: local;
   background-position: 0 1mm;
+  background-size: 100% 7mm;
 }
 textarea.inp.plain { background-image: none; line-height: 1.5; }
 .date-wrap { display: flex; align-items: center; height: 100%; }
@@ -287,7 +300,7 @@ table.grid td textarea.inp { height: 100%; }
   .sheet { margin: 0; box-shadow: none; page-break-after: always; break-after: page; }
   .sheet:last-child { page-break-after: auto; break-after: auto; }
   .inp, textarea.inp, .checks .box { background-color: transparent !important; box-shadow: none !important; }
-  textarea.inp { background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(7mm - 1px), var(--line-weak) calc(7mm - 1px), var(--line-weak) 7mm); }
+  textarea.inp { background-image: var(--rule-line); background-size: 100% 7mm; }
   textarea.inp.plain { background-image: none; }
   select.inp { color: var(--ink); }
   .img-field { background: transparent; }
