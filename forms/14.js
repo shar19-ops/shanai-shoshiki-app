@@ -42,14 +42,13 @@
     selfStamp: '発行者', // 本人欄（デート印を押す欄）
     meta: [
       { label: '発行日', key: 'date', type: 'date' },
-      { label: '事業所名', key: 'office', type: 'select', options: LISTS.offices, default: '本店', w: 32 },
-      { label: '注文番号 ※2', key: 'orderNo', w: 40 },
+      { label: '注文番号 ※2', key: 'orderNo', w: 40, right: true }, // 発行日と同じ行で押印欄側に寄せる
     ],
     stamps: [{ boxes: ['承認', '確認', '確認', '確認', '発行者'] }],
     blocks: [
       // 1項目＝6列（ラベル3列＋入力3列）を基本単位にそろえる。件名・発注先名・工期は幅広
       { type: 'grid', lw: 3, rows: [
-        [{ label: '事業所CD', key: 'officeCd', type: 'select', options: LISTS.officeCodes, span: 6 }, { label: '工　番', key: 'koban', span: 6 }, { label: '件　名', key: 'subject', span: 12 }],
+        [{ label: '事業所', key: 'officeCd', type: 'select', options: LISTS.officeCodes, span: 6 }, { label: '工　番', key: 'koban', span: 6 }, { label: '件　名', key: 'subject', span: 12 }],
         [{ label: '発注先CD', key: 'vendorCd', span: 6 }, { label: '発注先名', key: 'vendor', span: 18 }],
         [{ label: '労災保険', key: 'rosai', type: 'select', options: ['0:発注者加入', '1:受注者加入', '2:なし'], span: 6 },
           { label: '見積書工期', key: 'kFrom', key2: 'kTo', type: 'daterange', span: 12 },

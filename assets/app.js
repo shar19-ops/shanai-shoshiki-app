@@ -352,7 +352,8 @@
       h('div', { class: 'f-head-left' },
         h('div', { class: 'f-code' }, d.code),
         h('div', { class: 'f-title' }, d.title, d.subtitle ? h('span', { class: 'f-sub' }, d.subtitle) : null),
-        d.meta ? h('div', { class: 'f-meta' }, d.meta.map((m) => h('div', { class: 'm-item' },
+        // meta の right: true は押印欄側（右端）に寄せる
+        d.meta ? h('div', { class: 'f-meta' }, d.meta.map((m) => h('div', { class: 'm-item' + (m.right ? ' right' : '') },
           h('span', { class: 'm-label' }, m.label),
           h('span', { class: 'm-val', style: m.w ? `min-width:${m.w}mm` : '' }, field(m))))) : null,
         // headBlocks：タイトルの下（押印欄の左側の空き）に置く項目。下端を押印欄の下端にそろえる

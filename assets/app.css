@@ -79,7 +79,9 @@ body {
 .f-title.xlong { font-size: 15pt; letter-spacing: .05em; }
 .f-sub { font-size: 9pt; margin-left: .5em; letter-spacing: 0; font-weight: normal; }
 .f-meta { display: flex; flex-wrap: wrap; gap: 1.5mm 6mm; font-size: 9.5pt; }
+.f-meta { align-self: stretch; }
 .f-meta .m-item { display: flex; align-items: baseline; gap: 2mm; }
+.f-meta .m-item.right { margin-left: auto; }
 .f-meta .m-label { color: #333; white-space: nowrap; }
 .f-meta .m-val { border-bottom: 1px solid var(--line); min-width: 38mm; }
 
