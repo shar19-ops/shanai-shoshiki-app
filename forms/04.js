@@ -5,8 +5,9 @@ FORM_DEFS['04'] = {
     { label: '作成日', key: 'date', type: 'date' },
     { label: '事業所名', key: 'office', type: 'select', options: LISTS.offices, default: '本店', w: 32 },
   ],
+  // 承認ルートと関係ない欄は表の下（bottomStamps）
+  bottomStamps: [{ label: '処理', boxes: ['発注', '納入'] }],
   stamps: [
-    { label: '処理', boxes: ['発注', '納入'] },
     { boxes: ['承認', '確認', '確認', '要求者'] },
   ],
   blocks: [

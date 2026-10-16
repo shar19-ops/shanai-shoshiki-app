@@ -81,7 +81,9 @@ body {
 .f-meta .m-val { border-bottom: 1px solid var(--line); min-width: 38mm; }
 
 /* 押印欄 */
-.stamps { display: flex; gap: 2mm; flex-shrink: 0; }
+/* 押印欄：入りきらないときは上下2段に折り返す（右寄せ） */
+.stamps { display: flex; gap: 2mm; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; max-width: 140mm; }
+.sheet.landscape .stamps { max-width: 200mm; }
 .stamp-group { display: flex; border: 1.2px solid var(--line); }
 .stamp-group .sg-label {
   writing-mode: vertical-rl; text-orientation: upright;
@@ -90,7 +92,7 @@ body {
   border-right: 1px solid var(--line);
   padding: 1mm .8mm; display: flex; align-items: center; justify-content: center;
 }
-.stamp-box { width: 16mm; display: flex; flex-direction: column; }
+.stamp-box { width: 20mm; display: flex; flex-direction: column; }
 .stamp-box + .stamp-box { border-left: 1px solid var(--line); }
 .stamp-box .sb-label {
   height: 5mm; line-height: 5mm; text-align: center;
@@ -101,14 +103,14 @@ body {
 .bottom-stamps { display: flex; justify-content: flex-end; align-items: flex-end; gap: 4mm; margin-top: 3mm; }
 .bottom-stamps .notes { flex: 1; }
 .stamp-box .sb-label.tight { font-size: 6.5pt; letter-spacing: 0; }
-.stamp-box .sb-area { height: 16mm; position: relative; }
+.stamp-box .sb-area { height: 20mm; position: relative; }
 /* 兼務の役職名（工事本部長・RE部長・支店長など）は押印部に薄く印字 */
 .stamp-box .sb-roles {
   position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
   text-align: center; font-size: 6.5pt; line-height: 1.45; color: #b3bac6; pointer-events: none;
 }
 /* 本人欄のデート印 */
-/* 印の大きさは全帳票共通（標準の押印欄に合わせて直径14.4mm）。小さい欄でははみ出してよい */
+/* 印の大きさは全帳票共通（直径14.4mm）。押印欄は20mm角。本文中の小さい欄ではみ出してよい */
 .self-stamp { display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: visible; }
 .self-stamp:hover { background: #f3f6fc; }
 .self-stamp svg { width: 14.4mm; height: 14.4mm; flex-shrink: 0; display: block; overflow: visible; position: relative; z-index: 1; }

@@ -323,6 +323,18 @@
 
   // タイトルが押印欄とぶつかるときは、1行に収まるまで文字を縮める
   function fitTitles() {
+    // 押印欄が2段に折り返したときは、いちばん広い段の幅まで縮めてタイトル側に場所を譲る
+    document.querySelectorAll('.f-header .stamps').forEach((st) => {
+      st.style.width = '';
+      const rows = {};
+      st.querySelectorAll(':scope > .stamp-group').forEach((g) => {
+        const r = g.getBoundingClientRect(), k = Math.round(r.top);
+        rows[k] = rows[k] || { l: r.left, r: r.right };
+        rows[k].l = Math.min(rows[k].l, r.left); rows[k].r = Math.max(rows[k].r, r.right);
+      });
+      const widths = Object.values(rows).map((x) => x.r - x.l);
+      if (widths.length > 1) st.style.width = Math.ceil(Math.max(...widths)) + 'px';
+    });
     document.querySelectorAll('.f-title').forEach((el) => {
       const box = el.parentElement;
       let pt = 20;
