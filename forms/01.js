@@ -8,7 +8,7 @@
       { label: '週の開始日（月）', key: 'week', type: 'date' },
       { label: '氏名', key: 'name', w: 40 },
     ],
-    stamps: [{ boxes: ['承認', '経理部長', '本部長', '部店長', '課長', '発行'] }],
+    stamps: [{ boxes: ['承認', '経理部長', '本部長', '部店長', '発行'] }],
     blocks: [
       {
         type: 'table', key: 'days', rows: 7, rowH: 26,
