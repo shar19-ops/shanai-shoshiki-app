@@ -10,7 +10,8 @@
     { label: `${no}. ${label}`, key: key + 'Cd', placeholder: 'コード', span: 9, req: o.req !== false },
     { key: key + 'Name', placeholder: '名称', span: o.span || 15 },
   ];
-  const sel = (no, label, key, options, o = {}) => it(no, label, key, { type: 'select', options, span: 8, ...o });
+  // 識別区分（18〜28）は1行に3つ並べるので、見出しを4列に詰めて入力欄を広く
+  const sel = (no, label, key, options, o = {}) => it(no, label, key, { type: 'select', options, span: 8, lw: 4, ...o });
   const busho = ['01040：営業本部', '01021：第1工事本部', '01022：第2工事本部', '01023：ＲＥ部', '02000：東関東支店',
     '03000：横浜支店', '04000：大阪支店', '05000：名古屋支店', '06000：仙台支店', '09000：北関東支店'];
   // 38. 小工事実行予算の列（見出し, keyの末尾）
@@ -134,7 +135,7 @@
         [sel('18', '受注識別', 'juchuS', ['1：本工事', '2：追加工事']), sel('19', '納品識別', 'nohin', ['0：通常', '1：納品']), sel('20', '官庁・民間', 'kanmin', C.kanmin)],
         [sel('21', '元請・下請', 'motouke', C.motouke), sel('22', '施主直接契約', 'choku', C.chokusetsu), sel('23', 'JV工事識別', 'jv', C.jv)],
         [sel('24', '計画外識別', 'keikakugai', ['0：通常', '1：計画外']), sel('25', '社内JV識別', 'shanaiJv', ['0：通常', '1：社内JV']), sel('26', '施工方式識別', 'hoshiki', ['0：通常', '1：D式'])],
-        [sel('27', '工番採番識別', 'saiban', ['1：営業（通常工番）', '2：工事（通常工番）', '3：RE(7000～)', '4：サービス(8000～)']), sel('28', '設備工事識別', 'setsubi', C.setsubi), { span: 8 }],
+        [sel('27', '工番採番識別', 'saiban', ['1：営業（通常工番）', '2：工事（通常工番）', '3：RE(7000～)', '4：サービス(8000～)'], { span: 16 }), sel('28', '設備工事識別', 'setsubi', C.setsubi)],
         '■ 建物情報',
         [it('29', '建物用途', 'youto', { type: 'select', options: C.youto, span: 9 }), { label: 'その他', key: 'youtoEtc', span: 15, lw: 3, placeholder: '「99：その他」の場合' }],
         [{ label: '　　住戸戸数', key: 'ko', type: 'number', unit: '戸', span: 8 }, { label: '室数', key: 'shitsu', type: 'number', unit: '室', span: 8, lw: 3 }, { label: '病床数', key: 'byosho', type: 'number', unit: '床', span: 8, lw: 3 }],
@@ -142,9 +143,10 @@
         [...code('30', '営業担当者', 'eigyo', { span: 5 }), it('31', '受注担当部署', 'juchuBu', { type: 'select', options: busho, span: 10, lw: 4 })],
         [...code('32', '工事担当者', 'koji', { span: 5 }), it('33', '施工担当部署', 'sekoBu', { type: 'select', options: busho, span: 10, lw: 4 })],
         [it('34', '支払条件', 'shiharai', { type: 'select', options: ['0：通常（出来高払）', '1：特殊'], span: 12 }), { span: 12 }],
-        [{ label: '　　出来高締', key: 'dekidaka', type: 'number', unit: '日', span: 8 }, { label: '請求締', key: 'seikyu', type: 'number', unit: '日', span: 8, lw: 3 }, { label: '支払日', key: 'shiharaiBi', type: 'number', unit: '日', span: 8, lw: 3 }],
-        [{ label: '　　前渡金', key: 'maetoki', type: 'number', unit: '％', span: 8 }, { label: '中間払', key: 'chukan', type: 'number', unit: '回', span: 8, lw: 3 }, { label: '竣工後', key: 'shunko', type: 'number', unit: '％', span: 8, lw: 3 }],
-        [{ label: '　　現金', key: 'genkin', type: 'number', unit: '％', span: 8, req: true },
+        // 支払条件の下の3行は、3つの入力欄を均等に（見出し3列＋入力5列）
+        [{ label: '　出来高締', key: 'dekidaka', type: 'number', unit: '日', span: 8, lw: 3 }, { label: '請求締', key: 'seikyu', type: 'number', unit: '日', span: 8, lw: 3 }, { label: '支払日', key: 'shiharaiBi', type: 'number', unit: '日', span: 8, lw: 3 }],
+        [{ label: '　前渡金', key: 'maetoki', type: 'number', unit: '％', span: 8, lw: 3 }, { label: '中間払', key: 'chukan', type: 'number', unit: '回', span: 8, lw: 3 }, { label: '竣工後', key: 'shunko', type: 'number', unit: '％', span: 8, lw: 3 }],
+        [{ label: '　現金', key: 'genkin', type: 'number', unit: '％', span: 8, lw: 3, req: true },
           { label: '手形', key: 'tegata', type: 'calc', unit: '％', calc: (n, v) => (v.genkin === '' || v.genkin == null ? null : 100 - n('genkin')), showZero: true, span: 8, lw: 3 },
           { label: 'サイト', key: 'site', type: 'select', options: ['15', '30', '45', '60'], unit: '日', span: 8, lw: 3 }],
         '■ その他',
