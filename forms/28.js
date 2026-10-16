@@ -31,9 +31,9 @@ FORM_DEFS['28'] = {
       [{ label: '省略理由', key: 'riyu', lw: 4, span: 18 }],
       [{ label: '13. インボイス登録番号', key: 'invoice', prefix: 'T', placeholder: '13桁', maxlength: 13, span: 14 }, { span: 10 }],
       [{ label: '14. 建設業許可\n＊工料の新規登録業者で「建設業許可」のある会社はその写しと②の写しを添付、無い会社は①の写しを添付', span: 6, rs: 3, h: 9 },
-        { label: '有無の選択', key: 'kyoka', type: 'select', options: ['1：有', '2：無'], lw: 6, span: 18 }],
-      [{ label: '①登録電気工事業者登録証', key: 'toroku1', type: 'select', options: ['1：有', '2：無'], lw: 6, span: 18 }],
-      [{ label: '②登録電気工事業者届出済証', key: 'toroku2', type: 'select', options: ['1：有', '2：無'], lw: 6, span: 18 }],
+        { label: '有無の選択', key: 'kyoka', type: 'select', options: ['1：有', '2：無'], lw: 7, span: 18 }],
+      [{ label: '①登録電気工事業者登録証', key: 'toroku1', type: 'select', options: ['1：有', '2：無'], lw: 7, span: 18 }],
+      [{ label: '②登録電気工事業者届出済証', key: 'toroku2', type: 'select', options: ['1：有', '2：無'], lw: 7, span: 18 }],
     ] },
     { type: 'notes', items: [
       '※1　呼出名称（半角ｶﾅ）と口座名義（半角ｶﾅ）は小文字を使用しない。また、ｶﾅ文字の「・、＄、＊、＆」は使用しない。',
