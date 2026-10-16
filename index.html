@@ -26,6 +26,12 @@
   .card.wip { opacity: .55; }
   .card.wip .no { background: #888; }
   .card .badge { margin-left: auto; font-size: 8pt; color: #666; white-space: nowrap; }
+  .cats { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .cats button { font: inherit; font-size: 10pt; padding: 5px 14px; border-radius: 99px; border: 1px solid #b8bfcc; background: #fff; color: #333; cursor: pointer; }
+  .cats button:hover { border-color: var(--accent); }
+  .cats button.on { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
+  .card .common { font-size: 8pt; color: #4a5a7a; background: #e6ecf7; border-radius: 3px; padding: 1px 5px; white-space: nowrap; }
+  .card .new { margin-left: auto; font-size: 8pt; font-weight: 800; color: #fff; background: #e8452c; border-radius: 99px; padding: 2px 8px; letter-spacing: .05em; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -35,6 +41,7 @@
     帳票を選んで入力し、「印刷」ボタンで紙に出力して回送してください。<br>
     入力内容はこのパソコンのブラウザ内にだけ一時保存されます（サーバーには送信されません）。共用PCでは印刷後に「クリア」してください。
   </div>
+  <div class="cats" id="cats"></div>
   <input class="search" type="search" placeholder="帳票名・番号で絞り込み" id="q">
   <div class="list" id="list"></div>
 </div>
@@ -42,9 +49,32 @@
 <script>
   (function () {
     var list = document.getElementById('list');
-    function render(q) {
+    var catsEl = document.getElementById('cats');
+    var KEY = 'shoshiki:_cat'; // 選んだ職種を覚えておく（このブラウザだけ）
+    var cur = '';
+    try { cur = localStorage.getItem(KEY) || ''; } catch (e) {}
+    if (cur && CATS.indexOf(cur) < 0) cur = '';
+    var q = '';
+    function inCat(c) { return !cur || c.cat === '共通' || (Array.isArray(c.cat) && c.cat.indexOf(cur) >= 0); }
+    function renderCats() {
+      catsEl.innerHTML = '';
+      [''].concat(CATS).forEach(function (name) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = name || 'すべて';
+        if (name === cur) b.className = 'on';
+        b.onclick = function () {
+          cur = name;
+          try { localStorage.setItem(KEY, cur); } catch (e) {}
+          renderCats(); render();
+        };
+        catsEl.appendChild(b);
+      });
+    }
+    function render() {
       list.innerHTML = '';
       CATALOG.forEach(function (c) {
+        if (!inCat(c)) return;
         if (q && (c.no + c.title).indexOf(q) < 0) return;
         var el = document.createElement('a');
         el.className = 'card';
@@ -52,11 +82,13 @@
         el.innerHTML = '<span class="no"></span><span class="t"></span>';
         el.querySelector('.no').textContent = c.no;
         el.querySelector('.t').textContent = c.title;
+        if (cur && c.cat === '共通') { var cm = document.createElement('span'); cm.className = 'common'; cm.textContent = '共通'; el.querySelector('.t').after(cm); }
+        if (c.isNew) { var nw = document.createElement('span'); nw.className = 'new'; nw.textContent = 'NEW'; el.appendChild(nw); }
         list.appendChild(el);
       });
     }
-    document.getElementById('q').addEventListener('input', function (e) { render(e.target.value.trim()); });
-    render('');
+    document.getElementById('q').addEventListener('input', function (e) { q = e.target.value.trim(); render(); });
+    renderCats(); render();
   })();
 </script>
 </body>
