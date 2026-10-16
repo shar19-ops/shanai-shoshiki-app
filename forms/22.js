@@ -11,7 +11,7 @@
   //   コード欄：見出し4＋コード4＋名称（残り）
   const code = (no, label, key, o = {}) => [
     { label: `${no}. ${label}`, key: key + 'Cd', placeholder: 'コード', span: 8, req: o.req !== false },
-    { key: key + 'Name', placeholder: '名称', span: o.span || 16 },
+    { key: key + 'Name', placeholder: o.name || '名称', span: o.span || 16 },
   ];
   const sel = (no, label, key, options, o = {}) => it(no, label, key, { type: 'select', options, span: 8, ...o });
   const three = (label, key, o = {}) => ({ label, key, type: 'number', span: 8, ...o });
@@ -143,8 +143,8 @@
         [it('29', '建物用途', 'youto', { type: 'select', options: C.youto }), { label: 'その他', key: 'youtoEtc', span: 12, placeholder: '「99：その他」の場合' }],
         [three('　　住戸戸数', 'ko', { unit: '戸' }), three('室数', 'shitsu', { unit: '室' }), three('病床数', 'byosho', { unit: '床' })],
         '■ 担当者・部署',
-        [...code('30', '営業担当者', 'eigyo', { span: 4 }), it('31', '受注担当部署', 'juchuBu', { type: 'select', options: busho })],
-        [...code('32', '工事担当者', 'koji', { span: 4 }), it('33', '施工担当部署', 'sekoBu', { type: 'select', options: busho })],
+        [...code('30', '営業担当者', 'eigyo', { span: 4, name: '氏名' }), it('31', '受注担当部署', 'juchuBu', { type: 'select', options: busho })],
+        [...code('32', '工事担当者', 'koji', { span: 4, name: '氏名' }), it('33', '施工担当部署', 'sekoBu', { type: 'select', options: busho })],
         [it('34', '支払条件', 'shiharai', { type: 'select', options: ['0：通常（出来高払）', '1：特殊'] }), { span: 12 }],
         [three('　　出来高締', 'dekidaka', { unit: '日' }), three('請求締', 'seikyu', { unit: '日' }), three('支払日', 'shiharaiBi', { unit: '日' })],
         [three('　　前渡金', 'maetoki', { unit: '％' }), three('中間払', 'chukan', { unit: '回' }), three('竣工後', 'shunko', { unit: '％' })],
@@ -161,7 +161,7 @@
           { key: r + 'Kei', type: 'calc', span: 4, calc: (n) => COLS.reduce((t, c) => t + n(r + c[1]), 0) }]),
       ] },
       { type: 'notes', items: [
-        '(注1) 得意先・担当者はコードと名称を記入（マスタの検索はありません）。色付きの欄は必須記入項目。',
+        '(注1) 得意先はコードと名称、担当者はコードと氏名を記入（マスタの検索はありません）。色付きの欄は必須記入項目。',
         '(注2) 36. 予算変更は、注文区分 1：新規・5：取消の時は記入しない。38. 小工事実行予算は契約金額500万円以下の時に記入。',
         '(注3) 添付書類（見積書・注文書／承諾書、500万円超は実行予算書・工事経費計算書）は紙で添付すること。',
       ] },
