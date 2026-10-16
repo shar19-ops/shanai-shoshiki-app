@@ -18,7 +18,8 @@ FORM_DEFS['29'] = {
       [{ label: '累計出来高金額', key: 'ruikei', type: 'money', unit: '円', span: 12 }, { label: '消費税額', key: 'ruikeiTax', type: 'money', unit: '円', span: 12 }],
       [{ label: '前回迄出来高累計額', key: 'zenkai', type: 'money', unit: '円', span: 12 }, { label: '消費税額', key: 'zenkaiTax', type: 'money', unit: '円', span: 12 }],
       [{ label: '前回迄の領収額', key: 'ryoshu', type: 'money', unit: '円', span: 12 }, { label: '消費税額', key: 'ryoshuTax', type: 'money', unit: '円', span: 12 }],
-      [{ label: '今回請求額', key: 'konkai', type: 'money', unit: '円', span: 12 }, { label: '今回請求消費税額', key: 'konkaiTax', type: 'money', unit: '円', span: 12 }],
+      // 今回請求額 ＝ 累計出来高金額 − 前回迄の領収額（ユーザー指定の計算式）
+      [{ label: '今回請求額', key: 'konkai', type: 'calc', calc: (n) => n('ruikei') - n('ryoshu'), unit: '円', span: 12 }, { label: '今回請求消費税額', key: 'konkaiTax', type: 'money', unit: '円', span: 12 }],
     ] },
     { type: 'free', label: '備考（請求書郵送先）', key: 'biko', lines: 5 },
     { type: 'grid', rows: [
