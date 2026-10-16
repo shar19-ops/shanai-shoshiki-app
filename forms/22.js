@@ -65,25 +65,60 @@
     });
   }
 
+  // 06.施工地区：都道府県・市区町村の候補（forms/data/prefectures.js）から選べるように。
+  // 候補を選ぶと、07.工事場所の先頭に名称を入れる（受注登録メモアプリの applyPrefixLink を移植）。
+  // 前に入れた名称（placePrefix）だけを差し替え、その後ろに入力した番地などは残す。
+  function bindChiku({ inputs, values, setVal }) {
+    const chiku = inputs.chiku, place = inputs.place;
+    if (!chiku || !place) return;
+    const s = document.createElement('script');
+    s.src = 'forms/data/prefectures.js';
+    s.onload = () => {
+      const dl = document.createElement('datalist');
+      dl.id = 'dl_chiku';
+      window.PREFECTURES.forEach((p) => { const o = document.createElement('option'); o.value = p; dl.append(o); });
+      document.body.append(dl);
+      chiku.setAttribute('list', 'dl_chiku');
+    };
+    document.head.append(s);
+    let last = '';
+    const apply = () => {
+      if (chiku.value === last || !window.PREFECTURES || window.PREFECTURES.indexOf(chiku.value) < 0) return; // 候補から選んだ時だけ
+      last = chiku.value;
+      const name = chiku.value.replace(/^\d+\s/, '');
+      const old = values.placePrefix || '';
+      const cur = place.value || '';
+      const rest = cur === old ? '' : old && cur.startsWith(old) ? cur.slice(old.length) : cur;
+      place.value = name + rest;
+      setVal('place', place.value);
+      setVal('placePrefix', name);
+    };
+    chiku.addEventListener('input', apply); // 候補を選ぶとすぐ反映
+    chiku.addEventListener('change', apply);
+    last = chiku.value;
+  }
+
   FORM_DEFS['22'] = {
     code: '般-22', title: '受注報告登録メモ',
     selfStamp: '発行者',
     meta: [{ label: '発行日', key: 'date', type: 'date' }],
     stamps: [{ boxes: ['確認', '確認', '発行者'] }],
     bottomStamps: ['登録済検印'],
-    setup: bindKana,
+    setup: (ctx) => { bindKana(ctx); bindChiku(ctx); },
     blocks: [
       { type: 'grid', dense: true, lalign: 'left', lw: 5, rows: [
-        [{ label: '注文区分', key: 'kubun', type: 'select', options: ['1：新規', '2：増額', '3：減額', '4：赤伝/黒伝', '5：工事取消'], span: 6, lw: 3, req: true },
-          { label: '工事番号', key: 'koban', placeholder: '26-0000', span: 6, lw: 3 },
-          { label: '施工事業所', key: 'jigyosho', type: 'select', options: LISTS.officeCodes, span: 6, lw: 3, req: true },
-          { label: '見積番号', key: 'mitsuNo', placeholder: '000-00-00000-00', span: 6, lw: 3 }],
+        [{ label: '注文区分', key: 'kubun', type: 'select', options: ['1：新規', '2：増額', '3：減額', '4：赤伝/黒伝', '5：工事取消'], span: 12, req: true },
+          { label: '施工事業所', key: 'jigyosho', type: 'select', options: LISTS.officeCodes, span: 12, req: true }],
+        [{ label: '工事番号', key: 'koban', placeholder: '例：26-0000（新規の時は記入しない）', maxlength: 12, span: 12 },
+          { label: '見積番号', key: 'mitsuNo', placeholder: '000-00-00000-00', span: 12 }],
         '■ 基本情報',
         [it('01', '受注計上年月', 'keijoYm', { type: 'ym', span: 9 }), { label: '02. 契約先', key: 'keiyakuCd', placeholder: 'コード', span: 7, lw: 3, req: true }, { key: 'keiyakuName', placeholder: '名称', span: 8 }],
         [it('03', '物件略称(漢字)', 'nameKanji', { span: 24, maxlength: 30, placeholder: '30文字以内' })],
         [it('04', '物件略称(ｶﾀｶﾅ)', 'nameKana', { span: 24, maxlength: 30, placeholder: '03の入力から自動で入ります（変換が不完全な場合は修正してください）' })],
-        [it('05', '工期', 'kFrom', { key2: 'kTo', type: 'daterange', span: 16 }), it('06', '施工地区', 'chiku', { span: 8, lw: 4 })],
-        [it('07', '工事場所(漢字)', 'place', { span: 24, maxlength: 30, placeholder: '30文字以内' })],
+        [it('05', '工期', 'kFrom', { key2: 'kTo', type: 'daterange', span: 24 })],
+        [it('06', '施工地区', 'chiku', { span: 14, placeholder: '都道府県・市区町村名の一部を入力 → 候補から選択' }),
+          { text: '候補から選ぶと、07の先頭に名称が入ります', note: true, span: 10 }],
+        [it('07', '工事場所(漢字)', 'place', { span: 24, maxlength: 30, placeholder: '30文字以内（06で候補を選ぶと先頭に名称が入ります。続きに番地などを入力）' })],
         [sel('08', '推定・確定識別', 'suitei', ['1：確定', '2：推定'], { span: 12 }), sel('09', '注文書類識別', 'chumon', ['1：注文書（契約書含む）', '2：承諾書'], { span: 12 })],
         '■ 金額',
         [it('10', '契約金額', 'keiyakuGaku', { type: 'money', unit: '円' }), it('11', '決定実行金額', 'kettei', { type: 'money', unit: '円', req: false })],
@@ -106,7 +141,6 @@
         '■ 担当者・部署',
         [...code('30', '営業担当者', 'eigyo', { span: 5 }), it('31', '受注担当部署', 'juchuBu', { type: 'select', options: busho, span: 10, lw: 4 })],
         [...code('32', '工事担当者', 'koji', { span: 5 }), it('33', '施工担当部署', 'sekoBu', { type: 'select', options: busho, span: 10, lw: 4 })],
-        '■ 34. 支払条件',
         [it('34', '支払条件', 'shiharai', { type: 'select', options: ['0：通常（出来高払）', '1：特殊'], span: 12 }), { span: 12 }],
         [{ label: '　　出来高締', key: 'dekidaka', type: 'number', unit: '日', span: 8 }, { label: '請求締', key: 'seikyu', type: 'number', unit: '日', span: 8, lw: 3 }, { label: '支払日', key: 'shiharaiBi', type: 'number', unit: '日', span: 8, lw: 3 }],
         [{ label: '　　前渡金', key: 'maetoki', type: 'number', unit: '％', span: 8 }, { label: '中間払', key: 'chukan', type: 'number', unit: '回', span: 8, lw: 3 }, { label: '竣工後', key: 'shunko', type: 'number', unit: '％', span: 8, lw: 3 }],
