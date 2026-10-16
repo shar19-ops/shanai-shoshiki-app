@@ -99,6 +99,11 @@
     background: var(--blue-2); color: #fff; font-weight: 800; font-size: 10.5pt; line-height: 1.3;
     border-radius: 3.5mm; padding: 2mm 2mm; box-shadow: 0 1.2mm 0 var(--blue-1); min-height: 11.5mm; }
   .slip small { display: block; font-size: 8pt; font-weight: 700; opacity: .85; }
+  /* ボタンの色は各アプリのアイコンの色 */
+  .slip.furikae { background: #009725; box-shadow: 0 1.2mm 0 #006b1a; }
+  .slip.ippan   { background: #0196ff; box-shadow: 0 1.2mm 0 #006ac0; }
+  .slip.misei   { background: #7918ff; box-shadow: 0 1.2mm 0 #5410b8; }
+  .slip.genka   { background: #0000bd; box-shadow: 0 1.2mm 0 #000080; }
   .slips .manual { margin-left: auto; font-size: 8.5pt; font-weight: 700; color: var(--ink); }
   .slips .manual a { color: var(--blue-2); font-weight: 700; }
 
@@ -176,10 +181,10 @@
   <div class="card slips">
     <h2>伝票・原価計算書アプリ<span class="tag">こちらから開けます</span><span class="manual">📖 操作マニュアル：<a href="https://shar19-ops.github.io/transfer-slip-app/%E4%BC%9D%E7%A5%A8%E3%83%9E%E3%83%8B%E3%83%A5%E3%82%A2%E3%83%AB.html">伝票</a>／<a href="https://shar19-ops.github.io/genka-webapp/manual.html">原価計算書</a></span></h2>
     <div class="row">
-      <a class="slip" href="https://shar19-ops.github.io/transfer-slip-app/%E6%8C%AF%E6%9B%BF%E4%BC%9D%E7%A5%A8.html">振替伝票 ›</a>
-      <a class="slip" href="https://shar19-ops.github.io/shiharai-denpyo/%E6%94%AF%E6%89%95%E4%BC%9D%E7%A5%A8%E3%80%90%E4%B8%80%E8%88%AC%E7%AE%A1%E7%90%86%E8%B2%BB%E3%80%91.html"><span>支払伝票 ›<small>一般管理費</small></span></a>
-      <a class="slip" href="https://shar19-ops.github.io/payment-slip-app/"><span>支払伝票 ›<small>未成工事用</small></span></a>
-      <a class="slip" href="https://shar19-ops.github.io/genka-webapp/">原価計算書 ›</a>
+      <a class="slip furikae" href="https://shar19-ops.github.io/transfer-slip-app/%E6%8C%AF%E6%9B%BF%E4%BC%9D%E7%A5%A8.html">振替伝票 ›</a>
+      <a class="slip ippan" href="https://shar19-ops.github.io/shiharai-denpyo/%E6%94%AF%E6%89%95%E4%BC%9D%E7%A5%A8%E3%80%90%E4%B8%80%E8%88%AC%E7%AE%A1%E7%90%86%E8%B2%BB%E3%80%91.html"><span>支払伝票 ›<small>一般管理費</small></span></a>
+      <a class="slip misei" href="https://shar19-ops.github.io/payment-slip-app/"><span>支払伝票 ›<small>未成工事用</small></span></a>
+      <a class="slip genka" href="https://shar19-ops.github.io/genka-webapp/">原価計算書 ›</a>
     </div>
   </div>
 
