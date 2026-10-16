@@ -553,6 +553,8 @@
     pages.forEach((p) => root.append(sheetEl(def, p)));
     if (def.selfStamp) calcs.push(renderSelfStamps); // 日付の入力に追従
     recalc();
+    // 帳票ごとの追加の動き（例：般-22 物件略称の漢字→カタカナ自動入力）
+    if (def.setup) def.setup({ inputs, values, setVal });
     fitTitles();
     if (document.fonts) document.fonts.ready.then(fitTitles);
   }

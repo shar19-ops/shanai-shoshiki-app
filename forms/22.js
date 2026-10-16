@@ -1,6 +1,7 @@
-// 受注報告登録メモ（簡易版の試作）
-// 本来の受注登録メモアプリ（juchu-touroku-webapp）は社内共有フォルダの得意先・担当者マスタを読み込むが、
+// 受注報告登録メモ（簡易版）
+// 本来の受注登録メモアプリ（juchu-touroku-webapp、別アプリとして継続）は社内共有フォルダの得意先・担当者マスタを読み込むが、
 // ここでは読み込まず、コード・名称を手入力する。検印の流れ・添付書類・CSV出力は持たない（紙で回送）。
+// 項目・選択肢・計算は受注登録メモアプリの form-fields.js に合わせる。
 (function () {
   const C = CODES;
   const it = (no, label, key, o = {}) => ({ label: `${no}. ${label}`, key, span: 12, req: true, ...o });
@@ -12,7 +13,57 @@
   const sel = (no, label, key, options, o = {}) => it(no, label, key, { type: 'select', options, span: 8, ...o });
   const busho = ['01040：営業本部', '01021：第1工事本部', '01022：第2工事本部', '01023：ＲＥ部', '02000：東関東支店',
     '03000：横浜支店', '04000：大阪支店', '05000：名古屋支店', '06000：仙台支店', '09000：北関東支店'];
+  // 38. 小工事実行予算の列（見出し, keyの末尾）
+  const COLS = [['材料費\n（F50）', 'Zai'], ['外注費\n（Z50）', 'Gai'], ['工料\n（K50）', 'Kou'], ['経費\n（O00）', 'Kei2']];
   const pct = (a, b) => (a ? Math.floor(((a - b) / a) * 1000) / 10 : null); // 粗利率（小数点第2位切捨て）
+
+  // 03.物件略称(漢字)の入力から04.物件略称(ｶﾀｶﾅ)を自動入力（受注登録メモアプリの bindFuriganaAutoFill を移植）
+  // IMEで変換確定前のかな（compositionupdate）を捕まえて全角カタカナにし、04へ追記する。英数字はそのまま追記。
+  // 03の末尾を消すと対応する分を04からも消す。04を手で直した後は、04には触れない。
+  const isKana = (t) => /^[぀-ゟ゠-ヿー]*$/.test(t || '');
+  const isAlnum = (t) => /^[A-Za-z0-9Ａ-Ｚａ-ｚ０-９]+$/.test(t || '');
+  const toKatakana = (t) => String(t ?? '').replace(/[ぁ-ゖ]/g, (c) => String.fromCharCode(c.charCodeAt(0) + 0x60));
+  function bindKana({ inputs, setVal }) {
+    const kanji = inputs.nameKanji, kana = inputs.nameKana;
+    if (!kanji || !kana) return;
+    let composing = '';
+    let auto = kana.value || '';
+    let segments = []; // { kanjiLen, kana }
+    let tracked = kanji.value.length;
+    const intact = () => kana.value === auto;
+    const apply = () => { kana.value = auto; setVal('nameKana', auto); };
+    const push = (len, k) => { segments.push({ kanjiLen: len, kana: k }); tracked += len; auto += k; apply(); };
+    const trim = (newLen) => {
+      if (!intact()) { tracked = newLen; segments = []; return; }
+      while (segments.length && tracked > newLen) {
+        const seg = segments.pop();
+        tracked -= seg.kanjiLen;
+        auto = auto.slice(0, auto.length - seg.kana.length);
+      }
+      tracked = Math.min(tracked, newLen);
+      apply();
+    };
+    kanji.addEventListener('compositionstart', () => { composing = ''; });
+    kanji.addEventListener('compositionupdate', (e) => { if (isKana(e.data)) composing = e.data; });
+    kanji.addEventListener('compositionend', () => {
+      if (!composing || !intact()) return;
+      const added = kanji.value.length - tracked;
+      if (added > 0) push(added, toKatakana(composing));
+    });
+    kanji.addEventListener('input', (e) => {
+      const newLen = kanji.value.length;
+      if (newLen === 0) {
+        segments = []; tracked = 0;
+        if (intact()) { auto = ''; apply(); }
+        return;
+      }
+      if (e.isComposing) return; // 変換中はcompositionendで処理
+      if (newLen < tracked) { trim(newLen); return; }
+      // 英数字の追記だけ04へ反映。貼り付け・途中への挿入などは追跡をやめる
+      if (!e.data || !isAlnum(e.data) || newLen !== tracked + e.data.length || !intact()) { tracked = newLen; segments = []; return; }
+      push(e.data.length, e.data);
+    });
+  }
 
   FORM_DEFS['22'] = {
     code: '般-22', title: '受注報告登録メモ',
@@ -20,6 +71,7 @@
     meta: [{ label: '発行日', key: 'date', type: 'date' }],
     stamps: [{ boxes: ['確認', '確認', '発行者'] }],
     bottomStamps: ['登録済検印'],
+    setup: bindKana,
     blocks: [
       { type: 'grid', dense: true, lalign: 'left', lw: 5, rows: [
         [{ label: '注文区分', key: 'kubun', type: 'select', options: ['1：新規', '2：増額', '3：減額', '4：赤伝/黒伝', '5：工事取消'], span: 6, lw: 3, req: true },
@@ -29,7 +81,7 @@
         '■ 基本情報',
         [it('01', '受注計上年月', 'keijoYm', { type: 'ym', span: 9 }), { label: '02. 契約先', key: 'keiyakuCd', placeholder: 'コード', span: 7, lw: 3, req: true }, { key: 'keiyakuName', placeholder: '名称', span: 8 }],
         [it('03', '物件略称(漢字)', 'nameKanji', { span: 24, maxlength: 30, placeholder: '30文字以内' })],
-        [it('04', '物件略称(ｶﾀｶﾅ)', 'nameKana', { span: 24, maxlength: 30, placeholder: '30文字以内' })],
+        [it('04', '物件略称(ｶﾀｶﾅ)', 'nameKana', { span: 24, maxlength: 30, placeholder: '03の入力から自動で入ります（変換が不完全な場合は修正してください）' })],
         [it('05', '工期', 'kFrom', { key2: 'kTo', type: 'daterange', span: 16 }), it('06', '施工地区', 'chiku', { span: 8, lw: 4 })],
         [it('07', '工事場所(漢字)', 'place', { span: 24, maxlength: 30, placeholder: '30文字以内' })],
         [sel('08', '推定・確定識別', 'suitei', ['1：確定', '2：推定'], { span: 12 }), sel('09', '注文書類識別', 'chumon', ['1：注文書（契約書含む）', '2：承諾書'], { span: 12 })],
@@ -64,9 +116,12 @@
         '■ その他',
         [sel('35', '契約方式識別', 'keiyakuHoshiki', ['0：通常', '1：コストオン工事', '2：CM'], { span: 12 }), sel('36', '予算変更', 'yosan', ['1：有り', '2：無し'], { span: 12, req: false })],
         [it('37', '特記事項', 'tokki', { span: 24, maxlength: 30, placeholder: '30文字以内', req: false })],
-        [{ label: '38. 小工事実行予算', span: 5, rs: 3 }, { label: '', span: 3 }, ...['材料費（F50）', '外注費（Z50）', '工料（K50）', '経費（O00）'].map((l) => ({ label: l, span: 4, lalign: 'center' }))],
-        [{ label: '積算金額', span: 3 }, ...['zZai', 'zGai', 'zKou', 'zKei'].map((k) => ({ key: k, type: 'money', span: 4 }))],
-        [{ label: '実行金額', span: 3 }, ...['jZai', 'jGai', 'jKou', 'jKei'].map((k) => ({ key: k, type: 'money', span: 4 }))],
+        // 38. 小工事実行予算：金額は百万の位（9,999,999）まで入る幅（3列）。合計は行ごとに自動計算（千万の位まで入るよう4列）
+        [{ label: '38. 小工事実行予算', span: 5, rs: 3 }, { label: '', span: 3 },
+          ...COLS.map((c) => ({ label: c[0], span: 3, lalign: 'center' })), { label: '合　計', span: 4, lalign: 'center' }],
+        ...[['z', '積算金額'], ['j', '実行金額']].map(([r, l]) => [{ label: l, span: 3 },
+          ...COLS.map((c) => ({ key: r + c[1], type: 'money', span: 3 })),
+          { key: r + 'Kei', type: 'calc', span: 4, calc: (n) => COLS.reduce((t, c) => t + n(r + c[1]), 0) }]),
       ] },
       { type: 'notes', items: [
         '(注1) 得意先・担当者はコードと名称を記入（マスタの検索はありません）。色付きの欄は必須記入項目。',
