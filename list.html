@@ -147,23 +147,23 @@
 
   <div class="steps">
     <div class="step"><div class="n">1</div><div><b>開く</b><span>帳票一覧から書類を選ぶ</span></div></div>
-    <div class="step"><div class="n">2</div><div><b>入力</b><span>自動で下書き保存。合計などは自動計算</span></div></div>
-    <div class="step"><div class="n">3</div><div><b>印刷して回送</b><span>これまでどおり紙で回送・押印</span></div></div>
+    <div class="step"><div class="n">2</div><div><b>入力</b><span>自動で下書き保存。<br>合計などは自動計算</span></div></div>
+    <div class="step"><div class="n">3</div><div><b>印刷して回送</b><span>これまでどおり紙で<br>押印・回送</span></div></div>
   </div>
 
   <div class="card about">
     <h2>このアプリについて<span class="tag">ご確認ください</span></h2>
     <ul>
       <li><span class="ic" style="background:#e6eeff"><svg viewBox="0 0 24 24" fill="none" stroke="#1f3f8f" stroke-width="2.4" stroke-linecap="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></span>
-        <span><b>データはこのPCの中だけ</b>入力内容は使っているPCのブラウザ内にだけ保存されます。</span></li>
+        <span><b>データはこのPCの中だけ</b>入力内容は使っているPCの<br>ブラウザ内にだけ保存されます。</span></li>
       <li><span class="ic" style="background:#e1f8f3"><svg viewBox="0 0 24 24" fill="none" stroke="#14907c" stroke-width="2.4" stroke-linecap="round"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/><path d="M4 4l16 16"/></svg></span>
         <span><b>データベースは使っていません</b>サーバーへの送信・保存はありません。</span></li>
       <li><span class="ic" style="background:#fff3cf"><svg viewBox="0 0 24 24" fill="none" stroke="#b07d00" stroke-width="2.4" stroke-linecap="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg></span>
         <span><b>残したいときは印刷・PDF保存</b>別のPCや別のブラウザには引き継がれません。</span></li>
       <li><span class="ic" style="background:#ffe7dd"><svg viewBox="0 0 24 24" fill="none" stroke="#d2552a" stroke-width="2.4" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></span>
-        <span><b>共用PCは印刷後に「クリア」</b>次に使う人に内容が残らないようにしてください。</span></li>
+        <span><b>共用PCは印刷後に「クリア」</b>次に使う人に内容が残らないように<br>してください。</span></li>
       <li><span class="ic" style="background:#ffe1e1"><svg viewBox="0 0 24 24" fill="none" stroke="#c8341b" stroke-width="2.4"><circle cx="12" cy="12" r="8.5"/><path d="M5 9.5h14M5 14.5h14"/></svg></span>
-        <span><b>押印設定でデート印</b>苗字・役職を一度登録すると、発行者欄などにデート印が入ります（PCごとに登録）。</span></li>
+        <span><b>押印設定でデート印</b>苗字・役職を一度登録すると、<br>発行者欄などにデート印が入ります<br>（PCごとに登録）。</span></li>
       <li><span class="ic" style="background:#e6eeff"><svg viewBox="0 0 24 24" fill="none" stroke="#1f3f8f" stroke-width="2.4"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.6 2.5 14.4 0 17M12 3.5c-2.5 2.6-2.5 14.4 0 17"/></svg></span>
         <span><b>推奨ブラウザ</b>Microsoft Edge または Google Chrome でご利用ください。</span></li>
     </ul>
@@ -197,7 +197,7 @@
     var BASE = new URLSearchParams(location.search).get('base') || 'https://shar19-ops.github.io/shanai-shoshiki-app/';
     // 配布時のお知らせ
     var NOTICES = [
-      '伝票・原価計算書アプリは上のボタンから、その他の社内アプリは別紙「雄電社 社内アプリ一覧」からお使いください。',
+      '伝票・原価計算書アプリは上のボタンから、<br>その他の社内アプリは別紙「雄電社 社内アプリ一覧」からお使いください。',
       'この書式は<em>2027年3月末</em>にて公開を終了する予定です。',
     ];
     var q = qrcode(0, 'M'); q.addData(BASE); q.make();
