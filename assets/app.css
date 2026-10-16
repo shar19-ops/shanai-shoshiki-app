@@ -64,7 +64,8 @@ body {
   display: flex; align-items: flex-start; gap: 6mm;
   margin-bottom: 4mm;
 }
-.f-head-left { flex: 1; min-width: 0; }
+.f-head-left { flex: 1; min-width: 0; align-self: stretch; display: flex; flex-direction: column; align-items: flex-start; }
+.f-head-left .head-blocks { margin-top: auto; padding-top: 3mm; align-self: stretch; }
 .f-code { font-size: 8pt; color: #555; letter-spacing: .05em; }
 .f-title {
   font-size: 20pt; font-weight: bold; letter-spacing: .3em;
