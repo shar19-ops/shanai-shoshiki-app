@@ -12,8 +12,8 @@
     blocks: [
       { type: 'grid', dense: true, rowH: 6, rows: [
         [{ label: '会社コード', key: 'code', span: 12, req: true }, { span: 12 }],
-        [{ label: '取引先\n概況', span: 2, rs: 9, req: true }, { label: '商号', span: 2, rs: 2 }, { label: 'ｶﾅ', key: 'kana', lw: 2, span: 12 }, { label: '創業', key: 'sogyo', placeholder: '年月', lw: 2, span: 4 }, { label: '設立', key: 'setsuritsu', placeholder: '年月', lw: 2, span: 4 }],
-        [{ key: 'shogo', span: 12 }, { label: '決算月', key: 'kessan', unit: '月', lw: 2, span: 4 }, { label: '従業員', key: 'jugyoin', unit: '名', lw: 2, span: 4 }],
+        [{ label: '取引先\n概況', span: 2, rs: 9, req: true }, { label: '商号', span: 2, rs: 2 }, { label: 'ｶﾅ', key: 'kana', lw: 2, span: 10 }, { label: '創業', key: 'sogyo', placeholder: '年月', lw: 2, span: 5 }, { label: '設立', key: 'setsuritsu', placeholder: '年月', lw: 2, span: 5 }],
+        [{ key: 'shogo', span: 10 }, { label: '決算月', key: 'kessan', unit: '月', lw: 2, span: 4 }, { label: '従業員', key: 'jugyoin', type: 'number', dec: 0, unit: '名', lw: 2, span: 6 }], // 従業員は4桁以上も入る幅
         [{ label: '所在地', span: 2, rs: 2 }, { label: '本店', key: 'honten', lw: 2, span: 12 }, { label: '主力銀行', key: 'bank', lw: 3, span: 8 }],
         [{ label: '取引する店', key: 'mise', lw: 2, span: 12 }, { label: '資本金', key: 'shihon', ...M, lw: 3, span: 8 }],
         [{ label: '代表者', key: 'daihyo', lw: 4, span: 14 }, { label: '売上高', key: 'uriage', ...M, lw: 3, span: 8 }],
