@@ -158,6 +158,9 @@ table.grid th, table.grid td.lbl {
   letter-spacing: .05em; line-height: 1.25;
 }
 table.grid td.lbl.left { text-align: left; }
+/* 見出しの中の小さな入力欄（税率など） */
+.lbl-field { display: inline-flex; align-items: center; white-space: nowrap; }
+.lbl-field .inp { width: 9mm; min-height: 5mm; height: 5mm; padding: 0 .5mm; font-size: 9pt; }
 /* 必須記入欄（元Excelの色塗り欄） */
 table.grid td.lbl.req { background: #fbe0c6; }
 table.grid td.txt { padding: 0 2mm; font-size: 9pt; }

@@ -383,7 +383,9 @@
           // key も text も無い項目はラベル単独（span 全体がラベル）
           const labelOnly = !it.key && it.text == null;
           const lw = labelOnly ? (it.span || cols) : (it.lw ?? b.lw ?? 4);
-          tr.append(h('td', { class: 'lbl' + ((it.lalign || b.lalign) === 'left' ? ' left' : '') + (it.req ? ' req' : ''), colspan: lw, rowspan: rs, style }, ...String(it.label).split('\n').flatMap((s, i) => i ? [h('br'), s] : [s])));
+          // labelField：見出しの中に置く小さな入力欄（例：消費税額（10 ％）の税率）
+          const lf = it.labelField ? h('span', { class: 'lbl-field' }, '（', field({ ...it.labelField, align: 'center' }), it.labelField.unit2 || '', '）') : null;
+          tr.append(h('td', { class: 'lbl' + ((it.lalign || b.lalign) === 'left' ? ' left' : '') + (it.req ? ' req' : ''), colspan: lw, rowspan: rs, style }, ...String(it.label).split('\n').flatMap((s, i) => i ? [h('br'), s] : [s]), lf));
           const rest = (it.span || cols) - lw;
           if (rest > 0) tr.append(valueCell(it, rest, rs, style));
         } else {
