@@ -22,7 +22,7 @@
         [{ label: '営業担当', key: 'eigyo', span: 12 }, { label: '工事担当', key: 'koji', span: 12 }],
         [{ label: '契約金額', key: 'amount', type: 'money', unit: '円', span: 12 }, { label: '請求日', key: 'seikyu', span: 6, lw: 3 }, { label: '支払日', key: 'shiharai', span: 6, lw: 3 }],
         [{ label: '受注先', key: 'juchu', span: 12, req: true }, { label: '支払条件', key: 'joken', span: 12, req: true }],
-        [{ label: '工　期', key: 'kFrom', type: 'date', span: 13, req: true }, { label: '〜', key: 'kTo', type: 'date', span: 11, lw: 1 }],
+        [{ label: '工　期', key: 'kFrom', key2: 'kTo', type: 'daterange', span: 24, req: true }], // 「〜」の両側に罫線なし
         [{ label: '現　場', span: 4, rs: 2 }, { label: '住所', key: 'siteAddr', lw: 4, span: 20, req: true }],
         [{ label: 'TEL', key: 'siteTel', type: 'tel', lw: 4, span: 10 }, { span: 10 }],
         ...party('施　主', 'seshu'),

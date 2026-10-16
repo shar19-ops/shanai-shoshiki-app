@@ -10,7 +10,7 @@ FORM_DEFS['47'] = {
   blocks: [
     { type: 'grid', rows: [
       [{ label: '事業所コード', key: 'officeCd', type: 'select', options: LISTS.officeCodes, span: 6, lw: 3 }, { label: '工　番', key: 'koban', span: 5, lw: 2 }, { label: '件　名', key: 'subject', span: 13, lw: 2 }],
-      [{ label: '工期（納期）', key: 'kFrom', type: 'date', span: 12, lw: 3 }, { label: '〜', key: 'kTo', type: 'date', span: 12, lw: 1 }],
+      [{ label: '工期（納期）', key: 'kFrom', key2: 'kTo', type: 'daterange', span: 24, lw: 3 }], // 「〜」の両側に罫線なし
     ] },
     {
       type: 'table', key: 'r', rows: 14, rowH: 7.2,

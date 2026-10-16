@@ -12,8 +12,8 @@ FORM_DEFS['26'] = {
       [{ label: '事業所', key: 'office', type: 'select', options: LISTS.officeCodes, span: 10 }, { span: 14 }],
       [{ label: '工　番', key: 'koban', span: 10 }, { label: '件　名', key: 'subject', span: 14, lw: 3 }],
       [{ label: '得意先', key: 'client', span: 14 }, { label: '契約金額', key: 'amount', type: 'money', unit: '円', span: 10, lw: 3 }],
-      [{ label: '工　期', span: 4, rs: 2 }, { label: '変更前', key: 'kBefFrom', type: 'date', lw: 3, span: 10 }, { label: '〜', key: 'kBefTo', type: 'date', lw: 1, span: 10 }],
-      [{ label: '変更後', key: 'kAftFrom', type: 'date', lw: 3, span: 10 }, { label: '〜', key: 'kAftTo', type: 'date', lw: 1, span: 10 }],
+      [{ label: '工　期', span: 4, rs: 2 }, { label: '変更前', key: 'kBefFrom', key2: 'kBefTo', type: 'daterange', lw: 3, span: 20 }], // 「〜」の両側に罫線なし
+      [{ label: '変更後', key: 'kAftFrom', key2: 'kAftTo', type: 'daterange', lw: 3, span: 20 }],
       [{ label: '工事担当者', span: 4, rs: 2 }, { label: '変更前', span: 3 }, { label: 'コード', key: 'tBefCd', lw: 2, span: 6 }, { label: '氏名', key: 'tBefName', lw: 2, span: 11 }],
       [{ label: '変更後', span: 3 }, { label: 'コード', key: 'tAftCd', lw: 2, span: 6 }, { label: '氏名', key: 'tAftName', lw: 2, span: 11 }],
       [{ label: '部　署', span: 4, rs: 2 }, { label: '変更前', key: 'bBef', lw: 3, span: 20 }],
