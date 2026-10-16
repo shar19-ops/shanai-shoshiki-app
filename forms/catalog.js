@@ -34,5 +34,5 @@ window.CATALOG = [
   { id: '47', no: '般-47', title: '外注品発注承認書' },
   { id: '48', no: '般-48', title: '入札結果報告書' },
   { id: '52', no: '般-52', title: '代行支払い承諾書' },
-  { id: '53', no: '般-53', title: '通勤用定期券購入申請書' }, // 元のExcelなし（新規作成）
+  { id: '53', no: '般-53', title: '通勤用定期券購入申請書', isNew: true }, // 元のExcelなし（新規作成）。isNew: true で一覧に NEW マーク
 ];
