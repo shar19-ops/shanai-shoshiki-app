@@ -1,6 +1,11 @@
 // 営業活動報告書（行先・経費）— 1週間ごとに回送
 (function () {
   const DOW = ['月', '火', '水', '木', '金', '土', '日'];
+  // 週の開始日から r 行目（1始まり）の日付。未入力なら null
+  const dayOf = (v, r) => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(v.week || '')) return null;
+    const d = new Date(v.week + 'T00:00'); d.setDate(d.getDate() + r - 1); return d;
+  };
   FORM_DEFS['01'] = {
     code: '般-01', title: '営業活動報告書', subtitle: '（行先・経費）',
     selfStamp: '発行', // 本人欄（デート印を押す欄）
@@ -13,8 +18,9 @@
       {
         type: 'table', key: 'days', rows: 7, rowH: 26,
         columns: [
-          { label: '月日', key: 'md', w: 9, align: 'center', placeholder: '月/日' },
-          { label: '曜', key: 'dow', w: 4, head: (r) => DOW[r - 1] },
+          // 月日は週の開始日から自動記入（未入力なら空欄）。曜日は日付があれば実際の曜日、なければ月〜日
+          { label: '月日', key: 'md', w: 9, align: 'center', rowCalc: (r, v) => { const d = dayOf(v, r); return d ? `${d.getMonth() + 1}/${d.getDate()}` : ''; } },
+          { label: '曜', key: 'dow', w: 4, align: 'center', rowCalc: (r, v) => { const d = dayOf(v, r); return d ? '日月火水木金土'[d.getDay()] : DOW[r - 1]; } },
           { label: '行　先', key: 'dest', w: 20, type: 'textarea', plain: true },
           { label: '実施報告', key: 'report', w: 36, type: 'textarea', plain: true },
           { label: '経費', key: 'cost', w: 11, type: 'money' },
