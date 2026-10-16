@@ -14,9 +14,9 @@
   };
   FORM_DEFS['53'] = {
     code: '般-53', title: '通勤用定期券購入申請書',
-    selfStamp: '発行', // 本人欄（デート印を押す欄）
+    selfStamp: '申請者', // 本人欄（デート印を押す欄）
     meta: [{ label: '申請日', key: 'date', type: 'date' }],
-    stamps: [{ boxes: ['承認', '確認', '確認', '発行'] }],
+    stamps: [{ boxes: ['承認', '確認', '確認', '申請者'] }],
     bottomStamps: ['入力検印'], // 台帳への入力済みの確認（承認ルート外なので表の下）
     blocks: [
       { type: 'para', text: '下記のとおり、通勤用定期券の購入を申請します。' },
