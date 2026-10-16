@@ -175,7 +175,7 @@
       el = h('input', {
         class: 'inp' + (isNum ? ' num' : '') + (f.align === 'center' ? ' center' : ''),
         type: 'text', value: v, placeholder: f.placeholder || '',
-        inputmode: isNum ? 'decimal' : (type === 'tel' || type === 'zip' ? 'tel' : null),
+        inputmode: f.inputmode || (isNum ? 'decimal' : (type === 'tel' || type === 'zip' ? 'tel' : null)),
         maxlength: f.maxlength || null,
         list: f.suggest ? 'dl_' + key : null,
         oninput: (e) => setVal(key, e.target.value),
