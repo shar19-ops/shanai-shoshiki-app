@@ -84,6 +84,10 @@ body {
 .f-meta .m-item.right { margin-left: auto; }
 .f-meta .m-label { color: #333; white-space: nowrap; }
 .f-meta .m-val { border-bottom: 1px solid var(--line); min-width: 38mm; }
+.f-meta .m-item.big { font-size: 13pt; font-weight: bold; }
+.f-meta .m-item.big .inp { font-size: 13pt; font-weight: bold; }
+.f-meta .m-item.newline { flex-basis: 100%; }
+.f-meta .m-item.noline .m-val { border-bottom: none; }
 
 /* 押印欄 */
 /* 押印欄：入りきらないときは上下2段に折り返す（右寄せ） */

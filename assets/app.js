@@ -150,7 +150,7 @@
         onmousedown: f.codeOnly ? () => labels(true) : null,
         onkeydown: f.codeOnly ? () => labels(true) : null,
         onblur: f.codeOnly ? () => labels(false) : null,
-      }, h('option', { value: '' }, ''), opts.map(([ov, ol]) => h('option', { value: ov, selected: ov === v }, f.codeOnly ? ov : ol)));
+      }, h('option', { value: '' }, f.placeholder || ''), opts.map(([ov, ol]) => h('option', { value: ov, selected: ov === v }, f.codeOnly ? ov : ol)));
       if (f.codeOnly) window.addEventListener('beforeprint', () => labels(false)); // 印刷は必ずコードだけ
     } else if (type === 'textarea') {
       const lines = f.lines || 4;
@@ -352,8 +352,8 @@
       h('div', { class: 'f-head-left' },
         h('div', { class: 'f-code' }, d.code),
         h('div', { class: 'f-title' }, d.title, d.subtitle ? h('span', { class: 'f-sub' }, d.subtitle) : null),
-        // meta の right: true は押印欄側（右端）に寄せる
-        d.meta ? h('div', { class: 'f-meta' }, d.meta.map((m) => h('div', { class: 'm-item' + (m.right ? ' right' : '') },
+        // meta の right: true は押印欄側（右端）に寄せる。cls で見た目を追加（big：大きめの文字、newline：次の行に置く）
+        d.meta ? h('div', { class: 'f-meta' }, d.meta.map((m) => h('div', { class: 'm-item' + (m.right ? ' right' : '') + (m.cls ? ' ' + m.cls : '') },
           h('span', { class: 'm-label' }, m.label),
           h('span', { class: 'm-val', style: m.w ? `min-width:${m.w}mm` : '' }, field(m))))) : null,
         // headBlocks：タイトルの下（押印欄の左側の空き）に置く項目。下端を押印欄の下端にそろえる
