@@ -66,11 +66,11 @@
         ],
         foot: [[{ label: '', span: 4, lbl: false }, { label: '計' }, { sum: 'cost' }, { label: '', lbl: false }]],
       },
-      // 般-01 と同じ形：注意書き＋経費の内訳（交通費・その他を記入）
+      // 経費の内訳：その他を記入すると、交通費＝計−その他を自動で入れる
       { type: 'row', items: [
-        { type: 'notes', items: ['※ 日付・曜日は、表題の下で選んだ開始日（各月の1日・11日・21日）から自動で入ります。'] },
+        { type: 'notes', items: ['※ 日付・曜日は、表題の下で選んだ開始日（各月の1日・11日・21日）から自動で入ります。', '※ 内訳はその他を記入してください。交通費は「計 − その他」で自動で入ります。'] },
         { type: 'grid', w: 45, rows: [
-          [{ label: '内訳', span: 4, rs: 2 }, { label: '交通費', key: 'kotsu', type: 'money', unit: '円', span: 20, lw: 6 }],
+          [{ label: '内訳', span: 4, rs: 2 }, { label: '交通費', key: 'kotsu', type: 'calc', calc: (n) => n('d.sum.cost') - n('other'), unit: '円', span: 20, lw: 6 }],
           [{ label: 'その他', key: 'other', type: 'money', unit: '円', span: 20, lw: 6 }],
         ] },
       ] },
