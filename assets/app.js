@@ -411,7 +411,7 @@
   //   foot: [{label, span, key(合計対象の列key) | text}]
   function tableBlock(b) {
     const cols = b.columns;
-    const tbl = h('table', { class: 'grid' },
+    const tbl = h('table', { class: 'grid' + (b.dense ? ' dense' : '') }, // dense：行の多い表（日報など）
       h('colgroup', null, cols.map((c) => h('col', { style: c.w ? `width:${c.w}%` : '' }))));
     const lbl = (s) => String(s).split('\n').flatMap((x, i) => (i ? [h('br'), x] : [x]));
     const hh = 'height:' + (b.headH || 8) + 'mm';
@@ -432,8 +432,17 @@
       tbl.append(h('thead', null, h('tr', null, cols.map((c) => h('th', { style: hh }, ...lbl(c.label))))));
     }
     const tb = h('tbody');
+    // groupRows: n 行を1組にする（例：日報の1日3行）。grouped: true の列は組ごとに縦にまとめ（rowspan）、
+    // 組の先頭行の r で rowCalc を呼ぶ。組の境目は罫線を太くする
+    const gn = b.groupRows || 1;
     for (let r = 1; r <= b.rows; r++) {
-      tb.append(h('tr', null, cols.map((c) => {
+      const gStart = (r - 1) % gn === 0;
+      tb.append(h('tr', { class: gn > 1 && gStart && r > 1 ? 'grp-start' : null }, cols.map((c) => {
+        if (c.grouped && gn > 1) {
+          if (!gStart) return null;
+          const f = { ...c, key: `${b.key}.${r}.${c.key}`, type: 'calc', calc: (n, v) => c.rowCalc(r, v) };
+          return h('td', { rowspan: gn, class: 'grp-cell' }, field(f));
+        }
         const key = `${b.key}.${r}.${c.key}`;
         if (c.rowNo) return h('td', { class: 'txt', style: 'text-align:center' + (b.rowH ? `;height:${b.rowH}mm` : '') }, String(r + (b.rowNoStart || 1) - 1));
         // head(r) が文字列なら固定表示、null なら入力欄（予備行など）

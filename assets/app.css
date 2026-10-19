@@ -167,6 +167,9 @@ table.grid td.txt { padding: 0 2mm; font-size: 9pt; }
 table.grid td.note { padding: 1mm 2mm; font-size: 8pt; color: #333; white-space: pre-line; line-height: 1.5; }
 table.grid tr.thin td { height: 6mm; }
 table.grid tfoot td { border-top: 1.5px solid var(--line); }
+/* 明細表の行の組（groupRows）：組の境目を太く、まとめた列は中央に */
+table.grid tr.grp-start > td { border-top: 1.5px solid var(--line); }
+table.grid td.grp-cell .inp { text-align: center; padding: 0; }
 /* 項目の多い帳票用（登録メモ類） */
 table.grid.dense td, table.grid.dense th { height: 5mm; }
 table.grid.dense .date-wrap .pv { font-size: 8.5pt; }
