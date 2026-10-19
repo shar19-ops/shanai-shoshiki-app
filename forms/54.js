@@ -50,7 +50,7 @@
       { type: 'grid', dense: true, rows: [
         [{ label: '区　分', span: 3 }, { label: '所属CD', key: 'deptCd', span: 11, lw: 3 },
           { label: '社員CD', key: 'empCode', span: 10, lw: 3, maxlength: 7, inputmode: 'numeric', placeholder: '7桁の数字' }],
-        [{ key: 'kubun', type: 'select', options: ['予定', '実施'], align: 'center', span: 3 }, { label: '所　属', key: 'dept', span: 11, lw: 3 },
+        [{ key: 'kubun', type: 'select', options: ['予定', '実施'], default: '実施', align: 'center', span: 3 }, { label: '所　属', key: 'dept', span: 11, lw: 3 },
           { label: '氏　名', key: 'name', span: 10, lw: 3 }],
       ] },
       {
