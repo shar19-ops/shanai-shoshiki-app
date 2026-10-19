@@ -174,6 +174,14 @@ table.grid tfoot td { border-top: 1.5px solid var(--line); }
 /* 明細表の行の組（groupRows）：組の境目を太く、まとめた列は中央に */
 table.grid tr.grp-start > td { border-top: 1.5px solid var(--line); }
 table.grid td.grp-cell .inp { text-align: center; padding: 0; }
+/* 日ごとのコピー・貼り付け（groupCopy）：まとめた列をクリックするとメニュー */
+table.grid td.grp-copy { cursor: pointer; }
+table.grid td.grp-copy:hover { background: #e6eeff; }
+table.grid td.grp-copy .inp { cursor: pointer; }
+.grp-menu { position: absolute; z-index: 50; display: flex; flex-direction: column; background: #fff; border: 1px solid #b8bfcc; border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,.18); padding: 4px; }
+.grp-menu button { font: inherit; font-size: 10pt; text-align: left; padding: 6px 12px; border: 0; background: none; border-radius: 4px; cursor: pointer; white-space: nowrap; }
+.grp-menu button:hover:not(:disabled) { background: #e6eeff; }
+.grp-menu button:disabled { color: #aaa; cursor: default; }
 /* 項目の多い帳票用（登録メモ類） */
 table.grid.dense td, table.grid.dense th { height: 5mm; }
 table.grid.dense .date-wrap .pv { font-size: 8.5pt; }

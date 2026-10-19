@@ -54,7 +54,7 @@
           { label: '氏　名', key: 'name', span: 10, lw: 3 }],
       ] },
       {
-        type: 'table', key: 'd', rows: DAYS * PER, groupRows: PER, rowH: 5.3, headH: 6, dense: true,
+        type: 'table', key: 'd', rows: DAYS * PER, groupRows: PER, groupCopy: true, rowH: 5.3, headH: 6, dense: true,
         columns: [
           { label: '日', key: 'day', w: 3.5, grouped: true, rowCalc: (r, v) => { const d = dayOf(v, groupOf(r)); return d ? String(d.getDate()) : ''; } },
           { label: '曜', key: 'dow', w: 3.5, grouped: true, rowCalc: (r, v) => { const d = dayOf(v, groupOf(r)); return d ? '日月火水木金土'[d.getDay()] : ''; } },
