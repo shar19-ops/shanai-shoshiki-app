@@ -50,6 +50,7 @@
   // ---------- 状態 ----------
   let def, values = {}, storeKey, saveTimer;
   const inputs = {};   // key -> element(s)
+  let groupClip = null; // 明細表の「この日をコピー」で覚えた内容（組の行×入力列）
   const calcs = [];    // 再計算関数
 
   function save() {
@@ -150,7 +151,7 @@
         onmousedown: f.codeOnly ? () => labels(true) : null,
         onkeydown: f.codeOnly ? () => labels(true) : null,
         onblur: f.codeOnly ? () => labels(false) : null,
-      }, h('option', { value: '' }, ''), opts.map(([ov, ol]) => h('option', { value: ov, selected: ov === v }, f.codeOnly ? ov : ol)));
+      }, h('option', { value: '' }, f.placeholder || ''), opts.map(([ov, ol]) => h('option', { value: ov, selected: ov === v }, f.codeOnly ? ov : ol)));
       if (f.codeOnly) window.addEventListener('beforeprint', () => labels(false)); // 印刷は必ずコードだけ
     } else if (type === 'textarea') {
       const lines = f.lines || 4;
@@ -352,8 +353,8 @@
       h('div', { class: 'f-head-left' },
         h('div', { class: 'f-code' }, d.code),
         h('div', { class: 'f-title' }, d.title, d.subtitle ? h('span', { class: 'f-sub' }, d.subtitle) : null),
-        // meta の right: true は押印欄側（右端）に寄せる
-        d.meta ? h('div', { class: 'f-meta' }, d.meta.map((m) => h('div', { class: 'm-item' + (m.right ? ' right' : '') },
+        // meta の right: true は押印欄側（右端）に寄せる。cls で見た目を追加（big：大きめの文字、newline：次の行に置く）
+        d.meta ? h('div', { class: 'f-meta' }, d.meta.map((m) => h('div', { class: 'm-item' + (m.right ? ' right' : '') + (m.cls ? ' ' + m.cls : '') },
           h('span', { class: 'm-label' }, m.label),
           h('span', { class: 'm-val', style: m.w ? `min-width:${m.w}mm` : '' }, field(m))))) : null,
         // headBlocks：タイトルの下（押印欄の左側の空き）に置く項目。下端を押印欄の下端にそろえる
@@ -435,13 +436,57 @@
     // groupRows: n 行を1組にする（例：日報の1日3行）。grouped: true の列は組ごとに縦にまとめ（rowspan）、
     // 組の先頭行の r で rowCalc を呼ぶ。組の境目は罫線を太くする
     const gn = b.groupRows || 1;
+    // 入力できる列（コピー・貼り付けの対象）
+    const editCols = cols.filter((c) => !c.grouped && !c.rowNo && !c.head && !c.calc && !c.rowCalc && c.type !== 'calc');
+    const cellKey = (r, c) => `${b.key}.${r}.${c.key}`;
+    const putCell = (r, c, text) => {
+      let t = String(text ?? '').trim();
+      if (c.type === 'money' || c.type === 'number') { const n = toNum(t); if (t !== '' && !isNaN(n)) t = fmtNum(n, c.dec ?? (c.type === 'money' ? 0 : 2)); }
+      setVal(cellKey(r, c), t);
+      const el = inputs[cellKey(r, c)];
+      if (el && 'value' in el) el.value = t;
+    };
+    // Excel などからの貼り付け：タブ・改行を含む文字列は、貼った欄から右・下へ順に入れる
+    const onPaste = (r, c) => (e) => {
+      const text = (e.clipboardData || window.clipboardData).getData('text');
+      if (!/[\t\n]/.test(text.replace(/\r?\n$/, ''))) return; // 1つの値だけなら普通に貼り付け
+      e.preventDefault();
+      const lines = text.replace(/\r/g, '').replace(/\n$/, '').split('\n');
+      const ci = editCols.indexOf(c);
+      lines.forEach((line, i) => {
+        if (r + i > b.rows) return;
+        line.split('\t').forEach((v, j) => { const cc = editCols[ci + j]; if (cc) putCell(r + i, cc, v); });
+      });
+    };
+    // groupCopy：まとめた列（日など）をクリックすると、その組（1日分）のコピー・貼り付け・クリア
+    const openGroupMenu = (r0, td) => {
+      document.querySelectorAll('.grp-menu').forEach((m) => m.remove());
+      const rows = Array.from({ length: gn }, (_, k) => r0 + k);
+      const copy = () => {
+        groupClip = rows.map((r) => editCols.map((c) => values[cellKey(r, c)] ?? ''));
+        // システムのクリップボードにも（Excel に貼れるようにタブ区切りで）
+        try { navigator.clipboard.writeText(groupClip.map((row) => row.join('\t')).join('\n')); } catch (e) { /* noop */ }
+      };
+      const paste = () => { if (groupClip) rows.forEach((r, k) => editCols.forEach((c, j) => putCell(r, c, (groupClip[k] || [])[j] ?? ''))); };
+      const clear = () => { if (confirm('この日の入力をすべて消去します。よろしいですか？')) rows.forEach((r) => editCols.forEach((c) => putCell(r, c, ''))); };
+      const item = (label, fn, dis) => h('button', { type: 'button', disabled: dis, onclick: (e) => { e.stopPropagation(); fn(); menu.remove(); } }, label);
+      const menu = h('div', { class: 'grp-menu no-print' },
+        item('この日をコピー', copy), item('ここに貼り付け', paste, !groupClip), item('この日をクリア', clear));
+      const rc = td.getBoundingClientRect();
+      menu.style.left = `${rc.right + window.scrollX + 4}px`;
+      menu.style.top = `${rc.top + window.scrollY}px`;
+      document.body.append(menu);
+      setTimeout(() => document.addEventListener('click', () => menu.remove(), { once: true }), 0);
+    };
     for (let r = 1; r <= b.rows; r++) {
       const gStart = (r - 1) % gn === 0;
       tb.append(h('tr', { class: gn > 1 && gStart && r > 1 ? 'grp-start' : null }, cols.map((c) => {
         if (c.grouped && gn > 1) {
           if (!gStart) return null;
           const f = { ...c, key: `${b.key}.${r}.${c.key}`, type: 'calc', calc: (n, v) => c.rowCalc(r, v) };
-          return h('td', { rowspan: gn, class: 'grp-cell' }, field(f));
+          const td = h('td', { rowspan: gn, class: 'grp-cell' + (b.groupCopy ? ' grp-copy' : ''), title: b.groupCopy ? 'クリックでこの日のコピー・貼り付け' : null }, field(f));
+          if (b.groupCopy) td.addEventListener('click', (e) => { e.stopPropagation(); openGroupMenu(r, td); });
+          return td;
         }
         const key = `${b.key}.${r}.${c.key}`;
         if (c.rowNo) return h('td', { class: 'txt', style: 'text-align:center' + (b.rowH ? `;height:${b.rowH}mm` : '') }, String(r + (b.rowNoStart || 1) - 1));
@@ -451,7 +496,9 @@
         const f = { ...c, key };
         if (c.calc) f.calc = (n) => c.calc((k) => n(`${b.key}.${r}.${k}`));
         if (c.rowCalc) { f.type = 'calc'; f.calc = (n, v) => c.rowCalc(r, v); }
-        return h('td', { style: b.rowH ? `height:${b.rowH}mm` : '' }, field(f));
+        const td = h('td', { style: b.rowH ? `height:${b.rowH}mm` : '' }, field(f));
+        if (editCols.includes(c)) td.addEventListener('paste', onPaste(r, c));
+        return td;
       })));
     }
     tbl.append(tb);
