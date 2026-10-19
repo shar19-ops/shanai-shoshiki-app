@@ -18,13 +18,6 @@
     for (let g = 1; g <= DAYS; g++) { const d = dayOf(v, g); if (d) last = d; }
     return last ? `${last.getMonth() + 1}月 ${last.getDate()}日` : '';
   };
-  // 費用明細の種類ごとの経費の合計（元Excelの SUMIF）
-  const sumKind = (kind) => (n, v) => {
-    let s = 0;
-    for (let r = 1; r <= DAYS * PER; r++) if (v[`d.${r}.kind`] === kind) s += n(`d.${r}.cost`);
-    return s;
-  };
-
   FORM_DEFS['54'] = {
     code: '般-54', title: '日　報',
     selfStamp: '印', // 本人欄は氏名横の「印」欄（stampCell）
@@ -49,19 +42,18 @@
           { label: '労務', key: 'romu', w: 4.5, type: 'number', align: 'center' },
           { label: '行動・業務内容', key: 'work', w: 21.5 },
           { label: '経費', key: 'cost', w: 10.5, type: 'money' },
-          { label: '種類', key: 'kind', w: 8, type: 'select', options: ['交通費', '電話代', 'その他'], group: '費用明細' },
-          { label: '内容', key: 'detail', w: 13.5, group: '費用明細' },
+          { label: '費用明細', key: 'detail', w: 21.5 },
         ],
-        foot: [[{ label: '', span: 5, lbl: false }, { label: '計' }, { sum: 'cost' }, { label: '', span: 2, lbl: false }]],
+        foot: [[{ label: '', span: 5, lbl: false }, { label: '計' }, { sum: 'cost' }, { label: '', lbl: false }]],
       },
-      // 経費の内訳（費用明細の種類ごとの合計）
-      { type: 'grid', dense: true, rows: [
-        [{ label: '経費の内訳', span: 3 },
-          { label: '交通費', key: 'sumKotsu', type: 'calc', calc: sumKind('交通費'), unit: '円', span: 7, lw: 3 },
-          { label: '電話代', key: 'sumDenwa', type: 'calc', calc: sumKind('電話代'), unit: '円', span: 7, lw: 3 },
-          { label: 'その他', key: 'sumOther', type: 'calc', calc: sumKind('その他'), unit: '円', span: 7, lw: 3 }],
+      // 般-01 と同じ形：注意書き＋経費の内訳（交通費・その他を記入）
+      { type: 'row', items: [
+        { type: 'notes', items: ['※ 日付・曜日は、年月と開始日（1日・11日・21日）から自動で入ります。'] },
+        { type: 'grid', w: 45, rows: [
+          [{ label: '内訳', span: 4, rs: 2 }, { label: '交通費', key: 'kotsu', type: 'money', unit: '円', span: 20, lw: 6 }],
+          [{ label: 'その他', key: 'other', type: 'money', unit: '円', span: 20, lw: 6 }],
+        ] },
       ] },
-      { type: 'notes', items: ['※ 日付・曜日は、年月と開始日（1日・11日・21日）から自動で入ります。経費は費用明細の種類ごとに上の内訳へ自動で集計します。'] },
     ],
   };
 })();
