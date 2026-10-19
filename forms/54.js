@@ -47,7 +47,7 @@
     stamps: [{ boxes: ['承認', '確認', '確認', '発行者'] }],
     blocks: [
       // 区分は見出しの下に値（予定／実施）を置く
-      { type: 'grid', dense: true, rows: [
+      { type: 'grid', dense: true, rowH: 7.5, rows: [ // 行の高さは通常の1.5倍
         [{ label: '区　分', span: 3 }, { label: '所属CD', key: 'deptCd', span: 11, lw: 3 },
           { label: '社員CD', key: 'empCode', span: 10, lw: 3, maxlength: 7, inputmode: 'numeric', placeholder: '7桁の数字' }],
         [{ key: 'kubun', type: 'select', options: ['予定', '実施'], default: '実施', align: 'center', span: 3 }, { label: '所　属', key: 'dept', span: 11, lw: 3 },
@@ -68,7 +68,7 @@
       },
       // 経費の内訳：その他を記入すると、交通費＝計−その他を自動で入れる
       { type: 'row', items: [
-        { type: 'notes', items: ['※ 日付・曜日は、表題の下で選んだ開始日（各月の1日・11日・21日）から自動で入ります。', '※ 内訳はその他を記入してください。交通費は「計 − その他」で自動で入ります。'] },
+        { type: 'notes', items: ['※ 日付・曜日は、表題の下の開始日から自動で入ります。', '※ 内訳はその他を記入。交通費は「計 − その他」で自動。'] },
         { type: 'grid', w: 45, rows: [
           [{ label: '内訳', span: 4, rs: 2 }, { label: '交通費', key: 'kotsu', type: 'calc', calc: (n) => n('d.sum.cost') - n('other'), unit: '円', span: 20, lw: 6 }],
           [{ label: 'その他', key: 'other', type: 'money', unit: '円', span: 20, lw: 6 }],
