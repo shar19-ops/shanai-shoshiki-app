@@ -596,7 +596,7 @@
     document.head.append(st);
 
     root.append(h('div', { class: 'toolbar' },
-      h('div', { class: 'tb-title' }, h('a', { href: './' }, '一覧 ＞ '), `${def.code}　${def.title}`),
+      h('div', { class: 'tb-title' }, h('a', { href: './', class: 'tb-home', title: '帳票一覧へ' }, h('span', { class: 'app-name' }, h('span', { class: 'y' }, 'Y'), '-Format'), h('span', { class: 'sep' }, '＞')), ` ${def.code}　${def.title}`),
       h('span', { class: 'saved' }),
       h('button', { onclick: () => {
         if (!confirm('入力内容をすべて消去します。よろしいですか？')) return;
