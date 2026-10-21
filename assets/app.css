@@ -32,6 +32,13 @@ body {
 }
 .toolbar .tb-title { font-weight: bold; font-size: 11pt; margin-right: auto; }
 .toolbar .tb-title a { color: #fff; text-decoration: none; opacity: .8; font-weight: normal; }
+/* アプリ名 Y-Format（2026-10-21 決定）：Montserrat ExtraBold、「Y」だけ黄色・以降は白 */
+.app-name { font-family: "Montserrat", "Segoe UI", Arial, sans-serif; font-weight: 800; letter-spacing: .02em; color: #fff; }
+.app-name .y { color: #ffd23f; }
+.toolbar .tb-title .app-name { font-size: 15pt; }
+.toolbar .tb-title a.tb-home { opacity: 1; display: inline-flex; align-items: baseline; gap: 6px; }
+.toolbar .tb-title a.tb-home .app-name { font-size: 13pt; }
+.toolbar .tb-title a.tb-home .sep { opacity: .7; font-weight: normal; }
 .toolbar button {
   font: inherit; font-size: 10pt;
   padding: 6px 14px; border: 1px solid rgba(255,255,255,.6); border-radius: 4px;

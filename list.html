@@ -41,8 +41,8 @@
   /* 背景の水玉（ポップな飾り） */
   .bubble { position: absolute; border-radius: 50%; pointer-events: none; }
   .b1 { width: 92mm; height: 92mm; right: -30mm; top: -26mm; background: rgba(255,255,255,.07); }
-  .b2 { width: 22mm; height: 22mm; right: 50mm; top: 30mm; background: var(--pop); opacity: .9; }
-  .b3 { width: 9mm; height: 9mm; right: 22mm; top: 44mm; background: var(--mint); }
+  .b2 { width: 22mm; height: 22mm; right: 50mm; top: 30mm; background: var(--mint); opacity: .85; } /* 名前の「Y」の黄色とかぶらないようミントに */
+  .b3 { width: 9mm; height: 9mm; right: 22mm; top: 44mm; background: var(--pop-2); }
   .b4 { width: 70mm; height: 70mm; left: -28mm; bottom: 34mm; background: rgba(255,255,255,.06); }
   .b5 { width: 8mm; height: 8mm; left: 82mm; bottom: 12mm; background: var(--pop-2); opacity: .9; }
   .dots { position: absolute; right: 78mm; top: 14mm; width: 30mm; height: 14mm; opacity: .3;
@@ -55,6 +55,7 @@
   h1 .hl { color: var(--pop); }
   /* アプリ名 Y-Format（2026-10-21 決定）。フッターの YUDENSHA と同じ Montserrat ExtraBold */
   h1 .name { font-family: "Montserrat", "Segoe UI", Arial, sans-serif; font-weight: 800; font-size: 36pt; letter-spacing: .02em; }
+  h1 .name .y { color: var(--pop); } /* 「Y」だけ黄色、以降は白 */
   h1 .sub { font-size: 15pt; font-weight: 800; letter-spacing: .08em; margin-left: 4mm; opacity: .95; }
   .catch { font-size: 13pt; font-weight: 700; opacity: .95; }
 
@@ -142,7 +143,7 @@
 
   <div class="head">
     <span class="kicker">一般社内書類</span>
-    <h1><span class="name">Y-<span class="hl">Format</span></span><span class="sub">社内書式アプリ</span></h1>
+    <h1><span class="name"><span class="y">Y</span>-Format</span><span class="sub">社内書式アプリ</span></h1>
     <div class="catch">いつもの社内書類を、ブラウザでかんたん入力・印刷。</div>
   </div>
 
