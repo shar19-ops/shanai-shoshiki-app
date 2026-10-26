@@ -523,7 +523,12 @@
   function freeBlock(b) {
     return wrapTitle(b, h('div', { class: 'free', style: b.grow ? 'flex:1' : '' },
       b.label ? h('div', { class: 'free-label' }, b.label) : null,
-      field({ key: b.key, type: 'textarea', lines: b.lines || 6, placeholder: b.placeholder })));
+      // plain: true で罫線なし（高さは lines 行分、grow なら残りいっぱい）
+      (() => {
+        const el = field({ key: b.key, type: 'textarea', lines: b.lines || 6, placeholder: b.placeholder, plain: b.plain });
+        if (b.plain && !b.grow) el.style.height = `calc(${b.lines || 6} * 7mm + 2mm)`;
+        return el;
+      })()));
   }
 
   function wrapTitle(b, el) {

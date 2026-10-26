@@ -16,6 +16,6 @@ FORM_DEFS['55'] = {
       [{ label: '担当者', key: 'tanto', span: 10 }, { label: '連絡先', key: 'tel', type: 'tel', span: 14 }],
       [{ label: '工　期', key: 'kFrom', key2: 'kTo', type: 'daterange' }], // 「〜」の両側に罫線なし
     ] },
-    { type: 'spacer' },
+    { type: 'free', label: '備　考', key: 'note', plain: true, grow: true }, // 罫線なし。下の検印欄まで伸ばす
   ],
 };
