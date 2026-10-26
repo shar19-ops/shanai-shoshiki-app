@@ -258,6 +258,13 @@ table.grid .date-wrap .pv { text-align: right; font-size: 9.5pt; }
   background: var(--label-bg); border-bottom: 1px solid var(--line);
   padding: 1mm 2mm; font-size: 9pt; letter-spacing: .1em;
 }
+/* 備考の「罫線 なし／あり」切り替え（lineToggle、画面だけ） */
+.free .free-label.has-toggle { display: flex; align-items: center; }
+.free .line-toggle { margin-left: auto; display: inline-flex; align-items: center; gap: 2px; font-size: 8pt; letter-spacing: 0; color: #555; }
+.free .line-toggle button { font: inherit; font-size: 8pt; padding: 1px 8px; border: 1px solid #b8bfcc; background: #fff; color: #555; cursor: pointer; }
+.free .line-toggle button:first-of-type { border-radius: 99px 0 0 99px; margin-left: 4px; }
+.free .line-toggle button:last-of-type { border-radius: 0 99px 99px 0; border-left: 0; }
+.free .line-toggle button.on { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: bold; }
 .free textarea { flex: 1; }
 
 /* 画像欄 */

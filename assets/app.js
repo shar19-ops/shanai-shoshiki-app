@@ -521,14 +521,28 @@
   }
 
   function freeBlock(b) {
+    // plain: true で罫線なし（高さは lines 行分、grow なら残りいっぱい）
+    // lineToggle: true で、見出しの右に「罫線 なし／あり」の切り替え（画面だけ、印刷には出ない）。
+    //   初期値は plain の有無。選んだ状態は `<key>__plain`（'1'＝なし、'0'＝あり）に保存
+    const lines = b.lines || 6;
+    const pk = b.key + '__plain';
+    const isPlain = () => (b.lineToggle && values[pk] != null && values[pk] !== '' ? values[pk] === '1' : !!b.plain);
+    const el = field({ key: b.key, type: 'textarea', lines, placeholder: b.placeholder, plain: isPlain() });
+    el.style.height = b.grow ? '' : `calc(${lines} * 7mm + 2mm)`;
+    let toggle = null;
+    if (b.lineToggle) {
+      const btn = (label, plain) => h('button', { type: 'button', 'data-plain': plain ? '1' : '0', onclick: () => { setVal(pk, plain ? '1' : '0'); paint(); } }, label);
+      toggle = h('span', { class: 'line-toggle no-print' }, '罫線', btn('なし', true), btn('あり', false));
+    }
+    const paint = () => {
+      const p = isPlain();
+      el.classList.toggle('plain', p);
+      if (toggle) toggle.querySelectorAll('button').forEach((x) => x.classList.toggle('on', (x.dataset.plain === '1') === p));
+    };
+    paint();
     return wrapTitle(b, h('div', { class: 'free', style: b.grow ? 'flex:1' : '' },
-      b.label ? h('div', { class: 'free-label' }, b.label) : null,
-      // plain: true で罫線なし（高さは lines 行分、grow なら残りいっぱい）
-      (() => {
-        const el = field({ key: b.key, type: 'textarea', lines: b.lines || 6, placeholder: b.placeholder, plain: b.plain });
-        if (b.plain && !b.grow) el.style.height = `calc(${b.lines || 6} * 7mm + 2mm)`;
-        return el;
-      })()));
+      b.label || toggle ? h('div', { class: 'free-label' + (toggle ? ' has-toggle' : '') }, b.label || '', toggle) : null,
+      el));
   }
 
   function wrapTitle(b, el) {
