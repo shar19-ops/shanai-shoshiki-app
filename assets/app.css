@@ -231,6 +231,14 @@ textarea.inp {
   background-size: 100% 7mm;
 }
 textarea.inp.plain { background-image: none; line-height: 1.5; }
+/* 罫線の切り替えができる記述欄（.lt）は、罫線なしでも行の間隔を罫線ありと同じにする（切り替えても文字の位置が動かない） */
+textarea.inp.lt.plain { line-height: 7mm; }
+/* 表の中の記述欄の「罫線」ボタン（右上、画面だけ） */
+td.ln-cell { position: relative; }
+td.ln-cell textarea.inp { padding-right: 11mm; }
+.ln-btn { position: absolute; top: 2px; right: 2px; z-index: 2; font: inherit; font-size: 7pt; line-height: 1.4; padding: 0 6px; border-radius: 99px; border: 1px solid #b8bfcc; background: #fff; color: #777; cursor: pointer; }
+.ln-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ln-btn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
 .date-wrap { display: flex; align-items: center; height: 100%; }
 .date-wrap input[type=date] { flex: 1; }
 .pv { display: none; }

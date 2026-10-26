@@ -410,7 +410,13 @@
     }
     if (it.text != null && !it.key) return h('td', { class: it.note ? 'note' : 'txt', colspan: span, rowspan: rs, style: style + (it.align ? `;text-align:${it.align}` : '') }, it.text);
     if (!it.key) return h('td', { colspan: span, rowspan: rs, style });
-    return h('td', { colspan: span, rowspan: rs, style }, field(it));
+    const td = h('td', { colspan: span, rowspan: rs, style }, field(it));
+    // 表の中の記述欄：罫線は初期値なし（plain: false なら初期値あり）、右上の「罫線」ボタンで切り替え（lineToggle: false で付けない）
+    if (it.type === 'textarea' && it.lineToggle !== false && !it.plain) {
+      const ta = td.querySelector('textarea');
+      if (ta) { td.classList.add('ln-cell'); td.append(lineButton(it.key, ta, it.plain === false ? false : true)); }
+    }
+    return td;
   }
 
   // table: 明細表。columns: [{label, key, w, type, calc, align}], rows: 行数
@@ -525,17 +531,34 @@
     return wrapTitle(b, tbl);
   }
 
+  // ---------- 記述欄の罫線（なし／あり） ----------
+  // 罫線は初期値「なし」（2026-10-26 ユーザー指定）。使う人が画面で「あり」に切り替えられる（画面だけ、印刷には出ない）。
+  // 選んだ状態は `<key>__plain`（'1'＝なし、'0'＝あり）に保存。帳票の定義で plain: false なら初期値「あり」、
+  // lineToggle: false なら切り替えなし（定義の plain のまま固定）
+  const linePlain = (key, def) => { const v = values[key + '__plain']; return v === '1' ? true : v === '0' ? false : def; };
+  // 表の中の記述欄（textarea）用：欄の右上に小さな「罫線」ボタン（押すと罫線あり／なしが入れ替わる）
+  function lineButton(key, ta, def) {
+    const btn = h('button', { type: 'button', class: 'ln-btn no-print', title: '罫線の表示を切り替え（あり／なし）' }, '罫線');
+    const paint = () => { const p = linePlain(key, def); ta.classList.toggle('plain', p); btn.classList.toggle('on', !p); };
+    btn.addEventListener('click', () => { setVal(key + '__plain', linePlain(key, def) ? '0' : '1'); paint(); });
+    ta.classList.add('lt');
+    paint();
+    return btn;
+  }
+
   function freeBlock(b) {
-    // plain: true で罫線なし（高さは lines 行分、grow なら残りいっぱい）
-    // lineToggle: true で、見出しの右に「罫線 なし／あり」の切り替え（画面だけ、印刷には出ない）。
-    //   初期値は plain の有無。選んだ状態は `<key>__plain`（'1'＝なし、'0'＝あり）に保存
+    // 罫線は初期値なし（b.plain === false なら初期値あり）。見出しの右に「罫線 なし／あり」の切り替え（lineToggle: false で付けない）
+    // 高さは lines 行分、grow なら残りいっぱい
     const lines = b.lines || 6;
     const pk = b.key + '__plain';
-    const isPlain = () => (b.lineToggle && values[pk] != null && values[pk] !== '' ? values[pk] === '1' : !!b.plain);
-    const el = field({ key: b.key, type: 'textarea', lines, placeholder: b.placeholder, plain: isPlain() });
+    const def = b.plain ?? true;
+    const canToggle = b.lineToggle !== false;
+    const isPlain = () => (canToggle ? linePlain(b.key, def) : def);
+    const el = field({ key: b.key, type: 'textarea', lines, placeholder: b.placeholder });
+    el.classList.add('lt');
     el.style.height = b.grow ? '' : `calc(${lines} * 7mm + 2mm)`;
     let toggle = null;
-    if (b.lineToggle) {
+    if (canToggle) {
       const btn = (label, plain) => h('button', { type: 'button', 'data-plain': plain ? '1' : '0', onclick: () => { setVal(pk, plain ? '1' : '0'); paint(); } }, label);
       toggle = h('span', { class: 'line-toggle no-print' }, '罫線', btn('なし', true), btn('あり', false));
     }
