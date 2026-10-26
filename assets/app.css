@@ -265,6 +265,17 @@ table.grid .date-wrap .pv { text-align: right; font-size: 9.5pt; }
 .free .line-toggle button:first-of-type { border-radius: 99px 0 0 99px; margin-left: 4px; }
 .free .line-toggle button:last-of-type { border-radius: 0 99px 99px 0; border-left: 0; }
 .free .line-toggle button.on { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: bold; }
+/* 備考・内容への画像の貼り付け（images）：文章の下に並べる。追加・削除のボタンは画面だけ */
+.free .img-tools { margin-left: auto; }
+.free .img-tools + .line-toggle { margin-left: 8px; }
+.free .img-tools button { font: inherit; font-size: 8pt; letter-spacing: 0; padding: 1px 10px; border: 1px solid #b8bfcc; border-radius: 99px; background: #fff; color: #333; cursor: pointer; }
+.free .img-tools button:hover { border-color: var(--accent); }
+.free-imgs { display: flex; flex-wrap: wrap; gap: 2mm; padding: 2mm; align-items: flex-start; }
+.free-img { position: relative; max-width: calc(50% - 1mm); }
+.free-img img { display: block; max-width: 100%; max-height: var(--img-h, 75mm); }
+/* 画像があるときは文章欄を縮めて、画像の分の場所を空ける */
+.free.has-img-items textarea { flex: 1 1 0; min-height: 21mm; }
+.free-img button { position: absolute; top: 2px; right: 2px; width: 22px; height: 22px; border-radius: 50%; border: 0; background: rgba(0,0,0,.6); color: #fff; font-size: 13px; line-height: 22px; padding: 0; cursor: pointer; }
 .free textarea { flex: 1; }
 
 /* 画像欄 */

@@ -217,21 +217,26 @@
       img.src = v || ''; img.style.display = v ? '' : 'none';
       hint.style.display = v ? 'none' : ''; del.style.display = v ? '' : 'none';
     }
-    function load(blob) {
-      const url = URL.createObjectURL(blob);
-      const im = new Image();
-      im.onload = () => {
-        const max = 1600, s = Math.min(1, max / Math.max(im.width, im.height));
-        const c = document.createElement('canvas');
-        c.width = Math.round(im.width * s); c.height = Math.round(im.height * s);
-        c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
-        URL.revokeObjectURL(url);
-        setVal(key, c.toDataURL('image/jpeg', 0.85)); show();
-      };
-      im.src = url;
-    }
+    function load(blob) { shrinkImage(blob, 1600, 0.85, (data) => { setVal(key, data); show(); }); }
     show();
     return box;
+  }
+
+  // 画像を長辺 max px までに縮めて JPEG の data URL にする（ブラウザ内の保存容量を節約）
+  function shrinkImage(blob, max, quality, done) {
+    const url = URL.createObjectURL(blob);
+    const im = new Image();
+    im.onload = () => {
+      const s = Math.min(1, max / Math.max(im.width, im.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(im.width * s); c.height = Math.round(im.height * s);
+      const g = c.getContext('2d');
+      g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); // 透過PNGの背景を白に
+      g.drawImage(im, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      done(c.toDataURL('image/jpeg', quality));
+    };
+    im.src = url;
   }
 
   // ---------- 本人欄のデート印 ----------
@@ -540,9 +545,50 @@
       if (toggle) toggle.querySelectorAll('button').forEach((x) => x.classList.toggle('on', (x.dataset.plain === '1') === p));
     };
     paint();
-    return wrapTitle(b, h('div', { class: 'free', style: b.grow ? 'flex:1' : '' },
-      b.label || toggle ? h('div', { class: 'free-label' + (toggle ? ' has-toggle' : '') }, b.label || '', toggle) : null,
-      el));
+    // images: true で、Ctrl+V（または「画像を追加」）で画像を貼れる。画像は文章の下に並べて印刷にも出す。
+    //   画像は `<key>__imgs`（data URL の配列）に保存。長辺1200pxに縮める
+    let imgArea = null, imgTools = null;
+    if (b.images) {
+      const ik = b.key + '__imgs';
+      const list = () => (Array.isArray(values[ik]) ? values[ik] : []);
+      imgArea = h('div', { class: 'free-imgs' });
+      const file = h('input', { type: 'file', accept: 'image/*', multiple: true, style: 'display:none',
+        onchange: (e) => { [...e.target.files].forEach(add); e.target.value = ''; } });
+      imgTools = h('span', { class: 'img-tools no-print' },
+        h('button', { type: 'button', onclick: () => file.click(), title: 'Ctrl+V で貼り付けることもできます' }, '画像を追加'), file);
+      // 用紙からはみ出すときは、1ページに収まるまで画像の高さを縮める（75mm → 最小20mm）
+      const fit = () => {
+        const sheet = imgArea.closest('.sheet');
+        if (!sheet) return;
+        const limit = () => sheet.scrollHeight > sheet.getBoundingClientRect().height + 1 || sheet.scrollHeight > parseFloat(getComputedStyle(sheet).minHeight) + 1;
+        let mm = 75;
+        imgArea.style.setProperty('--img-h', mm + 'mm');
+        while (limit() && mm > 20) { mm -= 5; imgArea.style.setProperty('--img-h', mm + 'mm'); }
+      };
+      const draw = () => {
+        imgArea.innerHTML = '';
+        list().forEach((src, i) => imgArea.append(h('div', { class: 'free-img' },
+          h('img', { src, alt: '', onload: fit }),
+          h('button', { type: 'button', class: 'no-print', title: 'この画像を削除', onclick: () => { setVal(ik, list().filter((_, j) => j !== i)); draw(); } }, '×'))));
+        imgArea.style.display = list().length ? '' : 'none';
+        imgArea.parentElement && imgArea.parentElement.classList.toggle('has-img-items', list().length > 0);
+        fit();
+      };
+      function add(blob) { shrinkImage(blob, 1200, 0.8, (data) => { setVal(ik, [...list(), data]); draw(); }); }
+      el.addEventListener('paste', (e) => {
+        const its = [...(e.clipboardData?.items || [])].filter((x) => x.type.startsWith('image/'));
+        if (!its.length) return; // 文字の貼り付けはそのまま
+        e.preventDefault();
+        its.forEach((x) => add(x.getAsFile()));
+      });
+      draw();
+    }
+    const head = b.label || toggle || imgTools;
+    const box = h('div', { class: 'free' + (b.images ? ' has-imgs' : ''), style: b.grow ? 'flex:1' : '' },
+      head ? h('div', { class: 'free-label' + (toggle || imgTools ? ' has-toggle' : '') }, b.label || '', imgTools, toggle) : null,
+      el, imgArea);
+    if (imgArea) box.classList.toggle('has-img-items', imgArea.childElementCount > 0);
+    return wrapTitle(b, box);
   }
 
   function wrapTitle(b, el) {
