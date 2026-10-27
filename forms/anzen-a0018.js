@@ -20,7 +20,9 @@
       { type: 'para', text: '下記のとおり、私有車の使用許可を願い出ます。' },
       { type: 'grid', lw: 4, rowH: 11, rows: [
         [{ label: '部　署', key: 'dept', type: 'inline', span: 24, parts: [
-          { key: 'honbu' }, '本部', { key: 'bu' }, '部', { key: 'ka' }, '課'] }],
+          // 支店の場合は「本部」を「支店」に切り替える（印刷には選んだほうだけ出る）
+          { key: 'honbu' }, { key: 'honbuKind', type: 'select', options: ['本部', '支店'], default: '本部', w: 11 },
+          { key: 'bu' }, '部', { key: 'ka' }, '課'] }],
         [{ label: '氏　名', key: 'name', span: 24 }],
         [{ label: '使用理由', key: 'reason', type: 'textarea', plain: true, h: 45, span: 24 }],
         [{ label: '使用期間', span: 4, rs: 2 }, when('from', '自', 'から')],
@@ -30,7 +32,7 @@
         [{ label: '予定走行\n距離', key: 'kmW', type: 'inline', span: 24, req: true, parts: [
           // 1日・1ヶ月・距離の間を空ける（同じキーの選択肢を2つに分けて、間に空白を置く）
           '　', { key: 'kmUnit', type: 'radio', options: ['1日'] }, '　　　', { key: 'kmUnit', type: 'radio', options: ['1ヶ月'] },
-          '　　　約　', { key: 'km', type: 'number', w: 30 }, '　km　　　（予定走行km数を必ず記入する事）'] }],
+          '　　　約', { key: 'km', type: 'number', w: 13 } /* 3桁まで */, '　km　　　（予定走行km数を必ず記入する事）'] }],
         [{ label: '使用車輌', span: 4, rs: 1 }, { label: '車　種', key: 'carType', lw: 3, span: 9 }, { label: '登録番号', key: 'carNo', lw: 3, span: 11 }],
       ] },
       { type: 'notes', items: [
