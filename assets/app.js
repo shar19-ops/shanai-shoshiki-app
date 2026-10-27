@@ -96,6 +96,11 @@
         oninput: (e) => { setVal(key, e.target.value); pv.textContent = show(e.target.value); },
       });
       inputs[key] = el;
+      // jp：画面でも「2026年 10月 27日」の形で見せる（入力欄の文字は隠し、クリックでカレンダーを開く）
+      if (f.jp && type === 'date') {
+        el.addEventListener('click', () => { try { el.showPicker(); } catch (e) { /* 古いブラウザ */ } });
+        return h('div', { class: 'date-wrap jp' }, el, pv);
+      }
       return h('div', { class: 'date-wrap' }, el, pv);
     }
 

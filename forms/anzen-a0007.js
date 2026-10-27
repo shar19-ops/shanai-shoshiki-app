@@ -10,9 +10,10 @@
   const vehicle = (p) => [{ label: '車輌関係', key: `${p}Car`, type: 'inline', span: 24, parts: [
     '車種：', { key: `${p}CarKind` }, '車名：', { key: `${p}CarName` }, '登録番号：', { key: `${p}CarNo` }] }];
   const insurance = (p, label) => [
-    { label, key: `${p}Co`, span: 7 },
-    { label: '保険証書番号', key: `${p}No`, span: 7 },
-    { label: '期　間', key: `${p}From`, key2: `${p}To`, type: 'daterange', lw: 2, span: 10 }];
+    // 期間（日付2つ）が画面でもはみ出さない幅にする
+    { label, key: `${p}Co`, span: 6 },
+    { label: '保険証書\n番号', key: `${p}No`, lw: 2, span: 6 },
+    { label: '期　間', key: `${p}From`, key2: `${p}To`, type: 'daterange', lw: 2, span: 12 }];
   const damage = (p) => [
     { label: '被害の程度', key: `${p}Dmg`, prefix: '傷名・物損', span: 9 },
     { label: '治療日数', key: `${p}Days`, type: 'number', unit: '日', span: 5 },
@@ -23,8 +24,10 @@
       { label: '所　属', key: 'dept', span: 8 }, { label: '報告者', key: 'reporter', span: 8 }],
     [{ label: '年　度', key: 'nendo', type: 'number', unit: '年度', lw: 4, span: 9 },
       { label: '事故種別', key: 'shubetsu', type: 'radio', options: ['自損', '加害', '被害'], span: 16 }],
-    [{ label: '事故発生月日', key: 'hDate', type: 'date', lw: 4, span: 10 },
-      { key: 'hDow', type: 'calc', align: 'center', span: 3, calc: (n, v) => (v.hDate ? `（${DOW[new Date(v.hDate + 'T00:00').getDay()]}）` : '（　）') },
+    // 事故発生月日：年月日で表示し、曜日は同じ欄に（間に縦罫線なし）
+    [{ label: '事故発生月日', key: 'hDT', type: 'inline', lw: 4, span: 13, parts: [
+      { key: 'hDate', type: 'date', jp: true, w: 38 },
+      { key: 'hDow', type: 'calc', align: 'left', calc: (n, v) => (v.hDate ? `（${DOW[new Date(v.hDate + 'T00:00').getDay()]}）` : '（　）') }] },
       { key: 'hTime', type: 'time', unit: '頃', span: 12 }],
     [{ label: '事故発生場所', key: 'place', unit: '附近', lw: 4, span: 15 }, { label: '届出警察署', key: 'police', span: 10 }],
     [{ label: '事故の形態', key: 'keitai', type: 'inline', lw: 4, span: 25, parts: [

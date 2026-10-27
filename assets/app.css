@@ -429,3 +429,10 @@ table.grid.q-check td.q-goal-h .q-vt { writing-mode: vertical-rl; margin: 0 auto
 .sheet.tight-checks table.grid .checks label { font-size: 8pt; gap: .6mm; letter-spacing: -.02em; }
 .sheet.tight-checks table.grid .checks .box { width: 3.2mm; height: 3.2mm; }
 .sheet.tight-checks table.grid .checks { gap: 0 1.6mm !important; }
+/* 日付の jp：画面でも年月日の形で見せる（入力欄の文字は隠し、上に表示用の文字を重ねる） */
+@media screen {
+  .date-wrap.jp { position: relative; }
+  .date-wrap.jp input[type=date]::-webkit-datetime-edit { color: transparent; }
+  .date-wrap.jp .pv { display: flex; align-items: center; position: absolute; inset: 0 6mm 0 0; padding: 0 1.5mm; pointer-events: none; white-space: nowrap; font-size: 9pt; }
+}
+.inline-wrap .iw > .date-wrap { flex: 1; min-width: 0; }
