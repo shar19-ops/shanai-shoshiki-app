@@ -117,11 +117,21 @@
       return h('div', { class: 'range-wrap' }, ...part(key), h('span', { class: 'range-sep' }, '〜'), ...part(f.key2));
     }
 
+    // inline：1つの欄に選択肢・入力欄・文字を罫線なしで並べる。parts: [文字 | 入力部品の定義（w で幅mm）]
+    //   例：作業区分「□単独作業 □共同作業 [　]名」、雇用区分「…□その他（[　　]）」
+    if (type === 'inline') {
+      return h('div', { class: 'cell-wrap inline-wrap' }, f.parts.map((p) => (typeof p === 'string'
+        ? h('span', { class: 'unit' }, p)
+        // 選択肢は中身の幅、入力欄は残りの幅（w を指定すればその幅mm）
+        : h('span', { class: 'iw', style: p.w ? `width:${p.w}mm;flex-shrink:0` : (p.type === 'radio' || p.type === 'checks') ? 'flex:none' : 'flex:1;min-width:0' }, field(p)))));
+    }
+
     if (type === 'checks' || type === 'radio') {
       const multi = type === 'checks';
       const cur = new Set(multi ? (Array.isArray(v) ? v : []) : [v]);
       const name = 'r_' + key;
-      const wrap = h('div', { class: 'checks', style: f.vertical ? 'flex-direction:column;align-items:flex-start' : '' },
+      // nowrap：選択肢を折り返さず1行に（性別など幅の狭い欄）
+      const wrap = h('div', { class: 'checks', style: f.vertical ? 'flex-direction:column;align-items:flex-start' : f.nowrap ? 'flex-wrap:nowrap;gap:0 3mm' : '' },
         f.options.map((o) => {
           const cb = h('input', {
             type: multi ? 'checkbox' : 'radio', name, value: o, checked: cur.has(o),

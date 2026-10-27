@@ -421,3 +421,7 @@ table.grid.q-check td.q-goal-h .q-vt { writing-mode: vertical-rl; margin: 0 auto
 /* near：前の項目のすぐ横に置く */
 .f-meta .m-item.near { margin-left: -3mm; }
 .f-meta:has(.m-item.near) { align-items: baseline; } /* 横に並べた項目と文字の高さをそろえる */
+/* inline：1つの欄に選択肢・入力欄・文字を並べる（間に縦罫線を入れない） */
+.inline-wrap .checks { padding: 0; flex-wrap: nowrap; gap: 0 3mm; }
+.inline-wrap .iw { display: flex; align-items: center; height: 100%; }
+.inline-wrap .iw .inp { padding: 0 1mm; }

@@ -10,23 +10,26 @@
       { label: '災害の種類', key: 'shurui', type: 'checks', lw: 3, span: 12, rs: 3,
         options: ['墜落・転落', '転倒', '激突', '飛来・落下', '崩壊・倒壊', '巻き込まれ・はさまれ', '切れ・こすれ', '有害物接触', '感電', '火傷', '疾病', '自動車等による災害'] }],
     [{ label: '件　名', key: 'subject', lw: 4, span: 13 }],
-    [{ label: '報告者', key: 'reporter', lw: 4, span: 10 }, { stampCell: true, span: 3 }],
+    [{ label: '報告者', key: 'reporter', lw: 4, span: 13, unit: '印' }],
     // 被災者
     [{ label: vt('被災者'), span: 1, rs: 5 },
       { label: '氏　名', key: 'vName', span: 9 },
-      { label: '性　別', key: 'sex', type: 'radio', options: ['男', '女'], span: 6 },
+      { label: '性　別', key: 'sex', type: 'radio', options: ['男', '女'], nowrap: true, span: 6 },
       { label: '所　属', key: 'vDept', span: 9 }],
     [{ label: '生年月日', key: 'birth', type: 'date', span: 9 },
       { label: '年　齢', key: 'age', type: 'number', unit: '才', span: 6 },
       { label: '健康状況\n（既往症）', key: 'health', span: 9 }],
-    [{ label: '住　所', key: 'addr', prefix: '〒', span: 15 }, { label: 'TEL', key: 'vTel', type: 'tel', span: 9 }],
+    // 郵便番号と住所は縦罫線で分ける
+    [{ label: '住　所', key: 'zip', type: 'zip', prefix: '〒', span: 6 }, { key: 'addr', span: 9 }, { label: 'TEL', key: 'vTel', type: 'tel', span: 9 }],
     [{ label: '職　種', key: 'shokushu', span: 6 },
       { label: '入社年月日', key: 'nyusha', type: 'date', span: 9 },
-      { label: '経験年数', key: 'expY', type: 'number', unit: '年', span: 5 },
-      { key: 'expM', type: 'number', unit: 'ヶ月', span: 4 }],
-    [{ label: '雇用区分', key: 'koyo1', type: 'radio', options: ['雄電社', '会員会社', '非会員会社'], span: 10 },
-      { key: 'koyo2', type: 'radio', options: ['社員', '常傭', '日雇', 'その他'], span: 10 },
-      { key: 'koyoEtc', prefix: '（', unit: '）', span: 4 }],
+      // 経験年数：年とヶ月の欄は同じ幅
+      { label: '経験年数', key: 'expY', type: 'number', unit: '年', span: 6 },
+      { key: 'expM', type: 'number', unit: 'ヶ月', span: 3 }],
+    // 雇用区分：1行に並べ、その他の横に括弧書き（間に縦罫線なし）
+    [{ label: '雇用区分', key: 'koyo', type: 'inline', span: 24, parts: [
+      { key: 'koyo1', type: 'radio', options: ['雄電社', '会員会社', '非会員会社'] }, '　［',
+      { key: 'koyo2', type: 'radio', options: ['社員', '常傭', '日雇', 'その他'] }, '（', { key: 'koyoEtc' }, '）］'] }],
     // 災害発生状況
     [{ label: vt('災害発生状況'), span: 1, rs: 7 },
       { label: '発生場所', key: 'place', span: 12 }, { label: '元請名', key: 'motouke', span: 12 }],
@@ -34,8 +37,9 @@
       { label: '休・不休別', key: 'kyugyo', type: 'radio', options: ['不休', '休業'], span: 7 },
       { key: 'mikomi', type: 'number', prefix: '（見込', unit: '日）', span: 5 }],
     [{ label: '作業名', key: 'sagyoName', span: 12 },
-      { label: '作業区分', key: 'sagyoKbn', type: 'radio', options: ['単独作業', '共同作業'], span: 9 },
-      { key: 'ninzu', type: 'number', unit: '名', span: 3 }],
+      // 作業区分：共同作業の人数は同じ欄に（縦罫線なし）
+      { label: '作業区分', key: 'sagyo', type: 'inline', span: 12, parts: [
+        { key: 'sagyoKbn', type: 'radio', options: ['単独作業', '共同作業'] }, { key: 'ninzu', type: 'number' }, '名'] }],
     [{ label: '傷病部位', key: 'bui', span: 8 }, { label: '傷病名', key: 'byomei', span: 8 }, { label: '現認者', key: 'genninsha', span: 8 }],
     [{ label: '病院名', key: 'hospital', span: 8 }, { label: '所在地', key: 'hospAddr', span: 10 }, { label: 'TEL', key: 'hospTel', type: 'tel', lw: 2, span: 6 }],
     [{ text: '（事故の内容）①どの様な場所で　②どの様な作業をしているときに　③どの様な物又は環境に　④どの様な不安全な又は有害な状態があって　⑤どのようにして災害が発生したかを具体的に記入', note: true, span: 24 }],
@@ -67,11 +71,11 @@
   FORM_DEFS['anzen-a0006'] = {
     code: '本-安全-A0006', title: '災害報告書',
     paper: 'A3', orientation: 'landscape',
-    selfStamp: '印', // 報告者の「印」欄にデート印（stampCell）
+    selfStamp: '作成者', // 押印欄の右端（作成者）にデート印
     meta: [{ label: '作成日', key: 'date', type: 'date' }],
     // 元は2ページ目の下に横一列（安全管理者の欄に「保管」）。上に1段で並べる
-    // 本-安全-A0001 と同じく、支店長の欄は工事長と同じ欄（工事長・支店長）
-    stamps: [{ boxes: ['社長', '本店長', '総務部', '総括安全|衛生管理者', '安全管理者\n保管', '衛生管理者', '工事本部長|RE部長', '工事長|支店長'] }],
+    // ユーザー指定：右端に作成者の欄を追加。工事長と支店長は同じ欄（工事部長は不要）
+    stamps: [{ boxes: ['社長', '本店長', '総務部', '総括安全|衛生管理者', '安全管理者\n保管', '衛生管理者', '工事本部長|RE部長', '工事長・支店長', '作成者'] }],
     blocks: [
       { type: 'row', gap: 5, grow: true, items: [
         { type: 'col', items: [left, { type: 'image', label: '災害発生状況図', key: 'zu', grow: true }] },
