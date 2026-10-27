@@ -638,7 +638,8 @@
 
   // sketch：略図の欄。図形・記号・文字を何個でも置き、マウスで自由に動かせる（下絵の画像も敷ける）
   //   保存：values[key] = 図形の配列（座標は欄の左上からの mm）、values[key + '__bg'] = 下絵（JPEG の data URL）
-  //   図形：line/arrow {x1,y1,x2,y2}、rect/ellipse {x,y,w,h,rot}、text {x,y,text,size,rot,box}、sym {x,y,sym,size,rot}
+  //   図形：line/arrow {x1,y1,x2,y2}、rect/ellipse {x,y,w,h,rot}、text {x,y,text,size,rot,box}、sym {x,y,sym,size,rot}、
+  //         img {x,y,w,h,rot,src}（写真など。何枚でも置けて動かせる。保存量を抑えるため長辺1000pxのJPEGに縮める）
   const SK_SYMS = [['①', '①当方'], ['②', '②相手車'], ['✖', '✖衝突場所'], ['♀', '♀人'], ['▽', '▽一時停止'], ['signal', '信号']];
   function sketchBlock(b) {
     const key = b.key, bgKey = key + '__bg';
@@ -680,6 +681,13 @@
           g.append(S('line', { x1: it.x1, y1: it.y1, x2: it.x2, y2: it.y2, ...line, 'marker-end': it.t === 'arrow' ? `url(#sk-ar-${key})` : null }));
           g.append(S('line', { x1: it.x1, y1: it.y1, x2: it.x2, y2: it.y2, stroke: 'transparent', 'stroke-width': 4, ...hit(i) }));
           if (i === sel) ['1', '2'].forEach((n) => g.append(S('circle', { class: 'sk-handle', cx: it['x' + n], cy: it['y' + n], r: 1.6, ...hit(i, 'p' + n) })));
+        } else if (it.t === 'img') {
+          const cx = it.x + it.w / 2, cy = it.y + it.h / 2;
+          const sg = S('g', { transform: rotT(it, cx, cy) });
+          sg.append(S('image', { href: it.src, x: it.x, y: it.y, width: it.w, height: it.h, preserveAspectRatio: 'none' }));
+          sg.append(S('rect', { x: it.x, y: it.y, width: it.w, height: it.h, fill: 'rgba(0,0,0,0)', stroke: i === sel ? 'var(--accent)' : 'none', 'stroke-width': 0.4, 'stroke-dasharray': '1.5 1', ...hit(i) }));
+          if (i === sel) sg.append(S('circle', { class: 'sk-handle', cx: it.x + it.w, cy: it.y + it.h, r: 1.6, ...hit(i, 'size') }));
+          g.append(sg);
         } else if (it.t === 'rect' || it.t === 'ellipse') {
           const cx = it.x + it.w / 2, cy = it.y + it.h / 2;
           const sg = S('g', { transform: rotT(it, cx, cy) });
@@ -723,6 +731,21 @@
     const del = () => { if (sel < 0) return; items.splice(sel, 1); sel = -1; commit(); draw(); };
     const file = h('input', { type: 'file', accept: 'image/*', style: 'display:none', onchange: (e) => e.target.files[0] && setBg(e.target.files[0]) });
     function setBg(blob) { shrinkImage(blob, 1600, 0.85, (data) => { setVal(bgKey, data); draw(); }); }
+    // 画像（写真など）を図形と同じように置く。図形の下（配列の先頭）に入れて、矢印や文字が上に重なるように
+    const imgFile = h('input', { type: 'file', accept: 'image/*', multiple: true, style: 'display:none',
+      onchange: (e) => { [...e.target.files].forEach(addImg); e.target.value = ''; } });
+    function addImg(blob) {
+      shrinkImage(blob, 1000, 0.8, (src) => {
+        const im = new Image();
+        im.onload = () => {
+          const w0 = Math.min(W * 0.45, H * 0.8 * im.width / im.height); // 欄の半分くらいの大きさで置く
+          const n = items.filter((x) => x.t === 'img').length;
+          items.unshift({ t: 'img', x: 4 + n * 6, y: 4 + n * 6, w: w0, h: w0 * im.height / im.width, rot: 0, src });
+          sel = 0; commit(); draw(); area.focus();
+        };
+        im.src = src;
+      });
+    }
     // ボタンは見出しの行に1行で並べる（画面だけ。見出しの行の高さを印刷と同じにして、描く範囲を画面と印刷でそろえる）
     const tools = h('div', { class: 'sk-tools no-print' },
       tb('→', () => add({ t: 'arrow', x1: cx() - 10, y1: cy(), x2: cx() + 10, y2: cy() }), '矢印（両端の○で向き・長さを変える）'),
@@ -737,10 +760,11 @@
       tb('⟲', () => rotate(-15), '選んだ図形を左に15°回す'), tb('⟳', () => rotate(15), '選んだ図形を右に15°回す'),
       tb('削除', del, '選んだ図形を消す（Delete キーでも可）'),
       h('span', { class: 'sk-sep' }),
-      tb('下絵', () => file.click(), '地図などの画像を下に敷く（欄を選んで Ctrl+V でも貼り付け可）'),
+      tb('画像', () => imgFile.click(), '写真などの画像を置く（何枚でも。欄を選んで Ctrl+V でも貼り付け可）。右下の○で大きさを変える'),
+      tb('下絵', () => file.click(), '地図などの画像を欄いっぱいに下に敷く（動かさない1枚）'),
       tb('外す', () => { setVal(bgKey, ''); draw(); }, '下絵を外す'),
       tb('全消去', () => { if (!confirm('この欄の図形と下絵をすべて消します。よろしいですか？')) return; items = []; sel = -1; commit(); setVal(bgKey, ''); draw(); }, '図形と下絵をすべて消す'),
-      file);
+      file, imgFile);
 
     svg.addEventListener('pointerdown', (e) => {
       const t = e.target.closest('[data-i]');
@@ -762,6 +786,10 @@
       } else if (drag.h === 'p1' || drag.h === 'p2') {
         const n = drag.h[1];
         it['x' + n] = o['x' + n] + dx; it['y' + n] = o['y' + n] + dy;
+      } else if (it.t === 'img') {
+        // 画像は縦横の比率を保ったまま大きさを変える
+        const a = -(o.rot || 0) * Math.PI / 180, ux = dx * Math.cos(a) - dy * Math.sin(a);
+        it.w = Math.max(5, o.w + ux); it.h = it.w * o.h / o.w;
       } else if (it.t === 'rect' || it.t === 'ellipse') {
         // 回っている図形は、回す前の向きに直してから幅・高さを変える
         const a = -(o.rot || 0) * Math.PI / 180, ux = dx * Math.cos(a) - dy * Math.sin(a), uy = dx * Math.sin(a) + dy * Math.cos(a);
@@ -795,8 +823,9 @@
       commit(); draw(); e.preventDefault();
     });
     area.addEventListener('paste', (e) => {
-      const f = [...(e.clipboardData?.items || [])].find((x) => x.type.startsWith('image/'));
-      if (f) { e.preventDefault(); setBg(f.getAsFile()); }
+      // 貼り付けた画像は動かせる画像として置く（下絵は「下絵」ボタンから）
+      const fs = [...(e.clipboardData?.items || [])].filter((x) => x.type.startsWith('image/'));
+      if (fs.length) { e.preventDefault(); fs.forEach((f) => addImg(f.getAsFile())); }
     });
     // 印刷のときは選択の取っ手を消す
     window.addEventListener('beforeprint', () => { if (sel >= 0) { sel = -1; draw(); } });
