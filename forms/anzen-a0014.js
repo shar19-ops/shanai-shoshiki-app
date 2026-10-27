@@ -62,8 +62,8 @@
       { label: '走行距離\n(km)', key: 'dist', w: 11, rowCalc: (r, v) => distance(v, r + start - 1) },
       { label: '行　先', key: 'dest', w: 25 },
       { label: '運転者', key: 'driver', w: 11 },
-      { label: '運転前', key: 'alcB', w: 9, group: 'アルコール検知値(mg/ℓ)', align: 'center' },
-      { label: '運転後', key: 'alcA', w: 9, group: 'アルコール検知値(mg/ℓ)', align: 'center' },
+      { label: '運転前', key: 'alcB', w: 9, group: 'アルコール検知値\n(mg/ℓ)', align: 'center' },
+      { label: '運転後', key: 'alcA', w: 9, group: 'アルコール検知値\n(mg/ℓ)', align: 'center' },
       { label: '給油\n(ℓ)', key: 'fuel', w: 11, type: 'number' },
     ],
   });

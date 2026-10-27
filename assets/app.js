@@ -477,7 +477,7 @@
         if (!c.group) { r1.append(h('th', { rowspan: 2, style: hh }, ...lbl(c.label))); continue; }
         let n = 1;
         while (cols[i + n] && cols[i + n].group === c.group) n++;
-        r1.append(h('th', { colspan: n, style: 'height:6mm' }, c.group));
+        r1.append(h('th', { colspan: n, style: 'height:6mm' }, ...lbl(c.group))); // '\n' で改行（単位を次の行に）
         for (let k = 0; k < n; k++) r2.append(h('th', { style: 'height:6mm' }, ...lbl(cols[i + k].label)));
         i += n - 1;
       }
