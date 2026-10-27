@@ -95,6 +95,10 @@ body {
 .f-meta .m-item.big .inp { font-size: 13pt; font-weight: bold; }
 .f-meta .m-item.newline { flex-basis: 100%; }
 .f-meta .m-item.noline .m-val { border-bottom: none; }
+/* fixw：入力欄の幅を w（mm）ちょうどにする（短い欄を検査日と同じ行に並べるとき） */
+.f-meta .m-item.fixw .inp { width: 100%; }
+/* 印刷では日付と同じ高さ（文字の高さ）にして、横の検査日と行をそろえる */
+@media print { .f-meta .m-item.fixw .inp { height: auto; min-height: 0; padding-top: 0; padding-bottom: 0; } }
 
 /* 押印欄 */
 /* 押印欄：入りきらないときは上下2段に折り返す（右寄せ） */
@@ -121,6 +125,7 @@ body {
 .bottom-stamps { display: flex; justify-content: flex-end; align-items: flex-end; gap: 4mm; margin-top: 3mm; }
 .bottom-stamps .notes { flex: 1; }
 .stamp-box .sb-label.tight { font-size: 6.5pt; letter-spacing: 0; }
+.stamp-box .sb-label.two { font-size: 6pt; line-height: 2.3mm; padding-top: .2mm; letter-spacing: 0; }
 .stamp-box .sb-area { height: 20mm; position: relative; }
 /* 兼務の役職名（工事本部長・RE部長・支店長など）は押印部に薄く印字 */
 .stamp-box .sb-roles {
@@ -394,3 +399,71 @@ table.grid td textarea.inp { height: 100%; }
 /* 確認者の日付：空欄なら「/　/」を印字（手書き用） */
 .k50-conf-d .inp::placeholder { color: #000; opacity: 1; font-weight: normal; }
 @media screen { .k50-conf-d .inp::placeholder { color: #666; } }
+
+/* ---------- 品質記録様式：検査項目の表（本-安全-A0001） ---------- */
+.q-cols { display: flex; gap: 2mm; align-items: stretch; }
+.q-cols > table { flex: 1; height: auto; }
+/* 検査項目の多い帳票は段の間隔を詰めて1ページに収める */
+.sheet:has(.q-cols) .sheet-body { gap: 2.5mm; }
+table.grid.q-check td, table.grid.q-check th { height: 4.3mm; }
+table.grid.q-check tr.q-grp > td { border-top: 1.5px solid var(--line); }
+table.grid.q-check td.q-cat { writing-mode: vertical-rl; letter-spacing: 0; line-height: 1; padding: .5mm 0; font-size: 7.5pt; }
+table.grid.q-check td.q-no { text-align: center; font-size: 7.5pt; }
+table.grid.q-check td.q-txt { font-size: 7.5pt; line-height: 1.2; padding: .2mm 1mm; }
+table.grid.q-check td.q-goal .inp { font-size: 8pt; }
+table.grid.q-check .inp { min-height: 3.6mm; height: 3.6mm; font-size: 8pt; padding-top: 0; padding-bottom: 0; display: block; }
+/* 月安全衛生目標：見出しの上に月の記入欄（横書き）、その下に縦書きの見出し */
+table.grid.q-check td.q-goal-h { writing-mode: horizontal-tb; padding: .5mm 0; vertical-align: top; }
+table.grid.q-check td.q-goal-h .q-month { margin: 0 .3mm; } /* 月と見出しの間に線を入れず一体に見せる */
+table.grid.q-check td.q-goal-h .q-month .inp { padding: 0; font-size: 8pt; text-align: center; }
+table.grid.q-check td.q-goal-h .q-month .inp::placeholder { color: transparent; }
+table.grid.q-check td.q-goal-h .q-vt { writing-mode: vertical-rl; margin: 0 auto; }
+/* near：前の項目のすぐ横に置く */
+.f-meta .m-item.near { margin-left: -3mm; }
+.f-meta:has(.m-item.near) { align-items: baseline; } /* 横に並べた項目と文字の高さをそろえる */
+/* inline：1つの欄に選択肢・入力欄・文字を並べる（間に縦罫線を入れない） */
+.inline-wrap .checks { padding: 0; flex-wrap: nowrap; gap: 0 2mm; }
+.inline-wrap .iw { display: flex; align-items: center; height: 100%; }
+.inline-wrap .iw .inp { padding: 0 1mm; }
+/* tight-checks：選択肢の多い帳票（本-安全-A0007 など）は選択肢の文字と間隔を少し詰める */
+.sheet.tight-checks table.grid .checks label { font-size: 8pt; gap: .6mm; letter-spacing: -.02em; }
+.sheet.tight-checks table.grid .checks .box { width: 3.2mm; height: 3.2mm; }
+.sheet.tight-checks table.grid .checks { gap: 0 1.6mm !important; }
+/* 日付の jp：画面でも年月日の形で見せる（入力欄の文字は隠し、上に表示用の文字を重ねる） */
+@media screen {
+  .date-wrap.jp { position: relative; }
+  .date-wrap.jp input[type=date]::-webkit-datetime-edit { color: transparent; }
+  .date-wrap.jp .pv { display: flex; align-items: center; position: absolute; inset: 0 6mm 0 0; padding: 0 1.5mm; pointer-events: none; white-space: nowrap; font-size: 9pt; }
+}
+.inline-wrap .iw > .date-wrap { flex: 1; min-width: 0; }
+/* titleSide：表題の横の項目（年度・事故種別など） */
+.f-title-row { display: flex; align-items: center; gap: 8mm; align-self: stretch; }
+.f-title-row .f-title { flex: none; }
+.f-title-row .title-side { width: 130mm; flex: none; }
+.f-title-row .title-side td.lbl { font-size: 10pt; }
+.sheet .f-title-row .title-side table.grid .checks label { font-size: 10.5pt; gap: 1mm; }
+.sheet .f-title-row .title-side table.grid .checks .box { width: 3.8mm; height: 3.8mm; }
+.sheet .f-title-row .title-side table.grid .checks { gap: 0 3mm !important; }
+.f-title-row .title-side .inp { font-size: 11pt; }
+/* ---------- sketch：略図の欄（図形・記号・文字を自由に配置） ---------- */
+.sketch .sk-head { display: flex; align-items: center; gap: 3mm; height: 6mm; padding: 0 2mm; box-sizing: border-box; white-space: nowrap; overflow: hidden; }
+.sketch .sk-title { flex: none; }
+.sketch .sk-note { letter-spacing: 0; }
+.sketch .sk-tools { display: flex; align-items: center; gap: 2px; margin-left: auto; letter-spacing: 0; }
+.sketch .sk-tools button { font: inherit; font-size: 7.5pt; line-height: 1; height: 4.6mm; min-width: 5.2mm; padding: 0 4px; border: 1px solid #b8bfcc; border-radius: 3px; background: #fff; color: #333; cursor: pointer; white-space: nowrap; }
+.sketch .sk-tools button:hover { border-color: var(--accent); color: var(--accent); }
+.sketch .sk-tools .sk-sep { width: 1px; height: 4mm; background: #c9d0dc; margin: 0 2px; }
+@media screen { .sketch .sk-note { display: none; } }
+.sketch .sk-area { flex: 1; position: relative; min-height: 20mm; outline: none; }
+.sketch .sk-area:focus-visible { box-shadow: inset 0 0 0 1.5px var(--accent); }
+.sketch .sk-svg { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; user-select: none; }
+.sketch .sk-svg text { font-family: var(--font); cursor: move; }
+.sketch .sk-svg [data-i] { cursor: move; }
+.sketch .sk-handle { fill: #fff; stroke: var(--accent); stroke-width: .4; cursor: nwse-resize; }
+.sketch .sk-item.on > :not(.sk-handle) { filter: drop-shadow(0 0 .6px var(--accent)); }
+@media screen { .sketch .sk-area { background: var(--input-bg); } }
+@media print { .sketch .sk-handle { display: none; } .sketch .sk-item.on > * { filter: none; } }
+/* 罫線の切り替えボタンで見出しの行が高くならないように（画面と印刷で欄の高さをそろえる。略図の描く範囲がずれないように） */
+.free .free-label.has-toggle .line-toggle, .free .free-label.has-toggle .line-toggle button { line-height: 1; }
+.free .free-label.has-toggle .line-toggle { height: 3.1mm; }
+.free .free-label.has-toggle .line-toggle button { padding-top: 0; padding-bottom: 0; height: 3.1mm; font-size: 7.5pt; }

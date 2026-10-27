@@ -96,6 +96,11 @@
         oninput: (e) => { setVal(key, e.target.value); pv.textContent = show(e.target.value); },
       });
       inputs[key] = el;
+      // jp：画面でも「2026年 10月 27日」の形で見せる（入力欄の文字は隠し、クリックでカレンダーを開く）
+      if (f.jp && type === 'date') {
+        el.addEventListener('click', () => { try { el.showPicker(); } catch (e) { /* 古いブラウザ */ } });
+        return h('div', { class: 'date-wrap jp' }, el, pv);
+      }
       return h('div', { class: 'date-wrap' }, el, pv);
     }
 
@@ -117,11 +122,21 @@
       return h('div', { class: 'range-wrap' }, ...part(key), h('span', { class: 'range-sep' }, '〜'), ...part(f.key2));
     }
 
+    // inline：1つの欄に選択肢・入力欄・文字を罫線なしで並べる。parts: [文字 | 入力部品の定義（w で幅mm）]
+    //   例：作業区分「□単独作業 □共同作業 [　]名」、雇用区分「…□その他（[　　]）」
+    if (type === 'inline') {
+      return h('div', { class: 'cell-wrap inline-wrap' }, f.parts.map((p) => (typeof p === 'string'
+        ? h('span', { class: 'unit' }, p)
+        // 選択肢は中身の幅、入力欄は残りの幅（w を指定すればその幅mm）
+        : h('span', { class: 'iw', style: p.w ? `width:${p.w}mm;flex-shrink:0` : (p.type === 'radio' || p.type === 'checks') ? 'flex:none' : 'flex:1;min-width:0' }, field(p)))));
+    }
+
     if (type === 'checks' || type === 'radio') {
       const multi = type === 'checks';
       const cur = new Set(multi ? (Array.isArray(v) ? v : []) : [v]);
       const name = 'r_' + key;
-      const wrap = h('div', { class: 'checks', style: f.vertical ? 'flex-direction:column;align-items:flex-start' : '' },
+      // nowrap：選択肢を折り返さず1行に（性別など幅の狭い欄）
+      const wrap = h('div', { class: 'checks', style: f.vertical ? 'flex-direction:column;align-items:flex-start' : f.nowrap ? 'flex-wrap:nowrap;gap:0 2mm;padding:1mm 1.5mm' : '' },
         f.options.map((o) => {
           const cb = h('input', {
             type: multi ? 'checkbox' : 'radio', name, value: o, checked: cur.has(o),
@@ -320,8 +335,10 @@
         g.boxes.map((b) => {
           const [head, ...roles] = String(b).split('\n');
           const self = def && def.selfStamp === head;
+          // 見出しの '|' は改行（'総括安全|衛生管理者' のように長い役職名を2行で）
+          const hl = head.split('|');
           return h('div', { class: 'stamp-box' },
-            h('div', { class: 'sb-label' + (head.length >= 6 ? ' tight' : '') }, head),
+            h('div', { class: 'sb-label' + (hl.length > 1 ? ' two' : head.length >= 6 ? ' tight' : '') }, hl.flatMap((s, i) => (i ? [h('br'), s] : [s]))),
             h('div', self ? { class: 'sb-area self-stamp', title: 'クリックで押印設定', onclick: openStampDialog } : { class: 'sb-area' },
               roles.length ? h('div', { class: 'sb-roles' }, roles.flatMap((r, i) => (i ? [h('br'), r] : [r]))) : null));
         }))));
@@ -357,11 +374,15 @@
     return h('div', { class: 'f-header' },
       h('div', { class: 'f-head-left' },
         h('div', { class: 'f-code' }, d.code),
-        h('div', { class: 'f-title' }, d.title, d.subtitle ? h('span', { class: 'f-sub' }, d.subtitle) : null),
+        // titleSide：表題の横に置く項目（例：年度・事故種別。紙で保管したときに探しやすいように）
+        d.titleSide
+          ? h('div', { class: 'f-title-row' }, h('div', { class: 'f-title' }, d.title, d.subtitle ? h('span', { class: 'f-sub' }, d.subtitle) : null),
+            h('div', { class: 'title-side' }, d.titleSide.map(renderBlock)))
+          : h('div', { class: 'f-title' }, d.title, d.subtitle ? h('span', { class: 'f-sub' }, d.subtitle) : null),
         // meta の right: true は押印欄側（右端）に寄せる。cls で見た目を追加（big：大きめの文字、newline：次の行に置く）
         d.meta ? h('div', { class: 'f-meta' }, d.meta.map((m) => h('div', { class: 'm-item' + (m.right ? ' right' : '') + (m.cls ? ' ' + m.cls : '') },
           h('span', { class: 'm-label' }, m.label),
-          h('span', { class: 'm-val', style: m.w ? `min-width:${m.w}mm` : '' }, field(m))))) : null,
+          h('span', { class: 'm-val', style: m.w ? `min-width:${m.w}mm` + ((m.cls || '').split(' ').includes('fixw') ? `;width:${m.w}mm` : '') : '' }, field(m))))) : null,
         // headBlocks：タイトルの下（押印欄の左側の空き）に置く項目。下端を押印欄の下端にそろえる
         d.headBlocks ? h('div', { class: 'head-blocks' }, d.headBlocks.map(renderBlock)) : null),
       stampsEl(d.stamps, d.stampClass));
@@ -372,7 +393,8 @@
   //   item: {label, key, type, span(列数・ラベル込み), lw(ラベル列数), rs(行結合), h(高さmm), text}
   function gridBlock(b) {
     const cols = b.cols || 24;
-    const tbl = h('table', { class: 'grid' + (b.dense ? ' dense' : '') },
+    // grow：残りの高さいっぱいに伸ばす（col の中で隣の段と下端をそろえる）
+    const tbl = h('table', { class: 'grid' + (b.dense ? ' dense' : ''), style: b.grow ? 'flex:1' : null },
       // colWidths：列幅を個別に指定（例 ['31mm', null] で見出し列だけ固定幅）。未指定なら等幅
       h('colgroup', null, Array.from({ length: cols }, (_, i) => h('col', { style: b.colWidths && b.colWidths[i] ? `width:${b.colWidths[i]}` : null }))));
     const tb = h('tbody');
@@ -614,6 +636,206 @@
     return wrapTitle(b, box);
   }
 
+  // sketch：略図の欄。図形・記号・文字を何個でも置き、マウスで自由に動かせる（下絵の画像も敷ける）
+  //   保存：values[key] = 図形の配列（座標は欄の左上からの mm）、values[key + '__bg'] = 下絵（JPEG の data URL）
+  //   図形：line/arrow {x1,y1,x2,y2}、rect/ellipse {x,y,w,h,rot}、text {x,y,text,size,rot,box}、sym {x,y,sym,size,rot}、
+  //         img {x,y,w,h,rot,src}（写真など。何枚でも置けて動かせる。保存量を抑えるため長辺1000pxのJPEGに縮める）
+  const SK_SYMS = [['①', '①当方'], ['②', '②相手車'], ['✖', '✖衝突場所'], ['♀', '♀人'], ['▽', '▽一時停止'], ['signal', '信号']];
+  function sketchBlock(b) {
+    const key = b.key, bgKey = key + '__bg';
+    const NS = 'http://www.w3.org/2000/svg';
+    const S = (tag, attrs) => {
+      const e = document.createElementNS(NS, tag);
+      for (const [k, v] of Object.entries(attrs || {})) if (v != null) e.setAttribute(k, v);
+      return e;
+    };
+    // 以前の「画像を1枚貼る欄」で保存した画像は下絵として引き継ぐ
+    if (typeof values[key] === 'string' && values[key].startsWith('data:')) { values[bgKey] = values[key]; values[key] = []; }
+    let items = Array.isArray(values[key]) ? values[key].map((x) => ({ ...x })) : [];
+    let sel = -1, drag = null;
+    let W = 100, H = 60;
+    const svg = S('svg', { class: 'sk-svg', preserveAspectRatio: 'xMinYMin meet' });
+    const area = h('div', { class: 'sk-area', tabindex: 0 }, svg);
+    const commit = () => setVal(key, items.map((x) => ({ ...x })));
+    const measure = () => {
+      const r = area.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+      W = r.width * 25.4 / 96; H = r.height * 25.4 / 96;
+      svg.setAttribute('viewBox', `0 0 ${W.toFixed(2)} ${H.toFixed(2)}`);
+    };
+    const toMM = (e) => { const r = area.getBoundingClientRect(); return { x: (e.clientX - r.left) * W / r.width, y: (e.clientY - r.top) * W / r.width }; };
+    const rotT = (it, cx, cy) => (it.rot ? `rotate(${it.rot} ${cx} ${cy})` : null);
+    const hit = (i, hname) => ({ 'data-i': i, 'data-h': hname || null });
+
+    function draw() {
+      svg.textContent = '';
+      const defs = S('defs');
+      const mk = S('marker', { id: `sk-ar-${key}`, viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 5, markerHeight: 5, orient: 'auto-start-reverse' });
+      mk.append(S('path', { d: 'M0,0 L10,5 L0,10 z', fill: '#000' }));
+      defs.append(mk); svg.append(defs);
+      if (values[bgKey]) svg.append(S('image', { href: values[bgKey], x: 0, y: 0, width: W, height: H, preserveAspectRatio: 'xMidYMid meet' }));
+      items.forEach((it, i) => {
+        const g = S('g', { class: 'sk-item' + (i === sel ? ' on' : '') });
+        const line = { stroke: '#000', 'stroke-width': 0.5, fill: 'none' };
+        if (it.t === 'line' || it.t === 'arrow') {
+          g.append(S('line', { x1: it.x1, y1: it.y1, x2: it.x2, y2: it.y2, ...line, 'marker-end': it.t === 'arrow' ? `url(#sk-ar-${key})` : null }));
+          g.append(S('line', { x1: it.x1, y1: it.y1, x2: it.x2, y2: it.y2, stroke: 'transparent', 'stroke-width': 4, ...hit(i) }));
+          if (i === sel) ['1', '2'].forEach((n) => g.append(S('circle', { class: 'sk-handle', cx: it['x' + n], cy: it['y' + n], r: 1.6, ...hit(i, 'p' + n) })));
+        } else if (it.t === 'img') {
+          const cx = it.x + it.w / 2, cy = it.y + it.h / 2;
+          const sg = S('g', { transform: rotT(it, cx, cy) });
+          sg.append(S('image', { href: it.src, x: it.x, y: it.y, width: it.w, height: it.h, preserveAspectRatio: 'none' }));
+          sg.append(S('rect', { x: it.x, y: it.y, width: it.w, height: it.h, fill: 'rgba(0,0,0,0)', stroke: i === sel ? 'var(--accent)' : 'none', 'stroke-width': 0.4, 'stroke-dasharray': '1.5 1', ...hit(i) }));
+          if (i === sel) sg.append(S('circle', { class: 'sk-handle', cx: it.x + it.w, cy: it.y + it.h, r: 1.6, ...hit(i, 'size') }));
+          g.append(sg);
+        } else if (it.t === 'rect' || it.t === 'ellipse') {
+          const cx = it.x + it.w / 2, cy = it.y + it.h / 2;
+          const sg = S('g', { transform: rotT(it, cx, cy) });
+          sg.append(it.t === 'rect'
+            ? S('rect', { x: it.x, y: it.y, width: it.w, height: it.h, ...line, fill: 'rgba(0,0,0,0)', ...hit(i) })
+            : S('ellipse', { cx, cy, rx: it.w / 2, ry: it.h / 2, ...line, fill: 'rgba(0,0,0,0)', ...hit(i) }));
+          if (i === sel) sg.append(S('circle', { class: 'sk-handle', cx: it.x + it.w, cy: it.y + it.h, r: 1.6, ...hit(i, 'size') }));
+          g.append(sg);
+        } else {
+          // 文字・記号：中心が (x, y)。大きさは size（mm）
+          const sg = S('g', { transform: rotT(it, it.x, it.y) });
+          if (it.t === 'sym' && it.sym === 'signal') {
+            const s = it.size, w = s * 1.9, hh = s * 0.75;
+            sg.append(S('rect', { x: it.x - w / 2, y: it.y - hh / 2, width: w, height: hh, rx: hh / 2, ...line, fill: '#fff', ...hit(i) }));
+            [-1, 0, 1].forEach((k) => sg.append(S('circle', { cx: it.x + k * s * 0.6, cy: it.y, r: s * 0.22, ...line, 'data-i': i })));
+          } else {
+            const lines = String(it.t === 'sym' ? it.sym : it.text).split('\n');
+            const tx = S('text', { x: it.x, y: it.y - (lines.length - 1) * it.size * 0.6, 'font-size': it.size, 'text-anchor': 'middle', 'dominant-baseline': 'central', ...hit(i) });
+            lines.forEach((l, k) => { const sp = S('tspan', { x: it.x, dy: k ? it.size * 1.2 : 0 }); sp.textContent = l; tx.append(sp); });
+            sg.append(tx);
+          }
+          g.append(sg);
+          // 文字の枠（テキストボックス）と、選択中の大きさの取っ手は、描いた文字の大きさから
+          requestAnimationFrame(() => {
+            if (!sg.isConnected) return;
+            const bb = sg.firstChild.getBBox();
+            if (it.t === 'text' && it.box) sg.insertBefore(S('rect', { x: bb.x - 1.2, y: bb.y - 0.8, width: bb.width + 2.4, height: bb.height + 1.6, ...line, fill: '#fff', 'data-i': i }), sg.firstChild);
+            if (i === sel) sg.append(S('circle', { class: 'sk-handle', cx: bb.x + bb.width + 1, cy: bb.y + bb.height + 1, r: 1.6, ...hit(i, 'size') }));
+          });
+        }
+        svg.append(g);
+      });
+    }
+
+    function add(it) { items.push(it); sel = items.length - 1; commit(); draw(); area.focus(); }
+    const cx = () => W / 2 + (items.length % 5) * 3, cy = () => H / 2 + (items.length % 5) * 3; // 重ならないよう少しずつずらす
+    const askText = (cur) => { const t = prompt('文字を入力してください（2行にするときは「／」で区切ります）', cur || ''); return t == null ? null : t.replace(/／/g, '\n'); };
+    const tb = (label, fn, title) => h('button', { type: 'button', title: title || '', onclick: (e) => { e.preventDefault(); fn(); } }, label);
+    const selected = () => (sel >= 0 ? items[sel] : null);
+    const rotate = (d) => { const it = selected(); if (!it || it.t === 'line' || it.t === 'arrow') return; it.rot = ((it.rot || 0) + d + 360) % 360; commit(); draw(); };
+    const del = () => { if (sel < 0) return; items.splice(sel, 1); sel = -1; commit(); draw(); };
+    const file = h('input', { type: 'file', accept: 'image/*', style: 'display:none', onchange: (e) => e.target.files[0] && setBg(e.target.files[0]) });
+    function setBg(blob) { shrinkImage(blob, 1600, 0.85, (data) => { setVal(bgKey, data); draw(); }); }
+    // 画像（写真など）を図形と同じように置く。図形の下（配列の先頭）に入れて、矢印や文字が上に重なるように
+    const imgFile = h('input', { type: 'file', accept: 'image/*', multiple: true, style: 'display:none',
+      onchange: (e) => { [...e.target.files].forEach(addImg); e.target.value = ''; } });
+    function addImg(blob) {
+      shrinkImage(blob, 1000, 0.8, (src) => {
+        const im = new Image();
+        im.onload = () => {
+          const w0 = Math.min(W * 0.45, H * 0.8 * im.width / im.height); // 欄の半分くらいの大きさで置く
+          const n = items.filter((x) => x.t === 'img').length;
+          items.unshift({ t: 'img', x: 4 + n * 6, y: 4 + n * 6, w: w0, h: w0 * im.height / im.width, rot: 0, src });
+          sel = 0; commit(); draw(); area.focus();
+        };
+        im.src = src;
+      });
+    }
+    // ボタンは見出しの行に1行で並べる（画面だけ。見出しの行の高さを印刷と同じにして、描く範囲を画面と印刷でそろえる）
+    const tools = h('div', { class: 'sk-tools no-print' },
+      tb('→', () => add({ t: 'arrow', x1: cx() - 10, y1: cy(), x2: cx() + 10, y2: cy() }), '矢印（両端の○で向き・長さを変える）'),
+      tb('─', () => add({ t: 'line', x1: cx() - 10, y1: cy(), x2: cx() + 10, y2: cy() }), '線'),
+      tb('□', () => add({ t: 'rect', x: cx() - 10, y: cy() - 6, w: 20, h: 12, rot: 0 }), '四角（右下の○で大きさを変える）'),
+      tb('○', () => add({ t: 'ellipse', x: cx() - 6, y: cy() - 6, w: 12, h: 12, rot: 0 }), '丸'),
+      tb('文字', () => { const t = askText(); if (t) add({ t: 'text', x: cx(), y: cy(), text: t, size: 4, rot: 0, box: false }); }, '文字（ダブルクリックで直す）'),
+      tb('枠文字', () => { const t = askText(); if (t) add({ t: 'text', x: cx(), y: cy(), text: t, size: 4, rot: 0, box: true }); }, '枠付きの文字（テキストボックス）'),
+      h('span', { class: 'sk-sep' }),
+      SK_SYMS.map(([sym, label]) => tb(sym === 'signal' ? '信号' : sym, () => add({ t: 'sym', x: cx(), y: cy(), sym, size: sym === 'signal' ? 4 : 6, rot: 0 }), label)),
+      h('span', { class: 'sk-sep' }),
+      tb('⟲', () => rotate(-15), '選んだ図形を左に15°回す'), tb('⟳', () => rotate(15), '選んだ図形を右に15°回す'),
+      tb('削除', del, '選んだ図形を消す（Delete キーでも可）'),
+      h('span', { class: 'sk-sep' }),
+      tb('画像', () => imgFile.click(), '写真などの画像を置く（何枚でも。欄を選んで Ctrl+V でも貼り付け可）。右下の○で大きさを変える'),
+      tb('下絵', () => file.click(), '地図などの画像を欄いっぱいに下に敷く（動かさない1枚）'),
+      tb('外す', () => { setVal(bgKey, ''); draw(); }, '下絵を外す'),
+      tb('全消去', () => { if (!confirm('この欄の図形と下絵をすべて消します。よろしいですか？')) return; items = []; sel = -1; commit(); setVal(bgKey, ''); draw(); }, '図形と下絵をすべて消す'),
+      file, imgFile);
+
+    svg.addEventListener('pointerdown', (e) => {
+      const t = e.target.closest('[data-i]');
+      if (!t) { sel = -1; draw(); return; }
+      const i = Number(t.getAttribute('data-i'));
+      sel = i;
+      drag = { i, h: t.getAttribute('data-h') || 'move', p: toMM(e), o: { ...items[i] } };
+      svg.setPointerCapture(e.pointerId);
+      area.focus();
+      draw();
+      e.preventDefault();
+    });
+    svg.addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      const p = toMM(e), dx = p.x - drag.p.x, dy = p.y - drag.p.y, o = drag.o, it = items[drag.i];
+      if (drag.h === 'move') {
+        if ('x1' in o) Object.assign(it, { x1: o.x1 + dx, y1: o.y1 + dy, x2: o.x2 + dx, y2: o.y2 + dy });
+        else Object.assign(it, { x: o.x + dx, y: o.y + dy });
+      } else if (drag.h === 'p1' || drag.h === 'p2') {
+        const n = drag.h[1];
+        it['x' + n] = o['x' + n] + dx; it['y' + n] = o['y' + n] + dy;
+      } else if (it.t === 'img') {
+        // 画像は縦横の比率を保ったまま大きさを変える
+        const a = -(o.rot || 0) * Math.PI / 180, ux = dx * Math.cos(a) - dy * Math.sin(a);
+        it.w = Math.max(5, o.w + ux); it.h = it.w * o.h / o.w;
+      } else if (it.t === 'rect' || it.t === 'ellipse') {
+        // 回っている図形は、回す前の向きに直してから幅・高さを変える
+        const a = -(o.rot || 0) * Math.PI / 180, ux = dx * Math.cos(a) - dy * Math.sin(a), uy = dx * Math.sin(a) + dy * Math.cos(a);
+        it.w = Math.max(2, o.w + ux); it.h = Math.max(2, o.h + uy);
+      } else {
+        it.size = Math.max(2, Math.min(40, o.size + (dx + dy) / 2));
+      }
+      draw();
+    });
+    const end = () => { if (drag) { drag = null; commit(); } };
+    svg.addEventListener('pointerup', end);
+    svg.addEventListener('pointercancel', end);
+    svg.addEventListener('dblclick', (e) => {
+      const t = e.target.closest('[data-i]');
+      if (!t) return;
+      const it = items[Number(t.getAttribute('data-i'))];
+      if (it.t !== 'text') return;
+      const v = askText(it.text.replace(/\n/g, '／'));
+      if (v == null) return;
+      if (v === '') items.splice(items.indexOf(it), 1); else it.text = v;
+      sel = -1; commit(); draw();
+    });
+    area.addEventListener('keydown', (e) => {
+      const it = selected();
+      if (!it) return;
+      if (e.key === 'Delete' || e.key === 'Backspace') { del(); e.preventDefault(); return; }
+      const mv = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
+      if (!mv) return;
+      const [mx, my] = mv.map((v) => v * (e.shiftKey ? 5 : 0.5));
+      if ('x1' in it) { it.x1 += mx; it.x2 += mx; it.y1 += my; it.y2 += my; } else { it.x += mx; it.y += my; }
+      commit(); draw(); e.preventDefault();
+    });
+    area.addEventListener('paste', (e) => {
+      // 貼り付けた画像は動かせる画像として置く（下絵は「下絵」ボタンから）
+      const fs = [...(e.clipboardData?.items || [])].filter((x) => x.type.startsWith('image/'));
+      if (fs.length) { e.preventDefault(); fs.forEach((f) => addImg(f.getAsFile())); }
+    });
+    // 印刷のときは選択の取っ手を消す
+    window.addEventListener('beforeprint', () => { if (sel >= 0) { sel = -1; draw(); } });
+    new ResizeObserver(() => { measure(); draw(); }).observe(area);
+
+    // note：記号の説明など、印刷だけに出す見出しの続き（画面ではその場所にボタンを置く）
+    return h('div', { class: 'free sketch', style: b.grow ? 'flex:1' : `height:${b.h || 80}mm` },
+      h('div', { class: 'free-label sk-head' }, h('span', { class: 'sk-title' }, b.label || ''), b.note ? h('span', { class: 'sk-note' }, b.note) : null, tools), area);
+  }
+
   function wrapTitle(b, el) {
     if (!b.title) return b.grow ? h('div', { style: 'flex:1;display:flex;flex-direction:column' }, el) : el;
     return h('div', { style: b.grow ? 'flex:1;display:flex;flex-direction:column' : '' }, h('div', { class: 'blk-title' }, b.title), el);
@@ -623,6 +845,7 @@
     grid: gridBlock,
     table: tableBlock,
     free: freeBlock,
+    sketch: sketchBlock,
     image: (b) => h('div', { class: 'free', style: b.grow ? 'flex:1' : `height:${b.h || 80}mm` },
       b.label ? h('div', { class: 'free-label' }, b.label) : null, imageField({ key: b.key })),
     para: (b) => h('p', { class: 'para', style: b.style || '' }, b.text),
@@ -631,8 +854,11 @@
     spacer: () => h('div', { class: 'spacer' }),
     stamps: (b) => h('div', { class: 'inline-stamps', style: b.align === 'right' ? 'justify-content:flex-end' : '' },
       h('div', null, b.title ? h('div', { class: 'is-title' }, b.title) : null, stampsEl(b.groups))),
-    row: (b) => h('div', { style: `display:flex;gap:${b.gap ?? 4}mm;align-items:${b.align || 'stretch'}` },
-      b.items.map((x) => h('div', { style: x.w ? `width:${x.w}%;flex-shrink:0` : 'flex:1' }, renderBlock(x)))),
+    // row の grow：残りの高さいっぱいに伸ばす（A3横で左右2段に組むときなど）
+    row: (b) => h('div', { style: `display:flex;gap:${b.gap ?? 4}mm;align-items:${b.align || 'stretch'}` + (b.grow ? ';flex:1' : '') },
+      b.items.map((x) => h('div', { style: (x.w ? `width:${x.w}%;flex-shrink:0` : 'flex:1;min-width:0') + ';display:flex;flex-direction:column' }, renderBlock(x)))),
+    // col：ブロックを縦に並べる（row の中の1段）。中の grow のブロックが残りの高さを使う
+    col: (b) => h('div', { style: `display:flex;flex-direction:column;gap:${b.gap ?? 3}mm;flex:1` }, b.items.map(renderBlock)),
     custom: (b) => b.render({ h, field, values, setVal }),
   };
   function renderBlock(b) {
@@ -665,7 +891,8 @@
           h('img', { class: 'mark-only', src: 'assets/logo-mark.jpg', alt: '' }),
           h('div', { class: 'f-ver' }, pd.footerRight || '')));
     }
-    return h('div', { class: `sheet ${paper} ${orient}` },
+    // sheetClass：帳票ごとの見た目の調整（例：'tight-checks' 選択肢の多い帳票で文字と間隔を詰める）
+    return h('div', { class: `sheet ${paper} ${orient}` + (pd.sheetClass ? ' ' + pd.sheetClass : '') },
       headerEl(pd),
       h('div', { class: 'sheet-body' }, blocks.map(renderBlock)),
       bottom,
@@ -674,7 +901,8 @@
           h('img', { class: 'mark', src: 'assets/logo-mark.jpg', alt: '' }),
           // ロゴタイプはホームページと同じローマ字表記（書体は近いもの：Montserrat ExtraBold）
           h('span', { class: 'word', title: '株式会社 雄電社' }, 'YUDENSHA')),
-        h('div', { class: 'f-ver' }, `${pd.code}　${pd.title}`)));
+        // 品質記録様式：制定日（元の様式のまま固定）と最終改訂日（ユーザーが都度指定）を番号の後ろに
+        h('div', { class: 'f-ver' }, `${pd.code}　${pd.title}` + (pd.seitei ? `　　${pd.seitei}制定　　${pd.kaitei || pd.seitei}最終改訂` : ''))));
   }
 
   // ---------- 起動 ----------
