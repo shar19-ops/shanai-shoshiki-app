@@ -16,8 +16,10 @@
   ] };
 
   const incident = { type: 'grid', lw: 3, rowH: 7, dense: true, rows: [
-    [{ label: '被害の日時', ...when('higai'), span: 11 },
-      { label: '届出警察署', key: 'police', type: 'inline', span: 13, parts: [{ key: 'policeName' }, 'TEL', { key: 'policeTel', type: 'tel', w: 30 }] }],
+    // 被害の日時・被害発見の日時は同じ高さ（どちらも2行分）。届出警察署は元の様式どおり名称とTELの2行
+    [{ label: '被害の日時', ...when('higai'), span: 11, rs: 2 },
+      { label: '届出警察署', span: 3, rs: 2 }, { key: 'policeName', span: 10 }],
+    [{ key: 'policeTel', type: 'tel', prefix: 'TEL', span: 10 }],
     [{ label: '被害発見\nの日時', ...when('hakken'), span: 11, rs: 2 },
       { label: '届出の日時', ...when('todoke'), span: 13 }],
     [{ label: '届出人氏名', key: 'todokeName', span: 7 }, { label: '受理番号', key: 'juri', span: 6 }],
@@ -29,14 +31,14 @@
       '　他社（ゼネコン）：', { key: 'hokenGc', type: 'radio', options: ['加入', '未加入'] }] }],
   ] };
 
-  // 被害品：被害見積額の合計だけ自動（数量×単価の計算は元の様式にないので入れない）
+  // 被害品：被害見積額は数量×単価で自動計算（ユーザー指定）、合計も自動
   const damage = {
     type: 'table', key: 'items', rows: DAMAGE_ROWS, rowH: 6, dense: true,
     columns: [
       { label: '被害の品名及び種類', key: 'name', w: 50 },
       { label: '数　量', key: 'qty', w: 9, type: 'number' },
       { label: '単　価', key: 'price', w: 11, type: 'money' },
-      { label: '被害見積額', key: 'amount', w: 14, type: 'money' },
+      { label: '被害見積額', key: 'amount', w: 14, type: 'calc', calc: (n) => n('qty') * n('price') },
       { label: '備　考', key: 'note', w: 16 },
     ],
     foot: [[{ label: '合　計', span: 3 }, { sum: 'amount' }, { label: '', lbl: false }]],
