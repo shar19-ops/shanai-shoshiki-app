@@ -340,6 +340,11 @@ table.grid td textarea.inp { height: 100%; }
 /* ローマ字のロゴタイプ（ホームページの「YUDENSHA」に近い書体） */
 .brand .word { font-family: "Montserrat", "Segoe UI", Arial, sans-serif; font-weight: 800; font-size: 12.5pt; letter-spacing: .07em; color: #1f3f8f; line-height: 1; }
 .f-footer .f-ver { font-size: 7.5pt; color: #666; }
+/* bare（元のExcelのままの帳票）：共通の表題なし、フッターは YESマーク＋右に文字だけ */
+.sheet.bare { padding: 15mm 8mm 6mm; }
+.f-footer.bare { border-top: 0; align-items: center; }
+.f-footer.bare .mark-only { height: 6mm; }
+.f-footer.bare .f-ver { font-family: "MS Gothic", "ＭＳ ゴシック", monospace; font-size: 8pt; color: #000; letter-spacing: .05em; }
 
 /* ---------- 印刷 ---------- */
 @media print {
@@ -357,3 +362,33 @@ table.grid td textarea.inp { height: 100%; }
   .date-wrap .pv { display: block; width: 100%; padding: 0 1.5mm; white-space: nowrap; overflow: hidden; }
   * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+
+/* ---------- 般-50 工期設定チェックリスト（元のExcelのままの見た目） ---------- */
+.k50 { display: flex; gap: var(--k50-gap); font-family: "MS PGothic", "ＭＳ Ｐゴシック", sans-serif; font-size: 8.8pt; color: #000; }
+.k50-side { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.k50-head { height: calc(var(--k50-row) * 2); display: flex; flex-direction: column; justify-content: center; }
+.k50-title { text-align: center; font-size: 15.9pt; line-height: 1.2; }
+.k50-law { text-align: right; font-weight: bold; font-size: 8.8pt; padding-right: 22mm; }
+.k50-tbl { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.k50-tbl tr { height: var(--k50-row); } /* 2行の項目の2行目（セルなしの行）も高さを保つ */
+.k50-tbl td { border: .5pt solid #000; padding: 0 1.2mm; vertical-align: middle; line-height: 1.25; overflow: hidden; }
+.k50-top { margin-bottom: 0; }
+.k50-cap { margin-top: calc(var(--k50-row) * 0.5); }
+.k50-cap td { text-align: center; }
+.k50-th { text-align: center; font-weight: bold; }
+.k50-h { text-align: center; padding: 0 !important; white-space: nowrap; }
+.k50-item { text-align: justify; text-align-last: justify; padding: 0 1.5mm !important; }
+.k50-chk, .k50-in { background: #eaeaea; padding: 0 !important; }
+.k50-in.k50-white { background: #fff; }
+.k50-txt { white-space: nowrap; }
+.k50-tbl td.k50-multi { line-height: calc(var(--k50-row) - 1px); } /* 2行の項目は1行ずつ元の行の高さで */
+.k50 .inp { font: inherit; font-weight: bold; background-color: transparent; height: 100%; min-height: 0; border: 0; }
+.k50-chk .inp { text-align: center; text-align-last: center; padding: 0; font-weight: normal; }
+.k50-conf-h { text-align: center; }
+.k50-conf-s { position: relative; text-align: center; vertical-align: middle; }
+.k50-conf-s .self-stamp { position: absolute; inset: 0; }
+.k50-hatsu { position: relative; display: inline-block; line-height: 1.6; pointer-events: none; }
+.k50-legend { margin-top: var(--k50-row); line-height: var(--k50-row); }
+.k50-legend-h { display: inline-block; width: 25mm; text-align: center; }
+.k50-note { line-height: var(--k50-row); }
+@media screen { .k50-chk .inp, .k50-in .inp { background-color: var(--input-bg); } }

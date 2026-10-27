@@ -656,6 +656,15 @@
       if (notes) blocks = [...blocks.slice(0, i), ...blocks.slice(i + 1)];
       bottom = h('div', { class: 'bottom-stamps' }, notes ? renderBlock(notes) : null, stampsEl(pd.bottomStamps));
     }
+    // bare: 元のExcelのままの見た目で作る帳票（般-50）。共通の表題・押印欄は出さず、
+    //   フッターは左にYESマークだけ、右に footerRight（例：制定日）
+    if (pd.bare) {
+      return h('div', { class: `sheet ${paper} ${orient} bare` },
+        h('div', { class: 'sheet-body' }, blocks.map(renderBlock)),
+        h('div', { class: 'f-footer bare' },
+          h('img', { class: 'mark-only', src: 'assets/logo-mark.jpg', alt: '' }),
+          h('div', { class: 'f-ver' }, pd.footerRight || '')));
+    }
     return h('div', { class: `sheet ${paper} ${orient}` },
       headerEl(pd),
       h('div', { class: 'sheet-body' }, blocks.map(renderBlock)),
