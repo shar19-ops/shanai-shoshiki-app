@@ -81,7 +81,10 @@
   const goals = ({ h, field }) => (tb) => {
     for (let i = 1; i <= GOALS; i++) {
       tb.append(h('tr', { class: i === 1 ? 'q-grp' : null },
-        i === 1 ? h('td', { class: 'lbl q-cat', rowspan: GOALS }, '月安全衛生目標') : null,
+        // 何月の目標かを記入できるように、見出しの上に月の欄
+        i === 1 ? h('td', { class: 'lbl q-cat q-goal-h', rowspan: GOALS },
+          h('div', { class: 'q-month' }, field({ key: 'goalMonth', align: 'center', maxlength: 2, inputmode: 'numeric' })),
+          h('div', { class: 'q-vt' }, '月安全衛生目標')) : null,
         h('td', { class: 'q-goal', colspan: 2 }, field({ key: `goal${i}` })),
         h('td', { class: 'q-chk' }, field({ key: `goalJ${i}`, type: 'select', options: MARKS, align: 'center' }))));
     }
@@ -96,13 +99,14 @@
     selfStamp: '発行者', // 本人欄（デート印を押す欄）
     meta: [
       { label: '検査日', key: 'date', type: 'date', w: 30 },
-      { label: '天候', key: 'weather', w: 14, cls: 'fixw' },
+      { label: '天候', key: 'weather', w: 14, cls: 'fixw near' }, // 検査日のすぐ横
     ],
-    // 元は下部に横一列（社長〜発行者の9つ、安全管理者の欄に「保管」）。右上に2段で並べる
+    // 元は下部に横一列（社長〜発行者、安全管理者の欄に「保管」）。右上に2段で並べる
+    // ユーザー指定：支店長の欄は削除し、工事長の欄を「工事長・支店長」に
     // '|' は見出しの改行、'\n' 以降は押印部に薄く印字
     stamps: [
       { boxes: ['社長', '本店長', '総括安全|衛生管理者', '安全管理者\n保管'] },
-      { boxes: ['衛生管理者', '工事本部長|RE部長', '支店長', '工事長|工事部長', '発行者'] },
+      { boxes: ['衛生管理者', '工事本部長|RE部長', '工事長|支店長', '発行者'] },
     ],
     stampClass: 'stack',
     // 工番〜検査者名は押印欄の左の空き（タイトルの下）に置く。見出し列は下の表と同じ幅

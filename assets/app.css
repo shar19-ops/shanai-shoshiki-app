@@ -409,4 +409,11 @@ table.grid.q-check td.q-cat { writing-mode: vertical-rl; letter-spacing: 0; line
 table.grid.q-check td.q-no { text-align: center; font-size: 7.5pt; }
 table.grid.q-check td.q-txt { font-size: 7.5pt; line-height: 1.2; padding: .2mm 1mm; }
 table.grid.q-check td.q-goal .inp { font-size: 8pt; }
-table.grid.q-check .inp { min-height: 3.6mm; font-size: 8pt; padding-top: 0; padding-bottom: 0; }
+table.grid.q-check .inp { min-height: 3.6mm; height: 3.6mm; font-size: 8pt; padding-top: 0; padding-bottom: 0; display: block; }
+/* 月安全衛生目標：見出しの上に月の記入欄（横書き）、その下に縦書きの見出し */
+table.grid.q-check td.q-goal-h { writing-mode: horizontal-tb; padding: .5mm 0; vertical-align: top; }
+table.grid.q-check td.q-goal-h .q-month { border-bottom: 1px solid var(--line); margin: 0 .3mm 1mm; }
+table.grid.q-check td.q-goal-h .q-month .inp { padding: 0; font-size: 8pt; text-align: center; }
+table.grid.q-check td.q-goal-h .q-vt { writing-mode: vertical-rl; margin: 0 auto; }
+/* near：前の項目のすぐ横に置く */
+.f-meta .m-item.near { margin-left: -3mm; }
