@@ -445,3 +445,25 @@ table.grid.q-check td.q-goal-h .q-vt { writing-mode: vertical-rl; margin: 0 auto
 .sheet .f-title-row .title-side table.grid .checks .box { width: 3.8mm; height: 3.8mm; }
 .sheet .f-title-row .title-side table.grid .checks { gap: 0 3mm !important; }
 .f-title-row .title-side .inp { font-size: 11pt; }
+/* ---------- sketch：略図の欄（図形・記号・文字を自由に配置） ---------- */
+.sketch .sk-head { display: flex; align-items: center; gap: 3mm; height: 6mm; padding: 0 2mm; box-sizing: border-box; white-space: nowrap; overflow: hidden; }
+.sketch .sk-title { flex: none; }
+.sketch .sk-note { letter-spacing: 0; }
+.sketch .sk-tools { display: flex; align-items: center; gap: 2px; margin-left: auto; letter-spacing: 0; }
+.sketch .sk-tools button { font: inherit; font-size: 7.5pt; line-height: 1; height: 4.6mm; min-width: 5.2mm; padding: 0 4px; border: 1px solid #b8bfcc; border-radius: 3px; background: #fff; color: #333; cursor: pointer; white-space: nowrap; }
+.sketch .sk-tools button:hover { border-color: var(--accent); color: var(--accent); }
+.sketch .sk-tools .sk-sep { width: 1px; height: 4mm; background: #c9d0dc; margin: 0 2px; }
+@media screen { .sketch .sk-note { display: none; } }
+.sketch .sk-area { flex: 1; position: relative; min-height: 20mm; outline: none; }
+.sketch .sk-area:focus-visible { box-shadow: inset 0 0 0 1.5px var(--accent); }
+.sketch .sk-svg { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; user-select: none; }
+.sketch .sk-svg text { font-family: var(--font); cursor: move; }
+.sketch .sk-svg [data-i] { cursor: move; }
+.sketch .sk-handle { fill: #fff; stroke: var(--accent); stroke-width: .4; cursor: nwse-resize; }
+.sketch .sk-item.on > :not(.sk-handle) { filter: drop-shadow(0 0 .6px var(--accent)); }
+@media screen { .sketch .sk-area { background: var(--input-bg); } }
+@media print { .sketch .sk-handle { display: none; } .sketch .sk-item.on > * { filter: none; } }
+/* 罫線の切り替えボタンで見出しの行が高くならないように（画面と印刷で欄の高さをそろえる。略図の描く範囲がずれないように） */
+.free .free-label.has-toggle .line-toggle, .free .free-label.has-toggle .line-toggle button { line-height: 1; }
+.free .free-label.has-toggle .line-toggle { height: 3.1mm; }
+.free .free-label.has-toggle .line-toggle button { padding-top: 0; padding-bottom: 0; height: 3.1mm; font-size: 7.5pt; }

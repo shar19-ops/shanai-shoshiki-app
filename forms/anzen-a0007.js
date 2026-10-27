@@ -97,7 +97,8 @@
       { type: 'row', gap: 5, grow: true, items: [
         { type: 'col', items: [left, { type: 'free', label: '部長・支店長', key: 'buchoComment', lines: 3, grow: true }] },
         { type: 'col', items: [
-          { type: 'image', label: '事故現場略図（判り易く簡単に）　当方：①　相手車：②　進行方向：➔　衝突場所：✖　人：♀　一時停止：▽', key: 'zu', grow: true },
+          // 略図：図形・記号・文字を何個でも置いて自由に動かせる（下絵の画像も敷ける）
+          { type: 'sketch', label: '事故現場略図（判り易く簡単に）', note: '当方：①　相手車：②　進行方向：➔　衝突場所：✖　人：♀　一時停止：▽', key: 'zu', grow: true },
           { type: 'free', label: '事故の原因及び状況（事故当事者記入）', key: 'genin', lines: 6 },
           { type: 'free', label: '本部長・支店長', key: 'honbuComment', lines: 3 },
           { type: 'free', label: '安全運転管理者（正・副）', key: 'anzenComment', lines: 3 },
