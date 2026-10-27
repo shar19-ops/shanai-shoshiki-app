@@ -225,6 +225,10 @@ table.grid.dense tr.thin .inp { font-size: 7.5pt; min-height: 4mm; }
 .inp.num { text-align: right; font-variant-numeric: tabular-nums; }
 .inp.center { text-align: center; }
 .inp.calc { background: transparent; }
+/* mark：クリックで〇を付け外し（休日など） */
+.inp.mark-btn { display: block; width: 100%; height: 100%; padding: 0; border: 0; background: transparent; text-align: center; cursor: pointer; font: inherit; }
+.inp.mark-btn:hover { background: rgba(0, 0, 0, .05); }
+@media print { .inp.mark-btn:hover { background: transparent; } }
 select.inp { appearance: none; -webkit-appearance: none; cursor: pointer; }
 textarea.inp {
   resize: none; display: block; padding: 1mm 2mm;
@@ -418,6 +422,27 @@ table.grid.q-check td.q-goal-h .q-month { margin: 0 .3mm; } /* 月と見出し�
 table.grid.q-check td.q-goal-h .q-month .inp { padding: 0; font-size: 8pt; text-align: center; }
 table.grid.q-check td.q-goal-h .q-month .inp::placeholder { color: transparent; }
 table.grid.q-check td.q-goal-h .q-vt { writing-mode: vertical-rl; margin: 0 auto; }
+/* 本-安全-A0015 安全衛生重点管理表：点検事項と評点の表 */
+table.grid.q15 td, table.grid.q15 th { height: 5.2mm; }
+table.grid.q15 th.q15-sc { line-height: 1.1; padding: .3mm 0; }
+table.grid.q15 .q15-md .inp { height: 3.4mm; min-height: 0; font-size: 7pt; color: #555; padding: 0; }
+table.grid.q15 td.q15-c { text-align: center; font-size: 8pt; }
+table.grid.q15 td.q15-txt { font-size: 8pt; padding: 0 1.5mm; line-height: 1.2; }
+table.grid.q15 td.q15-title { text-align: left; font-weight: bold; letter-spacing: 0; }
+table.grid.q15 tr.q15-sec > td { border-top: 1.5px solid var(--line); }
+table.grid.q15 td.q15-na { background: #f6f7f9; }
+table.grid.q15 td .inp { font-size: 8.5pt; }
+table.grid.q15 td.q15-memo { position: relative; vertical-align: top; }
+table.grid.q15 td.q15-memo textarea.inp { position: absolute; inset: 0; width: 100%; height: 100%; font-size: 8.5pt; line-height: 1.5; }
+table.grid.q15 tr.q15-total > td { border-top: 1.5px solid var(--line); }
+table.grid.q15 tr.q15-sign td { height: 7mm; }
+table.grid.q15 td.q15-eval { padding: 0; }
+table.grid.q15 .q15-evals { display: flex; height: 100%; min-height: 21mm; }
+table.grid.q15 .q15-ev { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; }
+table.grid.q15 .q15-ev + .q15-ev { border-left: 1px solid var(--line); }
+table.grid.q15 .q15-g { font-size: 12pt; }
+/* 総合評価の〇は文字に重ねて大きく */
+table.grid.q15 .q15-ev .mark-btn { position: absolute; inset: 0; font-size: 26pt; line-height: 1; color: var(--ink); }
 /* near：前の項目のすぐ横に置く */
 .f-meta .m-item.near { margin-left: -3mm; }
 .f-meta:has(.m-item.near) { align-items: baseline; } /* 横に並べた項目と文字の高さをそろえる */
@@ -467,3 +492,7 @@ table.grid.q-check td.q-goal-h .q-vt { writing-mode: vertical-rl; margin: 0 auto
 .free .free-label.has-toggle .line-toggle, .free .free-label.has-toggle .line-toggle button { line-height: 1; }
 .free .free-label.has-toggle .line-toggle { height: 3.1mm; }
 .free .free-label.has-toggle .line-toggle button { padding-top: 0; padding-bottom: 0; height: 3.1mm; font-size: 7.5pt; }
+/* inline の stack：上下に積む（間に横罫線なし） */
+.inline-wrap.stack { flex-direction: column; align-items: stretch; justify-content: center; gap: 0; padding: 0; }
+.inline-wrap.stack > .iw { flex: 1; min-height: 0; }
+.inline-wrap.stack > .iw > * { flex: 1; }

@@ -124,11 +124,31 @@
 
     // inline：1つの欄に選択肢・入力欄・文字を罫線なしで並べる。parts: [文字 | 入力部品の定義（w で幅mm）]
     //   例：作業区分「□単独作業 □共同作業 [　]名」、雇用区分「…□その他（[　　]）」
+    //   stack: true なら上下に積む（例：届出警察署の名称とTELを、間に横罫線を入れずに2段で）
     if (type === 'inline') {
-      return h('div', { class: 'cell-wrap inline-wrap' }, f.parts.map((p) => (typeof p === 'string'
+      return h('div', { class: 'cell-wrap inline-wrap' + (f.stack ? ' stack' : '') }, f.parts.map((p) => (typeof p === 'string'
         ? h('span', { class: 'unit' }, p)
         // 選択肢は中身の幅、入力欄は残りの幅（w を指定すればその幅mm）
         : h('span', { class: 'iw', style: p.w ? `width:${p.w}mm;flex-shrink:0` : (p.type === 'radio' || p.type === 'checks') ? 'flex:none' : 'flex:1;min-width:0' }, field(p)))));
+    }
+
+    // mark：クリックで印（既定は〇）を付け外しする欄。auto(values) が true の日は自動で印（例：休日）
+    //   値は '1'（手で付けた）・'0'（手で外した）・''（自動のまま）。scope の項目（例：年月）があれば
+    //   「年月|1」の形で持ち、年月を変えると手で付け外しした印は無効になる（自動に戻る）
+    if (type === 'mark') {
+      const mark = f.mark || '〇';
+      el = h('button', { type: 'button', class: 'inp mark-btn', title: 'クリックで印を付け外し' });
+      const pre = () => (f.scope ? `${values[f.scope] || ''}|` : '');
+      const manual = () => { const s = String(values[key] ?? ''); return s.startsWith(pre()) ? s.slice(pre().length) : ''; };
+      const on = () => (manual() === '1' || (manual() !== '0' && !!(f.auto && f.auto(values))));
+      el.addEventListener('click', () => {
+        const auto = !!(f.auto && f.auto(values));
+        const next = !on();
+        setVal(key, next === auto ? '' : pre() + (next ? '1' : '0')); // 自動と同じなら自動に戻す
+      });
+      calcs.push(() => { el.textContent = on() ? mark : ''; });
+      inputs[key] = el;
+      return el;
     }
 
     if (type === 'checks' || type === 'radio') {
@@ -457,7 +477,7 @@
         if (!c.group) { r1.append(h('th', { rowspan: 2, style: hh }, ...lbl(c.label))); continue; }
         let n = 1;
         while (cols[i + n] && cols[i + n].group === c.group) n++;
-        r1.append(h('th', { colspan: n, style: 'height:6mm' }, c.group));
+        r1.append(h('th', { colspan: n, style: 'height:6mm' }, ...lbl(c.group))); // '\n' で改行（単位を次の行に）
         for (let k = 0; k < n; k++) r2.append(h('th', { style: 'height:6mm' }, ...lbl(cols[i + k].label)));
         i += n - 1;
       }
@@ -470,7 +490,7 @@
     // 組の先頭行の r で rowCalc を呼ぶ。組の境目は罫線を太くする
     const gn = b.groupRows || 1;
     // 入力できる列（コピー・貼り付けの対象）
-    const editCols = cols.filter((c) => !c.grouped && !c.rowNo && !c.head && !c.calc && !c.rowCalc && c.type !== 'calc');
+    const editCols = cols.filter((c) => !c.grouped && !c.rowNo && !c.head && !c.calc && !c.rowCalc && c.type !== 'calc' && c.type !== 'mark');
     const cellKey = (r, c) => `${b.key}.${r}.${c.key}`;
     const putCell = (r, c, text) => {
       let t = String(text ?? '').trim();
@@ -529,6 +549,7 @@
         const f = { ...c, key };
         if (c.calc) f.calc = (n) => c.calc((k) => n(`${b.key}.${r}.${k}`));
         if (c.rowCalc) { f.type = 'calc'; f.calc = (n, v) => c.rowCalc(r, v); }
+        if (c.rowAuto) f.auto = (v) => c.rowAuto(r, v); // mark の自動判定（行ごと）
         const td = h('td', { style: b.rowH ? `height:${b.rowH}mm` : '' }, field(f));
         if (editCols.includes(c)) td.addEventListener('paste', onPaste(r, c));
         return td;
@@ -541,7 +562,7 @@
         tf.append(h('tr', null, row.map((c) => {
           if (c.sum) {
             const key = `${b.key}.sum.${c.sum}`;
-            const f = { key, type: 'calc', calc: (n) => { let s = 0; for (let r = 1; r <= b.rows; r++) s += n(`${b.key}.${r}.${c.sum}`); return s; } };
+            const f = { key, type: 'calc', unit: c.unit, calc: (n) => { let s = 0; for (let r = 1; r <= b.rows; r++) s += n(`${b.key}.${r}.${c.sum}`); return s; } };
             return h('td', { colspan: c.span || 1 }, field(f));
           }
           if (c.key) return h('td', { colspan: c.span || 1 }, field(c));
@@ -755,7 +776,8 @@
       tb('文字', () => { const t = askText(); if (t) add({ t: 'text', x: cx(), y: cy(), text: t, size: 4, rot: 0, box: false }); }, '文字（ダブルクリックで直す）'),
       tb('枠文字', () => { const t = askText(); if (t) add({ t: 'text', x: cx(), y: cy(), text: t, size: 4, rot: 0, box: true }); }, '枠付きの文字（テキストボックス）'),
       h('span', { class: 'sk-sep' }),
-      SK_SYMS.map(([sym, label]) => tb(sym === 'signal' ? '信号' : sym, () => add({ t: 'sym', x: cx(), y: cy(), sym, size: sym === 'signal' ? 4 : 6, rot: 0 }), label)),
+      // hideSyms：帳票ごとに使わない記号のボタンを隠す（例：盗難現場見取図では信号を出さない）
+      SK_SYMS.filter(([sym]) => !(b.hideSyms || []).includes(sym)).map(([sym, label]) => tb(sym === 'signal' ? '信号' : sym, () => add({ t: 'sym', x: cx(), y: cy(), sym, size: sym === 'signal' ? 4 : 6, rot: 0 }), label)),
       h('span', { class: 'sk-sep' }),
       tb('⟲', () => rotate(-15), '選んだ図形を左に15°回す'), tb('⟳', () => rotate(15), '選んだ図形を右に15°回す'),
       tb('削除', del, '選んだ図形を消す（Delete キーでも可）'),
