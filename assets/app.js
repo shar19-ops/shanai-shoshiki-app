@@ -131,7 +131,7 @@
       const cur = new Set(multi ? (Array.isArray(v) ? v : []) : [v]);
       const name = 'r_' + key;
       // nowrap：選択肢を折り返さず1行に（性別など幅の狭い欄）
-      const wrap = h('div', { class: 'checks', style: f.vertical ? 'flex-direction:column;align-items:flex-start' : f.nowrap ? 'flex-wrap:nowrap;gap:0 3mm' : '' },
+      const wrap = h('div', { class: 'checks', style: f.vertical ? 'flex-direction:column;align-items:flex-start' : f.nowrap ? 'flex-wrap:nowrap;gap:0 2mm;padding:1mm 1.5mm' : '' },
         f.options.map((o) => {
           const cb = h('input', {
             type: multi ? 'checkbox' : 'radio', name, value: o, checked: cur.has(o),
@@ -681,7 +681,8 @@
           h('img', { class: 'mark-only', src: 'assets/logo-mark.jpg', alt: '' }),
           h('div', { class: 'f-ver' }, pd.footerRight || '')));
     }
-    return h('div', { class: `sheet ${paper} ${orient}` },
+    // sheetClass：帳票ごとの見た目の調整（例：'tight-checks' 選択肢の多い帳票で文字と間隔を詰める）
+    return h('div', { class: `sheet ${paper} ${orient}` + (pd.sheetClass ? ' ' + pd.sheetClass : '') },
       headerEl(pd),
       h('div', { class: 'sheet-body' }, blocks.map(renderBlock)),
       bottom,

@@ -422,6 +422,10 @@ table.grid.q-check td.q-goal-h .q-vt { writing-mode: vertical-rl; margin: 0 auto
 .f-meta .m-item.near { margin-left: -3mm; }
 .f-meta:has(.m-item.near) { align-items: baseline; } /* 横に並べた項目と文字の高さをそろえる */
 /* inline：1つの欄に選択肢・入力欄・文字を並べる（間に縦罫線を入れない） */
-.inline-wrap .checks { padding: 0; flex-wrap: nowrap; gap: 0 3mm; }
+.inline-wrap .checks { padding: 0; flex-wrap: nowrap; gap: 0 2mm; }
 .inline-wrap .iw { display: flex; align-items: center; height: 100%; }
 .inline-wrap .iw .inp { padding: 0 1mm; }
+/* tight-checks：選択肢の多い帳票（本-安全-A0007 など）は選択肢の文字と間隔を少し詰める */
+.sheet.tight-checks table.grid .checks label { font-size: 8pt; gap: .6mm; letter-spacing: -.02em; }
+.sheet.tight-checks table.grid .checks .box { width: 3.2mm; height: 3.2mm; }
+.sheet.tight-checks table.grid .checks { gap: 0 1.6mm !important; }
