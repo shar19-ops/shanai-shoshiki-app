@@ -386,9 +386,11 @@ table.grid td textarea.inp { height: 100%; }
 .k50-chk .inp { text-align: center; text-align-last: center; padding: 0; font-weight: normal; }
 .k50-conf-h { text-align: center; }
 .k50-conf-s { position: relative; text-align: center; vertical-align: middle; }
-.k50-conf-s .self-stamp { position: absolute; inset: 0; }
 .k50-hatsu { position: relative; display: inline-block; line-height: 1.6; pointer-events: none; }
 .k50-legend { margin-top: var(--k50-row); line-height: var(--k50-row); }
 .k50-legend-h { display: inline-block; width: 25mm; text-align: center; }
 .k50-note { line-height: var(--k50-row); }
 @media screen { .k50-chk .inp, .k50-in .inp { background-color: var(--input-bg); } }
+/* 確認者の日付：空欄なら「/　/」を印字（手書き用） */
+.k50-conf-d .inp::placeholder { color: #000; opacity: 1; font-weight: normal; }
+@media screen { .k50-conf-d .inp::placeholder { color: #666; } }

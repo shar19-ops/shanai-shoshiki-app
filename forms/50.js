@@ -73,9 +73,10 @@
         tr.append(td2({ class: 'k50-chk' }, mk(`O${i}`)));
         tr.append(td2({ class: 'k50-in', colspan: 3 }, field({ key: `Otext${i}` })));
         if (i === 1) tr.append(td2({ class: 'k50-conf-h' }, '確認者'));
+        // 日付：空欄のときは「/　/」を印字して、あとから手書きできるように（placeholder を印刷でも黒で出す）
         if (i === 2) tr.append(td2({ class: 'k50-in k50-conf-d' }, field({ key: 'confDate', align: 'center', placeholder: '/　　/' })));
-        if (i === 3) tr.append(td2({ class: 'k50-conf-s', rowspan: 3 },
-          h('div', { class: 'self-stamp', title: 'クリックで押印設定' }), h('span', { class: 'k50-hatsu' }, '発', h('br'), '行')));
+        // 発行の欄は認印（手で押す）。デート印は使わない
+        if (i === 3) tr.append(td2({ class: 'k50-conf-s', rowspan: 3 }, h('span', { class: 'k50-hatsu' }, '発', h('br'), '行')));
         tb.append(tr);
       }
     };
@@ -106,7 +107,6 @@
     orientation: 'landscape',
     bare: true, // 共通の表題・押印欄は使わず、元のExcelのままの見た目
     footerRight: '般-50　　25/07/25　制定',
-    selfStamp: '発行', // 確認者の欄（発行）にデート印
     blocks: [{ type: 'custom', render }],
   };
 })();
