@@ -1,7 +1,7 @@
-// Y-ORDER新規現場申請書（元のExcelなし。新規に作成した帳票）
+// Y-ORDER新規現場登録申請書（元のExcelなし。新規に作成した帳票）
 // 資材発注アプリ Y-ORDER に新しい現場を登録してもらうための申請書
 FORM_DEFS['55'] = {
-  code: '般-55', title: 'Y-ORDER新規現場申請書',
+  code: '般-55', title: 'Y-ORDER新規現場登録申請書',
   selfStamp: '起票者', // 押印欄の右端（起票者）にデート印
   meta: [{ label: '申請日', key: 'date', type: 'date' }],
   stamps: [{ boxes: ['承認', '確認', '確認', '起票者'] }],
