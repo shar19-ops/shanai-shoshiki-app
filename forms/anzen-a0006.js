@@ -64,8 +64,9 @@
     [{ key: 'genin', type: 'textarea', lines: 4, span: 24 }],
     [{ label: vt('安全管理者'), span: 1 }, { key: 'anzenKanri', type: 'textarea', lines: 4, span: 24 }],
     [{ label: vt('総括安全衛生管理者'), span: 1, rs: 2 }, { key: 'sokatsu', type: 'textarea', lines: 4, span: 24 }],
-    [{ label: '適用保険', key: 'hoken', type: 'checks', options: ['労災保険（当社）', '労災保険（元請）', '労災保険（特別労災）', 'その他'], span: 19 },
-      { key: 'hokenEtc', prefix: '（', unit: '）', span: 5 }],
+    // 適用保険：雇用区分と同じく1つの欄に、その他の横に括弧書き（縦罫線なし）
+    [{ label: '適用保険', key: 'hokenW', type: 'inline', span: 24, parts: [
+      { key: 'hoken', type: 'checks', options: ['労災保険（当社）', '労災保険（元請）', '労災保険（特別労災）', 'その他'] }, '（', { key: 'hokenEtc' }, '）'] }],
   ] };
 
   FORM_DEFS['anzen-a0006'] = {
