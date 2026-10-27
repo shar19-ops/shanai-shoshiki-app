@@ -562,7 +562,7 @@
         tf.append(h('tr', null, row.map((c) => {
           if (c.sum) {
             const key = `${b.key}.sum.${c.sum}`;
-            const f = { key, type: 'calc', calc: (n) => { let s = 0; for (let r = 1; r <= b.rows; r++) s += n(`${b.key}.${r}.${c.sum}`); return s; } };
+            const f = { key, type: 'calc', unit: c.unit, calc: (n) => { let s = 0; for (let r = 1; r <= b.rows; r++) s += n(`${b.key}.${r}.${c.sum}`); return s; } };
             return h('td', { colspan: c.span || 1 }, field(f));
           }
           if (c.key) return h('td', { colspan: c.span || 1 }, field(c));
