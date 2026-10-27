@@ -10,7 +10,7 @@
       { label: '災害の種類', key: 'shurui', type: 'checks', lw: 3, span: 12, rs: 3,
         options: ['墜落・転落', '転倒', '激突', '飛来・落下', '崩壊・倒壊', '巻き込まれ・はさまれ', '切れ・こすれ', '有害物接触', '感電', '火傷', '疾病', '自動車等による災害'] }],
     [{ label: '件　名', key: 'subject', lw: 4, span: 13 }],
-    [{ label: '報告者', key: 'reporter', lw: 4, span: 13, unit: '印' }],
+    [{ label: '報告者', key: 'reporter', lw: 4, span: 13 }],
     // 被災者
     [{ label: vt('被災者'), span: 1, rs: 5 },
       { label: '氏　名', key: 'vName', span: 9 },
@@ -72,11 +72,11 @@
   FORM_DEFS['anzen-a0006'] = {
     code: '本-安全-A0006', title: '災害報告書',
     paper: 'A3', orientation: 'landscape',
-    selfStamp: '作成者', // 押印欄の右端（作成者）にデート印
+    selfStamp: '報告者', // 押印欄の右端（報告者）にデート印
     meta: [{ label: '作成日', key: 'date', type: 'date' }],
     // 元は2ページ目の下に横一列（安全管理者の欄に「保管」）。上に1段で並べる
-    // ユーザー指定：右端に作成者の欄を追加。工事長と支店長は同じ欄（工事部長は不要）
-    stamps: [{ boxes: ['社長', '本店長', '総務部', '総括安全|衛生管理者', '安全管理者\n保管', '衛生管理者', '工事本部長|RE部長', '工事長・支店長', '作成者'] }],
+    // ユーザー指定：右端に報告者の欄を追加（本文の報告者の「印」はなし）。工事長と支店長は同じ欄で見出しは2段（工事部長は不要）
+    stamps: [{ boxes: ['社長', '本店長', '総務部', '総括安全|衛生管理者', '安全管理者\n保管', '衛生管理者', '工事本部長|RE部長', '工事長|支店長', '報告者'] }],
     blocks: [
       { type: 'row', gap: 5, grow: true, items: [
         { type: 'col', items: [left, { type: 'image', label: '災害発生状況図', key: 'zu', grow: true }] },
