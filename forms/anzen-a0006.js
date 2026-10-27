@@ -80,7 +80,8 @@
     stamps: [{ boxes: ['社長', '本店長', '総務部', '総括安全|衛生管理者', '安全管理者\n保管', '衛生管理者', '工事本部長|RE部長', '工事長|支店長', '報告者'] }],
     blocks: [
       { type: 'row', gap: 5, grow: true, items: [
-        { type: 'col', items: [left, { type: 'image', label: '災害発生状況図', key: 'zu', grow: true }] },
+        // 災害発生状況図：本-安全-A0007 と同じ略図の欄（図形・記号・文字・画像を自由に配置。以前貼った画像は下絵として引き継ぐ）
+        { type: 'col', items: [left, { type: 'sketch', label: '災害発生状況図', key: 'zu', grow: true }] },
         { type: 'col', items: [right] },
       ] },
       { type: 'notes', items: ['※ この報告書は災害発生後速やかに提出のこと'] },
