@@ -28,7 +28,9 @@
         [{ label: '行先き', key: 'dest', type: 'textarea', plain: true, h: 30, span: 24 }],
         // 予定走行距離は必ず記入（元の様式の注意書き）
         [{ label: '予定走行\n距離', key: 'kmW', type: 'inline', span: 24, req: true, parts: [
-          { key: 'kmUnit', type: 'radio', options: ['1日', '1ヶ月'] }, '約', { key: 'km', type: 'number', w: 24 }, 'km　（予定走行km数を必ず記入する事）'] }],
+          // 1日・1ヶ月・距離の間を空ける（同じキーの選択肢を2つに分けて、間に空白を置く）
+          '　', { key: 'kmUnit', type: 'radio', options: ['1日'] }, '　　　', { key: 'kmUnit', type: 'radio', options: ['1ヶ月'] },
+          '　　　約　', { key: 'km', type: 'number', w: 30 }, '　km　　　（予定走行km数を必ず記入する事）'] }],
         [{ label: '使用車輌', span: 4, rs: 1 }, { label: '車　種', key: 'carType', lw: 3, span: 9 }, { label: '登録番号', key: 'carNo', lw: 3, span: 11 }],
       ] },
       { type: 'notes', items: [
