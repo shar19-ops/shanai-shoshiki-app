@@ -5,7 +5,7 @@
     code: '本-営業-A0001', title: '契約内容確認書',
     seitei: '99/01/06', kaitei: '26/11/17', // フッター：制定日は元の様式のまま、最終改訂日はユーザー指定
     selfStamp: '作成者',
-    meta: [{ label: '区　分', key: 'kubun', type: 'radio', options: ['設計', '積算'], nowrap: true, cls: 'noline' }],
+    meta: [{ label: '区　分', key: 'kubun', type: 'radio', options: ['設計', '積算'], nowrap: true, cls: 'noline lg' }],
     stamps: [{ boxes: ['承認者', '作成者'] }],
     blocks: [
       { type: 'grid', lw: 4, rowH: 8, rows: [

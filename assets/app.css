@@ -94,6 +94,11 @@ body {
 .f-meta .m-item.big { font-size: 13pt; font-weight: bold; }
 .f-meta .m-item.big .inp { font-size: 13pt; font-weight: bold; }
 .f-meta .m-item.newline { flex-basis: 100%; }
+/* lg：文字を大きく（表題の代わりに選ぶ区分など。本-営業-A0001 の設計・積算） */
+.f-meta .m-item.lg { font-size: 12pt; align-items: center; }
+.f-meta .m-item.lg .checks { gap: 0 5mm; padding: 0 1mm; }
+.f-meta .m-item.lg .checks label { font-size: 12pt; gap: 1.5mm; }
+.f-meta .m-item.lg .checks .box { width: 4.2mm; height: 4.2mm; font-size: 10pt; }
 .f-meta .m-item.noline .m-val { border-bottom: none; }
 /* fixw：入力欄の幅を w（mm）ちょうどにする（短い欄を検査日と同じ行に並べるとき） */
 .f-meta .m-item.fixw .inp { width: 100%; }
