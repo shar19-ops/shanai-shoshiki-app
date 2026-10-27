@@ -18,13 +18,49 @@
   const totalDist = (v) => { let s = 0; for (let d = 1; d <= 31; d++) { const x = distance(v, d); if (x !== '') s += x; } return s; };
   const totalFuel = (v) => { let s = 0; for (let r = 1; r <= 15; r++) s += num(v[`a.${r}.fuel`]); for (let r = 1; r <= 16; r++) s += num(v[`b.${r}.fuel`]); return s; };
 
+  // 休日（土日・祝日）。祝日は現行の祝日法どおりに計算（春分・秋分は計算式、振替休日・国民の休日も）
+  const holidays = (y) => {
+    const s = new Set();
+    const add = (m, d) => s.add(`${m}-${d}`);
+    const nthMon = (m, n) => { const w = new Date(y, m - 1, 1).getDay(); return 1 + ((8 - w) % 7) + (n - 1) * 7; };
+    const k = y - 1980, leap = Math.floor(k / 4);
+    add(1, 1); add(1, nthMon(1, 2)); add(2, 11); add(2, 23);
+    add(3, Math.floor(20.8431 + 0.242194 * k - leap)); add(4, 29); add(5, 3); add(5, 4); add(5, 5);
+    add(7, nthMon(7, 3)); add(8, 11); add(9, nthMon(9, 3)); add(9, Math.floor(23.2488 + 0.242194 * k - leap));
+    add(10, nthMon(10, 2)); add(11, 3); add(11, 23);
+    const has = (dt) => s.has(`${dt.getMonth() + 1}-${dt.getDate()}`);
+    const base = [...s].map((md) => { const [m, d] = md.split('-').map(Number); return new Date(y, m - 1, d); });
+    // 国民の休日：祝日にはさまれた平日（9月の敬老の日と秋分の日の間など）
+    base.forEach((dt) => {
+      const d2 = new Date(y, dt.getMonth(), dt.getDate() + 2), mid = new Date(y, dt.getMonth(), dt.getDate() + 1);
+      if (has(d2) && !has(mid) && mid.getDay() !== 0) add(mid.getMonth() + 1, mid.getDate());
+    });
+    // 振替休日：日曜の祝日の後の、最初の祝日でない日
+    base.filter((dt) => dt.getDay() === 0).forEach((dt) => {
+      const n = new Date(dt); do n.setDate(n.getDate() + 1); while (has(n));
+      if (n.getFullYear() === y) add(n.getMonth() + 1, n.getDate());
+    });
+    return s;
+  };
+  const ymOf = (v) => (/^\d{4}-\d{2}$/.test(v.ym || '') ? [Number(v.ym.slice(0, 4)), Number(v.ym.slice(5, 7))] : null);
+  // その月にない日（2月30日など）は日付を空欄にする
+  const inMonth = (v, d) => { const ym = ymOf(v); return !ym || d <= new Date(ym[0], ym[1], 0).getDate(); };
+  const isHoliday = (v, d) => {
+    const ym = ymOf(v);
+    if (!ym || !inMonth(v, d)) return false;
+    const w = new Date(ym[0], ym[1] - 1, d).getDay();
+    return w === 0 || w === 6 || holidays(ym[0]).has(`${ym[1]}-${d}`);
+  };
+
   const days = (key, start, rows) => ({
-    type: 'table', key, rows, rowNoStart: start, rowH: 9, dense: true, headH: 12,
+    type: 'table', key, rows, rowH: 9, dense: true, headH: 12,
     columns: [
-      { label: '日付', key: 'day', w: 6, rowNo: true },
+      { label: '日付', key: 'day', w: 6, align: 'center', rowCalc: (r, v) => (inMonth(v, r + start - 1) ? String(r + start - 1) : '') },
+      // 休日：年月を選ぶと土日・祝日に〇（クリックで付け外しできる。会社の休日など）
+      { label: '休日\n〇印', key: 'hol', w: 5, type: 'mark', scope: 'ym', rowAuto: (r, v) => isHoliday(v, r + start - 1) },
       { label: '出庫時\nメーター指針\n(km)', key: 'meter', w: 13, type: 'number', dec: 0 },
       { label: '走行距離\n(km)', key: 'dist', w: 11, rowCalc: (r, v) => distance(v, r + start - 1) },
-      { label: '行　先', key: 'dest', w: 30 },
+      { label: '行　先', key: 'dest', w: 25 },
       { label: '運転者', key: 'driver', w: 11 },
       { label: '運転前', key: 'alcB', w: 9, group: 'アルコール検知値(mg/ℓ)', align: 'center' },
       { label: '運転後', key: 'alcA', w: 9, group: 'アルコール検知値(mg/ℓ)', align: 'center' },

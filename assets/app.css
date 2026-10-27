@@ -225,6 +225,10 @@ table.grid.dense tr.thin .inp { font-size: 7.5pt; min-height: 4mm; }
 .inp.num { text-align: right; font-variant-numeric: tabular-nums; }
 .inp.center { text-align: center; }
 .inp.calc { background: transparent; }
+/* mark：クリックで〇を付け外し（休日など） */
+.inp.mark-btn { display: block; width: 100%; height: 100%; padding: 0; border: 0; background: transparent; text-align: center; cursor: pointer; font: inherit; }
+.inp.mark-btn:hover { background: rgba(0, 0, 0, .05); }
+@media print { .inp.mark-btn:hover { background: transparent; } }
 select.inp { appearance: none; -webkit-appearance: none; cursor: pointer; }
 textarea.inp {
   resize: none; display: block; padding: 1mm 2mm;
