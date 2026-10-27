@@ -320,8 +320,10 @@
         g.boxes.map((b) => {
           const [head, ...roles] = String(b).split('\n');
           const self = def && def.selfStamp === head;
+          // 見出しの '|' は改行（'総括安全|衛生管理者' のように長い役職名を2行で）
+          const hl = head.split('|');
           return h('div', { class: 'stamp-box' },
-            h('div', { class: 'sb-label' + (head.length >= 6 ? ' tight' : '') }, head),
+            h('div', { class: 'sb-label' + (hl.length > 1 ? ' two' : head.length >= 6 ? ' tight' : '') }, hl.flatMap((s, i) => (i ? [h('br'), s] : [s]))),
             h('div', self ? { class: 'sb-area self-stamp', title: 'クリックで押印設定', onclick: openStampDialog } : { class: 'sb-area' },
               roles.length ? h('div', { class: 'sb-roles' }, roles.flatMap((r, i) => (i ? [h('br'), r] : [r]))) : null));
         }))));
@@ -361,7 +363,7 @@
         // meta の right: true は押印欄側（右端）に寄せる。cls で見た目を追加（big：大きめの文字、newline：次の行に置く）
         d.meta ? h('div', { class: 'f-meta' }, d.meta.map((m) => h('div', { class: 'm-item' + (m.right ? ' right' : '') + (m.cls ? ' ' + m.cls : '') },
           h('span', { class: 'm-label' }, m.label),
-          h('span', { class: 'm-val', style: m.w ? `min-width:${m.w}mm` : '' }, field(m))))) : null,
+          h('span', { class: 'm-val', style: m.w ? `min-width:${m.w}mm` + ((m.cls || '').split(' ').includes('fixw') ? `;width:${m.w}mm` : '') : '' }, field(m))))) : null,
         // headBlocks：タイトルの下（押印欄の左側の空き）に置く項目。下端を押印欄の下端にそろえる
         d.headBlocks ? h('div', { class: 'head-blocks' }, d.headBlocks.map(renderBlock)) : null),
       stampsEl(d.stamps, d.stampClass));

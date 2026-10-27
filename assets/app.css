@@ -95,6 +95,8 @@ body {
 .f-meta .m-item.big .inp { font-size: 13pt; font-weight: bold; }
 .f-meta .m-item.newline { flex-basis: 100%; }
 .f-meta .m-item.noline .m-val { border-bottom: none; }
+/* fixw：入力欄の幅を w（mm）ちょうどにする（短い欄を検査日と同じ行に並べるとき） */
+.f-meta .m-item.fixw .inp { width: 100%; height: auto; min-height: 0; padding-top: 0; padding-bottom: 0; }
 
 /* 押印欄 */
 /* 押印欄：入りきらないときは上下2段に折り返す（右寄せ） */
@@ -121,6 +123,7 @@ body {
 .bottom-stamps { display: flex; justify-content: flex-end; align-items: flex-end; gap: 4mm; margin-top: 3mm; }
 .bottom-stamps .notes { flex: 1; }
 .stamp-box .sb-label.tight { font-size: 6.5pt; letter-spacing: 0; }
+.stamp-box .sb-label.two { font-size: 6pt; line-height: 2.3mm; padding-top: .2mm; letter-spacing: 0; }
 .stamp-box .sb-area { height: 20mm; position: relative; }
 /* 兼務の役職名（工事本部長・RE部長・支店長など）は押印部に薄く印字 */
 .stamp-box .sb-roles {
@@ -394,3 +397,16 @@ table.grid td textarea.inp { height: 100%; }
 /* 確認者の日付：空欄なら「/　/」を印字（手書き用） */
 .k50-conf-d .inp::placeholder { color: #000; opacity: 1; font-weight: normal; }
 @media screen { .k50-conf-d .inp::placeholder { color: #666; } }
+
+/* ---------- 品質記録様式：検査項目の表（本-安全-A0001） ---------- */
+.q-cols { display: flex; gap: 2mm; align-items: stretch; }
+.q-cols > table { flex: 1; height: auto; }
+/* 検査項目の多い帳票は段の間隔を詰めて1ページに収める */
+.sheet:has(.q-cols) .sheet-body { gap: 2.5mm; }
+table.grid.q-check td, table.grid.q-check th { height: 4.3mm; }
+table.grid.q-check tr.q-grp > td { border-top: 1.5px solid var(--line); }
+table.grid.q-check td.q-cat { writing-mode: vertical-rl; letter-spacing: 0; line-height: 1; padding: .5mm 0; font-size: 7.5pt; }
+table.grid.q-check td.q-no { text-align: center; font-size: 7.5pt; }
+table.grid.q-check td.q-txt { font-size: 7.5pt; line-height: 1.2; padding: .2mm 1mm; }
+table.grid.q-check td.q-goal .inp { font-size: 8pt; }
+table.grid.q-check .inp { min-height: 3.6mm; font-size: 8pt; padding-top: 0; padding-bottom: 0; }

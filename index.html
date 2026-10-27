@@ -39,18 +39,26 @@
   .cats button { font: inherit; font-size: 10pt; padding: 5px 14px; border-radius: 99px; border: 1px solid #b8bfcc; background: #fff; color: #333; cursor: pointer; }
   .cats button:hover { border-color: var(--accent); }
   .cats button.on { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
+  /* 書式の種類（一般書式／品質記録様式）：職種ボタンの上のタブ */
+  .kinds { display: flex; gap: 0; margin-bottom: 10px; border-bottom: 2px solid var(--accent); }
+  .kinds button { font: inherit; font-size: 11pt; font-weight: 700; padding: 7px 20px; border: 1px solid #b8bfcc; border-bottom: 0; border-radius: 6px 6px 0 0; background: #e9edf4; color: #555; cursor: pointer; margin-right: 4px; }
+  .kinds button:hover { color: var(--accent); }
+  .kinds button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .card.q .no { background: #2e7d5b; } /* 品質記録様式の番号は緑 */
+  .list .empty { grid-column: 1 / -1; color: #666; font-size: 10pt; padding: 12px 4px; }
   .card .common { font-size: 8pt; color: #4a5a7a; background: #e6ecf7; border-radius: 3px; padding: 1px 5px; white-space: nowrap; }
   .card .new { margin-left: auto; font-size: 8pt; font-weight: 800; color: #fff; background: #e8452c; border-radius: 99px; padding: 2px 8px; letter-spacing: .05em; white-space: nowrap; }
 </style>
 </head>
 <body>
-<div class="toolbar"><div class="tb-title"><span class="app-name"><span class="y">Y</span>-Format</span><span class="app-sub">社内書式アプリ　一般社内書類</span></div><button onclick="location.href='list.html'">配布用一覧</button></div>
+<div class="toolbar"><div class="tb-title"><span class="app-name"><span class="y">Y</span>-Format</span><span class="app-sub" id="sub">社内書式アプリ　一般社内書類</span></div><button onclick="location.href='list.html'">配布用一覧</button></div>
 <div class="wrap">
   <div class="intro">
     帳票を選んで入力し、「印刷」ボタンで紙に出力して回送してください。<br>
     入力内容はこのパソコンのブラウザ内にだけ一時保存されます（サーバーには送信されません）。共用PCでは印刷後に「クリア」してください。<br>
     <span class="new-legend">NEW</span> は新規に制定した帳票です。
   </div>
+  <div class="kinds" id="kinds"></div>
   <div class="cats" id="cats"></div>
   <input class="search" type="search" placeholder="帳票名・番号で絞り込み" id="q">
   <div class="list" id="list"></div>
@@ -64,6 +72,29 @@
     var cur = '';
     try { cur = localStorage.getItem(KEY) || ''; } catch (e) {}
     if (cur && CATS.indexOf(cur) < 0) cur = '';
+    // 書式の種類（一般書式／品質記録様式）。これも覚えておく。初期値は一般書式
+    var kindsEl = document.getElementById('kinds');
+    var KKEY = 'shoshiki:_kind';
+    var kind = '一般';
+    try { kind = localStorage.getItem(KKEY) || '一般'; } catch (e) {}
+    if (!KINDS.some(function (k) { return k[0] === kind; })) kind = '一般';
+    var SUB = { '一般': '社内書式アプリ　一般社内書類', '品質': '社内書式アプリ　品質記録様式' };
+    function renderKinds() {
+      kindsEl.innerHTML = '';
+      KINDS.forEach(function (k) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = k[1];
+        if (k[0] === kind) b.className = 'on';
+        b.onclick = function () {
+          kind = k[0];
+          try { localStorage.setItem(KKEY, kind); } catch (e) {}
+          renderKinds(); render();
+        };
+        kindsEl.appendChild(b);
+      });
+      document.getElementById('sub').textContent = SUB[kind];
+    }
     var q = '';
     function inCat(c) { return !cur || c.cat === '共通' || (Array.isArray(c.cat) && c.cat.indexOf(cur) >= 0); }
     function renderCats() {
@@ -84,10 +115,11 @@
     function render() {
       list.innerHTML = '';
       CATALOG.forEach(function (c) {
+        if ((c.kind || '一般') !== kind) return;
         if (!inCat(c)) return;
         if (q && (c.no + c.title).indexOf(q) < 0) return;
         var el = document.createElement('a');
-        el.className = 'card';
+        el.className = 'card' + (c.kind === '品質' ? ' q' : '');
         el.href = 'form.html?id=' + c.id;
         el.innerHTML = '<span class="no"></span><span class="t"></span>';
         el.querySelector('.no').textContent = c.no;
@@ -96,6 +128,12 @@
         if (c.isNew) { var nw = document.createElement('span'); nw.className = 'new'; nw.textContent = 'NEW'; el.appendChild(nw); }
         list.appendChild(el);
       });
+      if (!list.children.length) {
+        var em = document.createElement('div');
+        em.className = 'empty';
+        em.textContent = '該当する帳票はまだありません。';
+        list.appendChild(em);
+      }
       fitNames();
     }
     // 帳票名がカードに入りきらない時は、1行に収まるまで文字を小さくする（下限 8pt）
@@ -110,7 +148,7 @@
     window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(fitNames, 100); });
     if (document.fonts) document.fonts.ready.then(fitNames);
     document.getElementById('q').addEventListener('input', function (e) { q = e.target.value.trim(); render(); });
-    renderCats(); render();
+    renderKinds(); renderCats(); render();
   })();
 </script>
 </body>
