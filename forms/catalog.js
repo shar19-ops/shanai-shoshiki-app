@@ -42,5 +42,5 @@ window.CATALOG = [
   { id: '52', no: '般-52', title: '代行支払い承諾書', cat: ['工事', '経理'] },
   { id: '53', no: '般-53', title: '通勤用定期券購入申請書', isNew: true, cat: '共通' }, // 元のExcelなし（新規作成）。isNew: true で一覧に NEW マーク
   { id: '54', no: '般-54', title: '日報', cat: ['工事'] }, // 2026-10-19 追加（元Excel：般ー54_日報.xlsm。社員一覧シートは取り込まない）
-  { id: '55', no: '般-55', title: 'Y-ORDER新規現場申請書', isNew: true, cat: ['営業', '工事'] }, // 2026-10-26 新規作成（元のExcelなし）
+  { id: '55', no: '般-55', title: 'Y-ORDER新規現場登録申請書', isNew: true, cat: ['営業', '工事'] }, // 2026-10-26 新規作成（元のExcelなし）
 ];
