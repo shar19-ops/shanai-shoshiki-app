@@ -71,6 +71,7 @@
 
   FORM_DEFS['anzen-a0006'] = {
     code: '本-安全-A0006', title: '災害報告書',
+    seitei: '04/05/20', kaitei: '26/11/17', // フッター：制定日は元の様式のまま、最終改訂日はユーザー指定（2026-10-27 指示）
     paper: 'A3', orientation: 'landscape',
     selfStamp: '報告者', // 押印欄の右端（報告者）にデート印
     meta: [{ label: '作成日', key: 'date', type: 'date' }],

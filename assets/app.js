@@ -700,7 +700,8 @@
           h('img', { class: 'mark', src: 'assets/logo-mark.jpg', alt: '' }),
           // ロゴタイプはホームページと同じローマ字表記（書体は近いもの：Montserrat ExtraBold）
           h('span', { class: 'word', title: '株式会社 雄電社' }, 'YUDENSHA')),
-        h('div', { class: 'f-ver' }, `${pd.code}　${pd.title}`)));
+        // 品質記録様式：制定日（元の様式のまま固定）と最終改訂日（ユーザーが都度指定）を番号の後ろに
+        h('div', { class: 'f-ver' }, `${pd.code}　${pd.title}` + (pd.seitei ? `　　${pd.seitei}制定　　${pd.kaitei || pd.seitei}最終改訂` : ''))));
   }
 
   // ---------- 起動 ----------

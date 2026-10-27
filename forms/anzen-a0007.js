@@ -81,6 +81,7 @@
 
   FORM_DEFS['anzen-a0007'] = {
     code: '本-安全-A0007', title: '交通事故報告書',
+    seitei: '05/04/14', kaitei: '26/11/17', // フッター：制定日は元の様式のまま、最終改訂日はユーザー指定（2026-10-27 指示）
     paper: 'A3', orientation: 'landscape',
     sheetClass: 'tight-checks', // 選択肢が多いので文字と間隔を少し詰める
     selfStamp: '報告者', // 押印欄の右端（報告者）にデート印
