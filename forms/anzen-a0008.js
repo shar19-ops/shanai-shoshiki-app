@@ -55,7 +55,8 @@
     blocks: [
       { type: 'row', gap: 5, grow: true, items: [
         { type: 'col', items: [head, incident, damage,
-          { type: 'free', label: '状況を具体的に記入（現場状況写真を添付のこと）', key: 'jokyo', lines: 3, grow: true }] },
+          // 状況：コメントと現場写真（Ctrl+V・「画像を追加」。文章の下に並べて印刷、はみ出すときは写真を自動で縮める）
+          { type: 'free', label: '状況を具体的に記入（現場状況写真を添付のこと）', key: 'jokyo', lines: 3, grow: true, images: true }] },
         { type: 'col', items: [
           // 見取図：図形・記号・文字・写真を自由に配置（略図の欄）
           { type: 'sketch', label: '盗難現場見取図', key: 'zu', grow: true },
