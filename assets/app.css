@@ -467,3 +467,7 @@ table.grid.q-check td.q-goal-h .q-vt { writing-mode: vertical-rl; margin: 0 auto
 .free .free-label.has-toggle .line-toggle, .free .free-label.has-toggle .line-toggle button { line-height: 1; }
 .free .free-label.has-toggle .line-toggle { height: 3.1mm; }
 .free .free-label.has-toggle .line-toggle button { padding-top: 0; padding-bottom: 0; height: 3.1mm; font-size: 7.5pt; }
+/* inline の stack：上下に積む（間に横罫線なし） */
+.inline-wrap.stack { flex-direction: column; align-items: stretch; justify-content: center; gap: 0; padding: 0; }
+.inline-wrap.stack > .iw { flex: 1; min-height: 0; }
+.inline-wrap.stack > .iw > * { flex: 1; }

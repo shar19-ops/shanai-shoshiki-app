@@ -16,10 +16,9 @@
   ] };
 
   const incident = { type: 'grid', lw: 3, rowH: 7, dense: true, rows: [
-    // 被害の日時・被害発見の日時は同じ高さ（どちらも2行分）。届出警察署は元の様式どおり名称とTELの2行
-    [{ label: '被害の日時', ...when('higai'), span: 11, rs: 2 },
-      { label: '届出警察署', span: 3, rs: 2 }, { key: 'policeName', span: 10 }],
-    [{ key: 'policeTel', type: 'tel', prefix: 'TEL', span: 10 }],
+    // 被害の日時・被害発見の日時は同じ高さ（どちらも2行分）。届出警察署は名称とTELを1つの欄に2段（間に横罫線なし）
+    [{ label: '被害の日時', ...when('higai'), span: 11, h: 14 },
+      { label: '届出警察署', key: 'police', type: 'inline', stack: true, span: 13, h: 14, parts: [{ key: 'policeName' }, { key: 'policeTel', type: 'tel', prefix: 'TEL' }] }],
     [{ label: '被害発見\nの日時', ...when('hakken'), span: 11, rs: 2 },
       { label: '届出の日時', ...when('todoke'), span: 13 }],
     [{ label: '届出人氏名', key: 'todokeName', span: 7 }, { label: '受理番号', key: 'juri', span: 6 }],
@@ -51,7 +50,7 @@
     selfStamp: '報告者', // 押印欄の右端（報告者）にデート印（本文の報告者の「印」はなし）
     meta: [],
     // 元は右下に横一列。上に1段で並べ、右端に報告者。支店長は本部長・RE部長の欄を共用（「支店は支店長」と薄く印字）
-    stamps: [{ boxes: ['社長', '本店長', '総務部', '総括安全|衛生管理者', '安全品質|保証部長', '工事本部長|RE部長\n支店は支店長', '工事長', '課長', '報告者'] }],
+    stamps: [{ boxes: ['社長', '本店長', '総務部', '総括安全|衛生管理者', '安全品質|保証部長', '工事本部長|RE部長\n支店は支店長', '工事長', '報告者'] }], // 課長の欄は不要（ユーザー指定）
     blocks: [
       { type: 'row', gap: 5, grow: true, items: [
         { type: 'col', items: [head, incident, damage,
@@ -59,7 +58,7 @@
           { type: 'free', label: '状況を具体的に記入（現場状況写真を添付のこと）', key: 'jokyo', lines: 3, grow: true, images: true }] },
         { type: 'col', items: [
           // 見取図：図形・記号・文字・写真を自由に配置（略図の欄）
-          { type: 'sketch', label: '盗難現場見取図', key: 'zu', grow: true },
+          { type: 'sketch', label: '盗難現場見取図', key: 'zu', grow: true, hideSyms: ['signal'] }, // 信号の記号は使わない
           { type: 'free', label: '再発防止策', key: 'boshi', lines: 6 },
           { type: 'free', label: '部長の意見', key: 'iken', lines: 5 },
         ] },

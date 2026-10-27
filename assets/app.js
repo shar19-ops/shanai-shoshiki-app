@@ -124,8 +124,9 @@
 
     // inline：1つの欄に選択肢・入力欄・文字を罫線なしで並べる。parts: [文字 | 入力部品の定義（w で幅mm）]
     //   例：作業区分「□単独作業 □共同作業 [　]名」、雇用区分「…□その他（[　　]）」
+    //   stack: true なら上下に積む（例：届出警察署の名称とTELを、間に横罫線を入れずに2段で）
     if (type === 'inline') {
-      return h('div', { class: 'cell-wrap inline-wrap' }, f.parts.map((p) => (typeof p === 'string'
+      return h('div', { class: 'cell-wrap inline-wrap' + (f.stack ? ' stack' : '') }, f.parts.map((p) => (typeof p === 'string'
         ? h('span', { class: 'unit' }, p)
         // 選択肢は中身の幅、入力欄は残りの幅（w を指定すればその幅mm）
         : h('span', { class: 'iw', style: p.w ? `width:${p.w}mm;flex-shrink:0` : (p.type === 'radio' || p.type === 'checks') ? 'flex:none' : 'flex:1;min-width:0' }, field(p)))));
@@ -755,7 +756,8 @@
       tb('文字', () => { const t = askText(); if (t) add({ t: 'text', x: cx(), y: cy(), text: t, size: 4, rot: 0, box: false }); }, '文字（ダブルクリックで直す）'),
       tb('枠文字', () => { const t = askText(); if (t) add({ t: 'text', x: cx(), y: cy(), text: t, size: 4, rot: 0, box: true }); }, '枠付きの文字（テキストボックス）'),
       h('span', { class: 'sk-sep' }),
-      SK_SYMS.map(([sym, label]) => tb(sym === 'signal' ? '信号' : sym, () => add({ t: 'sym', x: cx(), y: cy(), sym, size: sym === 'signal' ? 4 : 6, rot: 0 }), label)),
+      // hideSyms：帳票ごとに使わない記号のボタンを隠す（例：盗難現場見取図では信号を出さない）
+      SK_SYMS.filter(([sym]) => !(b.hideSyms || []).includes(sym)).map(([sym, label]) => tb(sym === 'signal' ? '信号' : sym, () => add({ t: 'sym', x: cx(), y: cy(), sym, size: sym === 'signal' ? 4 : 6, rot: 0 }), label)),
       h('span', { class: 'sk-sep' }),
       tb('⟲', () => rotate(-15), '選んだ図形を左に15°回す'), tb('⟳', () => rotate(15), '選んだ図形を右に15°回す'),
       tb('削除', del, '選んだ図形を消す（Delete キーでも可）'),
