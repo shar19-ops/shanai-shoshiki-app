@@ -96,7 +96,9 @@ body {
 .f-meta .m-item.newline { flex-basis: 100%; }
 .f-meta .m-item.noline .m-val { border-bottom: none; }
 /* fixw：入力欄の幅を w（mm）ちょうどにする（短い欄を検査日と同じ行に並べるとき） */
-.f-meta .m-item.fixw .inp { width: 100%; height: auto; min-height: 0; padding-top: 0; padding-bottom: 0; }
+.f-meta .m-item.fixw .inp { width: 100%; }
+/* 印刷では日付と同じ高さ（文字の高さ）にして、横の検査日と行をそろえる */
+@media print { .f-meta .m-item.fixw .inp { height: auto; min-height: 0; padding-top: 0; padding-bottom: 0; } }
 
 /* 押印欄 */
 /* 押印欄：入りきらないときは上下2段に折り返す（右寄せ） */
@@ -412,8 +414,10 @@ table.grid.q-check td.q-goal .inp { font-size: 8pt; }
 table.grid.q-check .inp { min-height: 3.6mm; height: 3.6mm; font-size: 8pt; padding-top: 0; padding-bottom: 0; display: block; }
 /* 月安全衛生目標：見出しの上に月の記入欄（横書き）、その下に縦書きの見出し */
 table.grid.q-check td.q-goal-h { writing-mode: horizontal-tb; padding: .5mm 0; vertical-align: top; }
-table.grid.q-check td.q-goal-h .q-month { border-bottom: 1px solid var(--line); margin: 0 .3mm 1mm; }
+table.grid.q-check td.q-goal-h .q-month { margin: 0 .3mm; } /* 月と見出しの間に線を入れず一体に見せる */
 table.grid.q-check td.q-goal-h .q-month .inp { padding: 0; font-size: 8pt; text-align: center; }
+table.grid.q-check td.q-goal-h .q-month .inp::placeholder { color: transparent; }
 table.grid.q-check td.q-goal-h .q-vt { writing-mode: vertical-rl; margin: 0 auto; }
 /* near：前の項目のすぐ横に置く */
 .f-meta .m-item.near { margin-left: -3mm; }
+.f-meta:has(.m-item.near) { align-items: baseline; } /* 横に並べた項目と文字の高さをそろえる */
