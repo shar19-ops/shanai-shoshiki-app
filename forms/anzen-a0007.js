@@ -22,8 +22,6 @@
   const left = { type: 'grid', cols: 25, colWidths: ['7mm'], lw: 3, rowH: 6.5, dense: true, rows: [
     [{ label: '店　名', key: 'office', type: 'select', options: LISTS.offices, lw: 4, span: 9 },
       { label: '所　属', key: 'dept', span: 8 }, { label: '報告者', key: 'reporter', span: 8 }],
-    [{ label: '年　度', key: 'nendo', type: 'number', unit: '年度', lw: 4, span: 9 },
-      { label: '事故種別', key: 'shubetsu', type: 'radio', options: ['自損', '加害', '被害'], span: 16 }],
     // 事故発生月日：年月日で表示し、曜日は同じ欄に（間に縦罫線なし）
     [{ label: '事故発生月日', key: 'hDT', type: 'inline', lw: 4, span: 13, parts: [
       { key: 'hDate', type: 'date', jp: true, w: 38 },
@@ -87,6 +85,11 @@
     sheetClass: 'tight-checks', // 選択肢が多いので文字と間隔を少し詰める
     selfStamp: '報告者', // 押印欄の右端（報告者）にデート印
     meta: [{ label: '提出日', key: 'date', type: 'date' }],
+    // 年度・事故種別は表題の横（紙で保管したときに探しやすいように）
+    titleSide: [{ type: 'grid', cols: 4, colWidths: ['20mm', '30mm', '24mm', null], rowH: 9, rows: [
+      [{ label: '年　度', key: 'nendo', unit: '年度', inputmode: 'numeric', maxlength: 4, align: 'center', lw: 1, span: 2 }, // 年は桁区切りなし
+        { label: '事故種別', key: 'shubetsu', type: 'radio', options: ['自損', '加害', '被害'], nowrap: true, lw: 1, span: 2 }],
+    ] }],
     // 元は右上に横一列（総括安全衛生管理者の欄に「保管」）。本-安全-A0006 と同じく右端に報告者、工事長・支店長は同じ欄（2段）
     stamps: [{ boxes: ['社長', '本店長', '総務部', '総括安全|衛生管理者\n保管', '安全運転|管理者', '本部長|RE部長', '工事長|支店長', '報告者'] }],
     blocks: [

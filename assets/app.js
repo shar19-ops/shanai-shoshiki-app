@@ -374,7 +374,11 @@
     return h('div', { class: 'f-header' },
       h('div', { class: 'f-head-left' },
         h('div', { class: 'f-code' }, d.code),
-        h('div', { class: 'f-title' }, d.title, d.subtitle ? h('span', { class: 'f-sub' }, d.subtitle) : null),
+        // titleSide：表題の横に置く項目（例：年度・事故種別。紙で保管したときに探しやすいように）
+        d.titleSide
+          ? h('div', { class: 'f-title-row' }, h('div', { class: 'f-title' }, d.title, d.subtitle ? h('span', { class: 'f-sub' }, d.subtitle) : null),
+            h('div', { class: 'title-side' }, d.titleSide.map(renderBlock)))
+          : h('div', { class: 'f-title' }, d.title, d.subtitle ? h('span', { class: 'f-sub' }, d.subtitle) : null),
         // meta の right: true は押印欄側（右端）に寄せる。cls で見た目を追加（big：大きめの文字、newline：次の行に置く）
         d.meta ? h('div', { class: 'f-meta' }, d.meta.map((m) => h('div', { class: 'm-item' + (m.right ? ' right' : '') + (m.cls ? ' ' + m.cls : '') },
           h('span', { class: 'm-label' }, m.label),
