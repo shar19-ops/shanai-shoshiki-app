@@ -51,4 +51,5 @@ window.CATALOG = [
   { id: 'anzen-a0001', no: '本-安全-A0001', title: '安全･衛生検査指導報告書', kind: '品質', cat: ['工事', '安全・品質'] },
   { id: 'anzen-a0006', no: '本-安全-A0006', title: '災害報告書', kind: '品質', cat: '共通' }, // A3横
   { id: 'anzen-a0007', no: '本-安全-A0007', title: '交通事故報告書', kind: '品質', cat: '共通' }, // A3横（A0006 に寄せる）
+  { id: 'anzen-a0008', no: '本-安全-A0008', title: '盗難報告書', kind: '品質', cat: '共通' }, // A3横（A0006・A0007 に寄せる）
 ];
