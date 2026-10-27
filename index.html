@@ -71,7 +71,6 @@
     var KEY = 'shoshiki:_cat'; // 選んだ職種を覚えておく（このブラウザだけ）
     var cur = '';
     try { cur = localStorage.getItem(KEY) || ''; } catch (e) {}
-    if (cur && CATS.indexOf(cur) < 0) cur = '';
     // 書式の種類（一般書式／品質記録様式）。これも覚えておく。初期値は一般書式
     var kindsEl = document.getElementById('kinds');
     var KKEY = 'shoshiki:_kind';
@@ -89,7 +88,7 @@
         b.onclick = function () {
           kind = k[0];
           try { localStorage.setItem(KKEY, kind); } catch (e) {}
-          renderKinds(); render();
+          renderKinds(); renderCats(); render();
         };
         kindsEl.appendChild(b);
       });
@@ -97,9 +96,12 @@
     }
     var q = '';
     function inCat(c) { return !cur || c.cat === '共通' || (Array.isArray(c.cat) && c.cat.indexOf(cur) >= 0); }
+    // 選んでいる種類の職種ボタン（共通の職種＋種類ごとの追加分）
+    function catsOf() { return CATS.concat((window.KIND_CATS || {})[kind] || []); }
     function renderCats() {
+      if (cur && catsOf().indexOf(cur) < 0) cur = ''; // ほかの種類にしかない職種を選んでいたら「すべて」に戻す
       catsEl.innerHTML = '';
-      [''].concat(CATS).forEach(function (name) {
+      [''].concat(catsOf()).forEach(function (name) {
         var b = document.createElement('button');
         b.type = 'button';
         b.textContent = name || 'すべて';
