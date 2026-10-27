@@ -427,6 +427,24 @@ table.grid.q-check td.q-goal-h .q-month { margin: 0 .3mm; } /* 月と見出し�
 table.grid.q-check td.q-goal-h .q-month .inp { padding: 0; font-size: 8pt; text-align: center; }
 table.grid.q-check td.q-goal-h .q-month .inp::placeholder { color: transparent; }
 table.grid.q-check td.q-goal-h .q-vt { writing-mode: vertical-rl; margin: 0 auto; }
+/* 本-営業-A0002 施工能力確認書：納期面・技術面の枠 */
+.e2-wrap { display: flex; flex-direction: column; gap: 5mm; }
+table.grid.e2 td.e2-h { height: 8mm; font-size: 11pt; font-weight: bold; letter-spacing: .2em; padding-left: 3mm; }
+table.grid.e2 td.e2-body { padding: 4mm 5mm 4mm; height: auto; vertical-align: top; }
+.e2-desc { margin: 0 0 5mm; font-size: 9.5pt; line-height: 1.7; text-indent: 1em; }
+.e2-opt { display: flex; align-items: center; flex-wrap: wrap; margin-top: 5mm; }
+.e2-opt .checks { padding: 0; height: auto; }
+.e2-opt .checks label { font-size: 10pt; white-space: normal; }
+.e2-date, .e2-sub { display: inline-flex; align-items: center; font-size: 10pt; }
+.e2-sub { margin: 1mm 0 0 7mm; }
+.e2-dv { display: inline-block; width: 40mm; }
+.e2-bul { margin: 1mm 0 0 14mm; padding: 0; list-style: none; font-size: 10pt; line-height: 1.7; }
+.e2-bul li::before { content: "・"; }
+.e2-res { display: flex; align-items: center; gap: 8mm; margin-top: 6mm; padding-top: 4mm; border-top: 1px dashed var(--line-weak); }
+.e2-res .e2-rl { font-size: 12pt; font-weight: bold; letter-spacing: .2em; }
+.e2-res .checks { padding: 0; height: auto; gap: 0 8mm; }
+.e2-res .checks label { font-size: 12pt; font-weight: bold; gap: 1.5mm; }
+.e2-res .checks .box { width: 4.2mm; height: 4.2mm; }
 /* 本-安全-A0005 幹線ケーブル通線作業チェックリスト */
 /* どの行もデート印が入る高さに（印を押しても行の高さが変わらないように） */
 table.grid.q5 td { height: 10mm; }
