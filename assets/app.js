@@ -374,7 +374,8 @@
   //   item: {label, key, type, span(列数・ラベル込み), lw(ラベル列数), rs(行結合), h(高さmm), text}
   function gridBlock(b) {
     const cols = b.cols || 24;
-    const tbl = h('table', { class: 'grid' + (b.dense ? ' dense' : '') },
+    // grow：残りの高さいっぱいに伸ばす（col の中で隣の段と下端をそろえる）
+    const tbl = h('table', { class: 'grid' + (b.dense ? ' dense' : ''), style: b.grow ? 'flex:1' : null },
       // colWidths：列幅を個別に指定（例 ['31mm', null] で見出し列だけ固定幅）。未指定なら等幅
       h('colgroup', null, Array.from({ length: cols }, (_, i) => h('col', { style: b.colWidths && b.colWidths[i] ? `width:${b.colWidths[i]}` : null }))));
     const tb = h('tbody');
@@ -633,8 +634,11 @@
     spacer: () => h('div', { class: 'spacer' }),
     stamps: (b) => h('div', { class: 'inline-stamps', style: b.align === 'right' ? 'justify-content:flex-end' : '' },
       h('div', null, b.title ? h('div', { class: 'is-title' }, b.title) : null, stampsEl(b.groups))),
-    row: (b) => h('div', { style: `display:flex;gap:${b.gap ?? 4}mm;align-items:${b.align || 'stretch'}` },
-      b.items.map((x) => h('div', { style: x.w ? `width:${x.w}%;flex-shrink:0` : 'flex:1' }, renderBlock(x)))),
+    // row の grow：残りの高さいっぱいに伸ばす（A3横で左右2段に組むときなど）
+    row: (b) => h('div', { style: `display:flex;gap:${b.gap ?? 4}mm;align-items:${b.align || 'stretch'}` + (b.grow ? ';flex:1' : '') },
+      b.items.map((x) => h('div', { style: (x.w ? `width:${x.w}%;flex-shrink:0` : 'flex:1;min-width:0') + ';display:flex;flex-direction:column' }, renderBlock(x)))),
+    // col：ブロックを縦に並べる（row の中の1段）。中の grow のブロックが残りの高さを使う
+    col: (b) => h('div', { style: `display:flex;flex-direction:column;gap:${b.gap ?? 3}mm;flex:1` }, b.items.map(renderBlock)),
     custom: (b) => b.render({ h, field, values, setVal }),
   };
   function renderBlock(b) {
