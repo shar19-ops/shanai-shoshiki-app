@@ -422,6 +422,24 @@ table.grid.q-check td.q-goal-h .q-month { margin: 0 .3mm; } /* 月と見出し�
 table.grid.q-check td.q-goal-h .q-month .inp { padding: 0; font-size: 8pt; text-align: center; }
 table.grid.q-check td.q-goal-h .q-month .inp::placeholder { color: transparent; }
 table.grid.q-check td.q-goal-h .q-vt { writing-mode: vertical-rl; margin: 0 auto; }
+/* 本-安全-A0005 幹線ケーブル通線作業チェックリスト */
+/* どの行もデート印が入る高さに（印を押しても行の高さが変わらないように） */
+table.grid.q5 td { height: 10mm; }
+table.grid.q5 th { height: 8mm; }
+table.grid.q5 td { font-size: 7.5pt; line-height: 1.3; padding: .6mm 1mm; }
+table.grid.q5 tr.q5-grp > td { border-top: 1.5px solid var(--line); }
+table.grid.q5 td.q5-t { font-size: 8pt; letter-spacing: .1em; }
+table.grid.q5 td.q5-c { text-align: center; }
+table.grid.q5 td.q5-o { text-align: left; }
+table.grid.q5 td.q5-time .q5-tf { margin-top: 1mm; }
+table.grid.q5 td.q5-time .inp { font-size: 8pt; text-align: center; }
+table.grid.q5 td.q5-sign { padding: .3mm; text-align: center; cursor: pointer; }
+table.grid.q5 td.q5-sign:hover { background: #f3f6fc; }
+table.grid.q5 td.q5-sign svg { width: 9mm; height: 9mm; display: block; margin: 0 auto; }
+table.grid.q5 td.q5-note { padding: 0; position: relative; }
+table.grid.q5 td.q5-note textarea.inp { position: absolute; inset: 0; width: 100%; height: 100%; font-size: 7.5pt; line-height: 1.3; padding: .5mm 1mm; }
+.q5-hint { font-size: 8pt; color: #66708a; margin-bottom: 1mm; }
+@media print { table.grid.q5 td.q5-sign:hover { background: transparent; } }
 /* 本-安全-A0015 安全衛生重点管理表：点検事項と評点の表 */
 table.grid.q15 td, table.grid.q15 th { height: 5.2mm; }
 table.grid.q15 th.q15-sc { line-height: 1.1; padding: .3mm 0; }
