@@ -156,7 +156,7 @@
       const cur = new Set(multi ? (Array.isArray(v) ? v : []) : [v]);
       const name = 'r_' + key;
       // nowrap：選択肢を折り返さず1行に（性別など幅の狭い欄）
-      const wrap = h('div', { class: 'checks', style: f.vertical ? 'flex-direction:column;align-items:flex-start' : f.nowrap ? 'flex-wrap:nowrap;gap:0 2mm;padding:1mm 1.5mm' : '' },
+      const wrap = h('div', { class: 'checks', style: (f.vertical ? 'flex-direction:column;align-items:flex-start' : f.nowrap ? 'flex-wrap:nowrap;gap:0 2mm;padding:1mm 1.5mm' : '') + (f.align === 'center' ? ';justify-content:center' : '') },
         f.options.map((o) => {
           const cb = h('input', {
             type: multi ? 'checkbox' : 'radio', name, value: o, checked: cur.has(o),
@@ -927,6 +927,85 @@
         h('div', { class: 'f-ver' }, `${pd.code}　${pd.title}` + (pd.seitei ? `　　${pd.seitei}制定　　${pd.kaitei || pd.seitei}最終改訂` : ''))));
   }
 
+  // ---------- JSONファイルへの保存・読み込み（def.fileIO） ----------
+  // 中身は { form, code, title, savedAt, values }。開いた（保存した）ファイルは覚えておき、次の保存はそのファイルに上書き
+  //   （File System Access API のある Chrome・Edge。ないブラウザはダウンロード・ファイル選択で代用）
+  let fileHandle = null;
+  const JSON_TYPES = [{ description: 'JSONファイル', accept: { 'application/json': ['.json'] } }];
+  function fileName() {
+    const d = new Date();
+    const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+    const name = String(values.subject || values.bukken || '').replace(/[\\/:*?"<>|\s]+/g, '_').slice(0, 40);
+    return `${def.code}_${name ? name + '_' : ''}${ymd}.json`;
+  }
+  async function saveFile(id) {
+    const text = JSON.stringify({ form: id, code: def.code, title: def.title, savedAt: new Date().toISOString(), values }, null, 2);
+    try {
+      if (window.showSaveFilePicker) {
+        if (!fileHandle) fileHandle = await window.showSaveFilePicker({ suggestedName: fileName(), types: JSON_TYPES });
+        const w = await fileHandle.createWritable();
+        await w.write(text); await w.close();
+        setSaved(`ファイルに保存しました（${fileHandle.name}）`);
+        return;
+      }
+    } catch (e) {
+      if (e && e.name === 'AbortError') return; // 保存先の選択をやめた
+      fileHandle = null;
+    }
+    const a = h('a', { href: URL.createObjectURL(new Blob([text], { type: 'application/json' })), download: fileName() });
+    document.body.append(a); a.click(); a.remove();
+    setSaved('ファイルに保存しました（ダウンロード）');
+  }
+  // ファイル選択で読み込む（File System Access API のないブラウザ）。読み込んだら再読み込み
+  function loadText(id, text) {
+    let data;
+    try { data = JSON.parse(text); } catch (e) { alert('JSONファイルとして読み込めませんでした。'); return; }
+    if (!data || data.form !== id || typeof data.values !== 'object') {
+      alert(`この帳票（${def.code} ${def.title}）のファイルではありません。` + (data && data.code ? `\n（ファイルの帳票：${data.code} ${data.title || ''}）` : ''));
+      return;
+    }
+    if (Object.keys(values).length && !confirm('いまの入力内容を、ファイルの内容に置き換えます。よろしいですか？')) return;
+    try { localStorage.setItem(storeKey, JSON.stringify(data.values)); } catch (e) { alert('読み込めませんでした（保存できる容量を超えています）。'); return; }
+    location.reload();
+  }
+  async function openFile(id) {
+    try {
+      if (window.showOpenFilePicker) {
+        const [hd] = await window.showOpenFilePicker({ types: JSON_TYPES, multiple: false });
+        const f = await hd.getFile();
+        // 再読み込みせずに入れ替えて、開いたファイルへそのまま上書きできるようにする
+        let data;
+        try { data = JSON.parse(await f.text()); } catch (e) { alert('JSONファイルとして読み込めませんでした。'); return; }
+        if (!data || data.form !== id || typeof data.values !== 'object') { loadText(id, JSON.stringify(data || {})); return; }
+        if (Object.keys(values).length && !confirm('いまの入力内容を、ファイルの内容に置き換えます。よろしいですか？')) return;
+        try { localStorage.setItem(storeKey, JSON.stringify(data.values)); } catch (e) { alert('読み込めませんでした（保存できる容量を超えています）。'); return; }
+        fileHandle = hd;
+        rebuild();
+        setSaved(`ファイルを開きました（${hd.name}）`);
+        return;
+      }
+    } catch (e) {
+      if (e && e.name === 'AbortError') return;
+    }
+    const inp = h('input', { type: 'file', accept: '.json,application/json', style: 'display:none' });
+    inp.addEventListener('change', async () => { const f = inp.files[0]; if (f) loadText(id, await f.text()); inp.remove(); });
+    document.body.append(inp); inp.click();
+  }
+  // 帳票を作り直す（ファイルを開いたとき。ページを再読み込みしないので、開いたファイルを覚えたまま）
+  function rebuild() {
+    try { values = JSON.parse(localStorage.getItem(storeKey) || '{}') || {}; } catch (e) { values = {}; }
+    const root = document.getElementById('app');
+    root.querySelectorAll('.sheet').forEach((s) => s.remove());
+    calcs.length = 0;
+    Object.keys(inputs).forEach((k) => delete inputs[k]);
+    const pages = def.pages || [{ blocks: def.blocks }];
+    pages.forEach((p) => root.append(sheetEl(def, p)));
+    if (def.selfStamp) calcs.push(renderSelfStamps);
+    recalc();
+    if (def.setup) def.setup({ inputs, values, setVal });
+    fitTitles();
+  }
+
   // ---------- 起動 ----------
   function boot() {
     const id = new URLSearchParams(location.search).get('id');
@@ -950,6 +1029,9 @@
         try { localStorage.removeItem(storeKey); } catch (e) { /* noop */ }
         location.reload();
       } }, 'クリア'),
+      // fileIO：入力内容をJSONファイルに保存・読み込み（つぎ足しながら使う帳票。例：本-営業-A0003）
+      def.fileIO ? h('button', { onclick: () => openFile(id), title: '保存したJSONファイルを読み込む' }, 'ファイルを開く') : null,
+      def.fileIO ? h('button', { onclick: () => saveFile(id), title: '入力内容をJSONファイルに保存（開いたファイルには上書き）' }, 'ファイルに保存') : null,
       def.selfStamp ? h('button', { onclick: openStampDialog }, '押印設定') : null,
       h('button', { class: 'primary', onclick: () => window.print() }, '印刷')));
     const pages = def.pages || [{ blocks: def.blocks }];
