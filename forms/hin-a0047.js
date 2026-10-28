@@ -33,7 +33,7 @@
       tb.append(h('tr', null, i === 0 ? h('td', { class: 'h47-cat', rowspan: items.length }, cat) : null,
         h('td', { class: 'h47-item' }, text), h('td', null, btn), h('td', null, field({ key: `${key}.shochi` }))));
     }));
-    return h('table', { class: 'grid h47' }, h('colgroup', null, ...[6, null, 10, 60].map((w) => h('col', { style: w ? `width:${w}mm` : null }))), tb);
+    return h('table', { class: 'grid h47' }, h('colgroup', null, ...[6, null, 10, 75].map((w) => h('col', { style: w ? `width:${w}mm` : null }))), tb);
   } };
 
   FORM_DEFS['hin-a0047'] = {
