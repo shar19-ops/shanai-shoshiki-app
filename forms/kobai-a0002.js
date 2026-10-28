@@ -3,7 +3,8 @@
 // 元のExcelは得点の欄の「入力メッセージ」に得点の付け方があった → 得点は一覧から選ぶ（一覧を開くと付け方の文が出る）、
 //   項目の欄にマウスを乗せると付け方を表示、2ページ目に「評価の付け方」の一覧表
 // 得点計・評価点（得点計÷基準点×100 を四捨五入）は自動（元のExcelの式のまま）
-// 押印欄は右上、右端の作業所長にデート印（評価する人）。元の日付欄はなし
+// 押印欄は右上、右端の作業所長にデート印（評価する人）。元の日付欄はなし。工事部長の欄は工事本部長（支店は支店長）
+// 1ページ5社。6社以上はページを足す（ユーザー指定）。JSONファイルに保存・読み込み
 (function () {
   // 評価項目：[名称, 配点の一覧（高い順）, { 点: 付け方 }]（元のExcelの入力メッセージ。明らかな誤字は直した）
   const ITEMS = [
@@ -30,8 +31,9 @@
     ['職長、作業員の安全認識度', [10, 8, 6, 4, 2], { 10: '職長以下作業員一人一人まで安全指示及び認識が徹底し、他の会社の模範となっている。', 6: '職長の安全認識は高いが、作業員の一部に徹底を欠く場合がある。指示、助言により正しい安全活動が行われている。', 2: '職長自らが安全意識を欠き、各種指示、指導にもかかわらず不安全行動が目立つ。' }],
     ['何か一つ環境問題に取り組んだか', [5, 4, 3, 2, 1], { 5: '取り組んだ。', 1: '取り組まない。' }],
   ];
-  const N_VENDOR = 5; // 1ページの社数（元のExcelと同じ）
-  const k = (b, f) => `v${b}.${f}`; // b：何社目（1〜5）
+  const N_VENDOR = 5; // 1ページの社数（元のExcelと同じ）。6社以上はページを足す（ユーザー指定）
+  const pageCount = (v) => Math.max(1, Number(v.pageCount) || 1);
+  const k = (b, f) => `v${b}.${f}`; // b：何社目（通し番号 1〜）
 
   const tip = (i) => {
     const [name, pts, desc] = ITEMS[i];
@@ -58,7 +60,7 @@
           h('th', null, '得点計'), h('th', null, '基準点'), h('th', null, '評価点')),
         h('tr', { class: 'b2-score' },
           ...ITEMS.map(([, pts, desc], i) => (used(i)
-            ? h('td', { title: tip(i) }, field({ key: k(b, `s${i + 1}`), type: 'select', align: 'center', codeOnly: true,
+            ? h('td', { title: tip(i) }, field({ key: k(b, `s${i + 1}`), type: 'select', codeOnly: true, // 一覧は左詰め（付け方の文が読みやすいように。ユーザー指定）
               options: pts.map((p) => [String(p), desc[p] ? `${p}：${desc[p]}` : String(p)]) }))
             : h('td', { class: 'b2-off' }, '－'))),
           h('td', { class: 'b2-auto' }, field({ key: k(b, 'sum'), type: 'calc', align: 'center', calc: (_, v) => (filled(v) ? score(v) : null), showZero: true })),
@@ -66,7 +68,7 @@
           h('td', { class: 'b2-auto b2-rate' }, field({ key: k(b, 'rate'), type: 'calc', align: 'center', calc: (_, v) => (filled(v) ? Math.round(score(v) / base * 100) : null), showZero: true }))),
         h('tr', null,
           h('th', { colspan: 3 }, '所属長所見'),
-          h('td', { colspan: 23, class: 'b2-ta' }, field({ key: k(b, 'shoken'), type: 'textarea', plain: true, lines: 1 }))))) };
+          h('td', { colspan: 23, class: 'b2-ta' }, field({ key: k(b, 'shoken'), type: 'textarea', plain: true, lines: 2 }))))) };
   };
 
   // 2ページ目：評価の付け方（この様式で使う項目だけ）
@@ -80,6 +82,22 @@
           h('td', { class: 'b2-desc' }, ...pts.filter((p) => desc[p]).map((p) => h('div', null, h('b', null, `${p}点`), h('span', null, desc[p])))));
       }))) });
 
+  // 最後の評価のページの下に、ページの追加・削除（印刷しない）
+  const pageButtons = (page) => ({ type: 'custom', render: ({ h, values, setVal, rebuild }) => {
+    const lastHasData = () => Object.keys(values).some((key) => {
+      const m = /^v(\d+)\./.exec(key);
+      return m && Number(m[1]) > (page - 1) * N_VENDOR && !/\.(sum|rate)$/.test(key) && String(values[key] ?? '') !== '';
+    });
+    return h('div', { class: 'k1-pages no-print' },
+      h('button', { type: 'button', onclick: () => { setVal('pageCount', String(page + 1)); rebuild(); } }, `＋ ページを追加（${N_VENDOR}社）`),
+      page > 1 ? h('button', { type: 'button', onclick: () => {
+        if (lastHasData() && !confirm(`${page}ページ目には入力があります。消してページを減らしますか？`)) return;
+        for (let i = 1; i <= N_VENDOR; i++) Object.keys(values).filter((key) => key.startsWith(`v${(page - 1) * N_VENDOR + i}.`)).forEach((key) => delete values[key]);
+        setVal('pageCount', String(page - 1)); rebuild();
+      } }, '最後のページを削除') : null,
+      h('span', { class: 'k1-hint' }, '評価する業者が5社より多いときはページを足してください。'));
+  } });
+
   const make = (no, kind, use) => {
     const base = use.reduce((a, n) => a + ITEMS[n - 1][1][0], 0); // 基準点＝使う項目の満点の合計（元のExcelの基準点と同じ）
     FORM_DEFS[`kobai-a0002-${no}`] = {
@@ -88,16 +106,22 @@
       orientation: 'landscape',
       selfStamp: '作業所長',
       sheetClass: 'tight-gap',
-      stamps: [{ boxes: ['購買部長', '工事部長', '工事長', '作業所長'] }],
-      pages: [
-        { meta: [],
+      fileIO: true, // 社数が多いときに続きから書けるよう、JSONファイルに保存・読み込み
+      // 元は工事部長 → 工事本部長（支店は支店長）（ユーザー指定）
+      stamps: [{ boxes: ['購買部長', '工事本部長\n支店は支店長', '工事長', '作業所長'] }],
+      // 評価のページ（5社ずつ、pageCount で増減）＋最後に付け方の一覧
+      pages: (v) => [
+        ...Array.from({ length: pageCount(v) }, (_, p) => ({
+          meta: [],
+          subtitle: pageCount(v) > 1 ? `（${p + 1}/${pageCount(v)}）` : '',
           headBlocks: [{ type: 'grid', lw: 3, rowH: 6.5, rows: [
             [{ label: '工　番', key: 'koban', maxlength: 12, span: 9 }, { label: '件　名', key: 'subject', span: 15 }]] }],
           blocks: [
-            ...Array.from({ length: N_VENDOR }, (_, i) => vendor(i + 1, use, base)),
-            { type: 'notes', items: ['得点は一覧から選んでください（一覧を開くと得点の付け方が出ます。項目の番号にマウスを乗せても出ます）。得点計・評価点（得点計÷基準点×100）は自動。得点の付け方は2ページ目。'] },
-          ] },
-        // 2ページ目は付け方の一覧（押印欄なし。項目が多いのでA4縦）
+            ...Array.from({ length: N_VENDOR }, (_, i) => vendor(p * N_VENDOR + i + 1, use, base)),
+            ...(p === pageCount(v) - 1 ? [pageButtons(p + 1)] : []),
+            { type: 'notes', items: ['得点は一覧から選んでください（一覧を開くと得点の付け方が出ます。項目の番号にマウスを乗せても出ます）。得点計・評価点（得点計÷基準点×100）は自動。得点の付け方は最後のページ。'] },
+          ] })),
+        // 最後のページは付け方の一覧（押印欄なし。項目が多いのでA4縦）
         { subtitle: '（評価の付け方）', orientation: 'portrait', stamps: [], blocks: [guide(use)] },
       ],
     };

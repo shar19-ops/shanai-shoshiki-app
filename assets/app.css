@@ -589,11 +589,11 @@ table.grid.b2 th.b2-kai { font-size: 6.5pt; }
 table.grid.b2 th.b2-no.off { color: #a3abbd; }
 table.grid.b2 td.b2-off { text-align: center; color: #a3abbd; background: #f4f5f8; }
 table.grid.b2 tr.b2-score td { height: 6mm; }
-table.grid.b2 tr.b2-score select.inp { font-size: 9pt; padding: 0; text-align-last: center; }
+table.grid.b2 tr.b2-score select.inp { font-size: 9pt; padding: 0 0 0 1mm; }
 table.grid.b2 td.b2-base { text-align: center; }
 table.grid.b2 td.b2-auto, table.grid.b2 td.b2-auto .inp { background: #e9edf5; }
 table.grid.b2 td.b2-rate .inp { font-weight: 700; font-size: 10pt; }
-table.grid.b2 td.b2-ta { position: relative; padding: 0; height: 7mm; }
+table.grid.b2 td.b2-ta { position: relative; padding: 0; height: 8.3mm; } /* 所属長所見は2行 */
 table.grid.b2 td.b2-ta textarea.inp { position: absolute; inset: 0; width: 100%; height: 100%; font-size: 8pt; line-height: 1.3; padding: .6mm 1.2mm; }
 table.grid.b2 .inp { min-height: 0; }
 table.grid.b2-guide th { font-size: 8pt; height: 5mm; }
