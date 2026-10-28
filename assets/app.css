@@ -708,7 +708,7 @@ table.grid.s1 .date-wrap .pv { font-size: 9pt; }
 /* 本-総務-A0012 教育訓練実施記録（受講者40名） */
 table.grid.s12 th { height: 5.5mm; font-size: 8.5pt; }
 table.grid.s12 td { height: 5.6mm; font-size: 9pt; }
-table.grid.s12 td.s12-no { text-align: center; font-size: 8pt; }
+table.grid.s12 td.s12-no { text-align: center !important; font-size: 8pt; padding: 0; } /* 通し番号は中央 */
 table.grid.s12 .inp { min-height: 0; }
 /* 本-総務-A0013 年度教育訓練計画（A4横、1ページ5項目、スケジュールは月をクリックで■） */
 .sheet:has(table.s13) .head-blocks { width: 90mm; align-self: flex-start; }
