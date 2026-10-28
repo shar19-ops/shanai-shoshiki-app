@@ -9,7 +9,7 @@
     const tb = h('tbody', null, h('tr', null, ...[0, 1].flatMap(() => [h('th', null, ''), h('th', null, '所　　属'), h('th', null, '社員番号'), h('th', null, '氏　　名')])));
     for (let i = 1; i <= N; i++) tb.append(h('tr', null, ...half(i), ...half(i + N)));
     return h('div', null, h('div', { class: 'blk-title' }, '受講者'),
-      h('table', { class: 'grid s12' }, h('colgroup', null, ...[0, 1].flatMap(() => [6, 30, 22, null].map((w) => h('col', { style: w ? `width:${w}mm` : null })))), tb));
+      h('table', { class: 'grid s12' }, h('colgroup', null, ...[0, 1].flatMap(() => [6, 26, 26, null].map((w) => h('col', { style: w ? `width:${w}mm` : null })))), tb));
   } };
 
   FORM_DEFS['somu-a0012'] = {
