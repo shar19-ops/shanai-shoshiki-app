@@ -1,5 +1,5 @@
 // 本-工務-A0071 優良職長表彰申請書（品質記録様式。元Excel：本-工務-A0071優良職長表彰申請書.xlsx、A4縦1ページ）
-// 押印欄は右上（元は下部に横一列）、右端の申請者（発行）にデート印。総務部長（保管）は下の段。支店長は工事本部長/RE部長の欄を共用、工事長の欄は工事長だけ
+// 押印欄は右上（元は下部に横一列）、右端の申請者（発行）にデート印。総務部長（保管）は最下段。支店長は工事本部長/RE部長の欄を共用、工事長の欄は工事長だけ
 // 申請理由の「計」は、レを付けた項目の数を自動で数える（16以上で表彰対象）
 (function () {
   // 評価項目：[区分, [文章, ...]]
@@ -33,7 +33,6 @@
       '毎日の作業後の片付け、清掃をよく実施した。',
       '一斉清掃に、積極的に参加した。']],
   ];
-  const LABEL_W = 'calc((210mm - 24mm) * 4 / 24)'; // 下の表の見出し列（24分割の4列）と同じ幅
   const TARGET = 16; // 該当項目が16以上で表彰対象
   const keys = ITEMS.flatMap(([, list], g) => list.map((_, i) => `r${g + 1}_${i + 1}`));
   const count = (v) => keys.filter((k) => Array.isArray(v[k]) && v[k].length).length;
@@ -60,21 +59,13 @@
     selfStamp: '申請者',
     sheetClass: 'tight-gap', // 項目が多いので、欄と欄の間と選択肢の余白を詰めて1ページに
     meta: [],
-    // 総務部長（保管）は承認の列とは別に、下の段へ（ユーザー指定）
-    stampClass: 'stack',
-    stamps: [{ boxes: ['社長', '本店長\n承認', '工事本部長|RE部長\n支店は支店長', '工事長', '申請者\n発行'] }, { boxes: ['総務部長\n保管'] }],
-    // 総務部長を下の段にしたので、職長の会社名〜TELは押印欄の左の空き（表題の下）に置く。見出し列は下の表と同じ幅
-    headBlocks: [
-      { type: 'grid', cols: 2, colWidths: [LABEL_W, null], rowH: 5.6, dense: true, title: '1. 申請する協力会社の職長', rows: [
-        [{ label: '会社名', key: 'company', lw: 1, span: 2 }],
-        [{ label: '代表者名', key: 'daihyo', lw: 1, span: 2 }],
-        [{ label: '職長名', key: 'shokucho', lw: 1, span: 2 }],
-        [{ label: '住　所', key: 'addr', lw: 1, span: 2 }],
-        [{ label: 'TEL', key: 'tel', type: 'tel', lw: 1, span: 2 }],
-      ] },
-    ],
+    stamps: [{ boxes: ['社長', '本店長\n承認', '工事本部長|RE部長\n支店は支店長', '工事長', '申請者\n発行'] }],
+    bottomStamps: ['総務部長\n保管'], // 総務部長（保管）は承認の列とは別に、最下段（注意書きの横）へ（ユーザー指定。他の帳票の登録済検印と同じ）
     blocks: [
-      { type: 'grid', lw: 4, rowH: 5.6, dense: true, rows: [
+      { type: 'grid', lw: 4, rowH: 5.6, dense: true, title: '1. 申請する協力会社の職長', rows: [
+        [{ label: '会社名', key: 'company', span: 15 }, { label: '代表者名', key: 'daihyo', span: 9 }],
+        [{ label: '職長名', key: 'shokucho', span: 24 }],
+        [{ label: '住　所', key: 'addr', span: 15 }, { label: 'TEL', key: 'tel', type: 'tel', span: 9 }],
         [{ label: '工　番', key: 'koban', maxlength: 12, span: 9 }, { label: '工事名称', key: 'kojiName', span: 15 }],
         [{ label: '請負次数', key: 'jisu', type: 'number', unit: '次', align: 'center', span: 9 }, { label: '工事内容', key: 'kojiNaiyo', span: 15 }],
         [{ label: '工　期', key: 'kFrom', key2: 'kTo', type: 'daterange', span: 24 }],

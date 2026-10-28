@@ -443,7 +443,7 @@ table.grid.q-check td.q-goal-h .q-vt { writing-mode: vertical-rl; margin: 0 auto
 .a70-roll span { font-size: 8.5pt; color: #66708a; }
 /* 本-工務-A0071 優良職長表彰申請書：申請理由の表 */
 table.grid.q-check.a71 td.a71-cat { font-size: 8pt; line-height: 1.3; letter-spacing: .1em; }
-table.grid.q-check.a71 td, table.grid.q-check.a71 th { height: 5.2mm; }
+table.grid.q-check.a71 td, table.grid.q-check.a71 th { height: 4.8mm; }
 table.grid.q-check.a71 td.q-txt { font-size: 8pt; padding: .4mm 1.2mm; }
 table.grid.q-check.a71 .a71-judge { display: inline-block; width: 42mm; vertical-align: middle; }
 table.grid.q-check.a71 .a71-judge .inp { font-size: 8pt; }
