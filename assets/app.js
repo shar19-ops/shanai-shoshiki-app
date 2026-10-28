@@ -884,7 +884,8 @@
       b.items.map((x) => h('div', { style: (x.w ? `width:${x.w}%;flex-shrink:0` : 'flex:1;min-width:0') + ';display:flex;flex-direction:column' }, renderBlock(x)))),
     // col：ブロックを縦に並べる（row の中の1段）。中の grow のブロックが残りの高さを使う
     col: (b) => h('div', { style: `display:flex;flex-direction:column;gap:${b.gap ?? 3}mm;flex:1` }, b.items.map(renderBlock)),
-    custom: (b) => b.render({ h, field, values, setVal, rebuild: () => rebuild(true) }), // rebuild：帳票を作り直す（台帳のページを増やすときなど）
+    // rebuild：帳票を作り直す（台帳のページを増やすときなど）。newFile：開いたファイルを忘れる（次の保存は新しいファイル。月報の翌月分など）
+    custom: (b) => b.render({ h, field, values, setVal, rebuild: () => rebuild(true), newFile: () => { fileHandle = null; } }),
   };
   function renderBlock(b) {
     const fn = BLOCKS[b.type];
