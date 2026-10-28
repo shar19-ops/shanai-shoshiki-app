@@ -42,8 +42,8 @@
   const TAIL = (kind) => [
     ...(kind === 1 ? [{ t: '工事契約時は工事下請負契約約款参照', d: '○' }] : []),
     { t: '契約前「おそれ情報」通知書確認保存', d: '○', red: true },
-    { f: 'text', key: 'free1' },
-    ...(kind === 2 ? [{ f: 'text', key: 'free2' }] : []),
+    // 余白の行：左右の表の高さをそろえる数（ユーザー指定）
+    ...Array.from({ length: 3 }, (_, i) => ({ f: 'text', key: `free${i + 1}` })), // 残りの数pxは表の高さをそろえて各行に配分
   ];
 
   // 裏面の約款（元の文書のまま。段落ごと）
@@ -128,18 +128,19 @@
       }
     };
     const tb = h('tbody', null, h('tr', null, h('th', null, '項　目'), h('th', { class: 'b4-mh' }, '○✕'), h('th', null, '摘　　　　要')));
-    groups.forEach(([label, items]) => items.forEach((it, i) => {
+    groups.forEach(([label, items], g) => items.forEach((it, i) => {
       n++;
       const key = (typeof it === 'object' && it.key) ? `m.${it.key}` : `m.${kind}.${label}.${i}`;
+      // 右の表の最後の項目（その他）は、下の指定メーカ・業者などの行まで見出しの欄を続ける（間の横罫線なし。ユーザー指定）
+      const extra = tail && g === groups.length - 1 ? 2 + tail.length : 0;
       tb.append(h('tr', { class: i === 0 ? 'b4-grp' : null },
-        i === 0 ? h('th', { class: 'b4-lbl', rowspan: items.length }, ...lines(label)) : null,
+        i === 0 ? h('th', { class: 'b4-lbl', rowspan: items.length + extra }, ...lines(label)) : null,
         h('td', { class: 'b4-m' }, mark(key, typeof it === 'object' ? it.d : '')), body(it)));
     }));
     if (tail) {
       // 下請等指定メーカ・業者の有無（注文書付属書・見積依頼書の発行の欄は押印欄として右上）
       tb.append(
-        h('tr', { class: 'b4-grp' }, h('th', { class: 'b4-lbl', rowspan: 2 + tail.length }, ''),
-          h('td', { class: 'b4-m' }, mark('m.maker', '')), h('td', { class: 'b4-txt' }, '下請等指定メーカの有無')),
+        h('tr', null, h('td', { class: 'b4-m' }, mark('m.maker', '')), h('td', { class: 'b4-txt' }, '下請等指定メーカの有無')),
         h('tr', null, h('td', { class: 'b4-m' }, mark('m.gyosha', '')), h('td', { class: 'b4-txt' }, '下請等指定業者の有無')),
         ...tail.map((it, i) => h('tr', null, h('td', { class: 'b4-m' }, mark(`m.tail${i}`, it.d)), body(it))));
     }
@@ -163,7 +164,7 @@
       meta: [],
       pages: [
         { subtitle: '（表面）', blocks: [
-          { type: 'row', gap: 4, align: 'start', items: [table(LEFT(kind), null, kind), table(RIGHT(kind), TAIL(kind), kind)] },
+          { type: 'row', gap: 4, items: [table(LEFT(kind), null, kind), table(RIGHT(kind), TAIL(kind), kind)] }, // 左右の高さをそろえる（stretch）
           // 元の様式の右上の「【8.4.3】外部提供者に対する情報」は注意書きの先頭に
           { type: 'notes', items: ['【8.4.3】外部提供者に対する情報　　○：見積･契約に含む･条件内、✕：見積･契約に含まない･条件外（○✕の欄はクリックで ○ → ✕ → 空欄）',
             '※1. 見積依頼時に、工事内容に含める場合は○、含めない場合は✕を記入して協力会社に交付する。　2. 協力会社は、見積書提出時に本書を添付して提出する。　3. 注文書発行時に、本書を添付して発行する。'] },

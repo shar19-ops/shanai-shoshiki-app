@@ -638,6 +638,7 @@ table.grid.b3 .b3-rank.on { border-color: #000; font-weight: 700; }
 table.grid.b3 .b3-dot { margin: 0 .2mm; }
 table.grid.b3 td.b3-criteria { font-size: 8.5pt; padding: 1mm 3mm; line-height: 1.5; }
 /* 本-購買-A0004-1・2 見積依頼書／注文書付属書（A4横の両面。表面は表を左右2段、裏面は約款） */
+table.grid.b4 { flex: 1; } /* 左右の表の下端をそろえる（数pxの差は各行に配分） */
 table.grid.b4 th { font-size: 7pt; height: 3.5mm; padding: 0 .5mm; line-height: 1.1; }
 table.grid.b4 td { font-size: 7pt; height: 3.6mm; line-height: 1.12; padding: 0 1mm; }
 table.grid.b4 tr.b4-grp > td, table.grid.b4 tr.b4-grp > th { border-top: 1.2px solid var(--line); }
