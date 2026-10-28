@@ -841,3 +841,8 @@ table.grid.h52 .h52-keep { position: absolute; left: 0; right: 0; bottom: 1.2mm;
 /* 出席・欠席の欄：上の罫線が日付の背景に隠れないように1px空ける。押印しない役職の欄はマスク（斜線の網掛け、印刷にも出す） */
 table.grid.h52 td.h52-st { padding: 1px 1px 0; }
 table.grid.h52 td.h52-mask { background: repeating-linear-gradient(45deg, #e9ecf1 0 2px, #f6f7f9 2px 6px); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+/* 押印欄の日付：入力欄の最小の高さ（7mm）が枠からはみ出して罫線を隠さないように、枠の高さに合わせる（ユーザー指摘。A0051・A0052） */
+table.grid.h52 td.h52-st .date-wrap input, table.grid.h51 .h51-st .date-wrap input { height: 100%; min-height: 0; padding-top: 0; padding-bottom: 0; }
+table.grid.h51 tr.h51-stamp td { padding: 1px 1px 0; }
+table.grid.h51 .h51-st { height: calc(30mm - 1px); }
+table.grid.h51 .h51-st.multi { height: 7.5mm; }
