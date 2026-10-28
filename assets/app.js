@@ -918,7 +918,9 @@
           h('div', { class: 'f-ver' }, pd.footerRight || '')));
     }
     // sheetClass：帳票ごとの見た目の調整（例：'tight-checks' 選択肢の多い帳票で文字と間隔を詰める）
-    return h('div', { class: `sheet ${paper} ${orient}` + (pd.sheetClass ? ' ' + pd.sheetClass : '') },
+    // 帳票と違う向き・用紙のページ（本-購買-A0002 の2ページ目はA4縦）は、名前付きの @page でその用紙に印刷する
+    const own = paper !== (d.paper || 'A4') || orient !== (d.orientation || 'portrait');
+    return h('div', { class: `sheet ${paper} ${orient}` + (pd.sheetClass ? ' ' + pd.sheetClass : ''), style: own ? `page:${paper}-${orient}` : null },
       headerEl(pd),
       h('div', { class: 'sheet-body' }, blocks.map(renderBlock)),
       bottom,
@@ -1028,7 +1030,8 @@
 
     const paper = def.paper || 'A4', orient = def.orientation || 'portrait';
     const st = document.createElement('style');
-    st.textContent = `@page { size: ${paper} ${orient}; margin: 0; }`;
+    st.textContent = `@page { size: ${paper} ${orient}; margin: 0; }`
+      + ['A4', 'A3'].flatMap((p) => ['portrait', 'landscape'].map((o) => `@page ${p}-${o} { size: ${p} ${o}; margin: 0; }`)).join('');
     document.head.append(st);
 
     root.append(h('div', { class: 'toolbar' },
