@@ -40,8 +40,9 @@
   const fmtNum = (n, dec) => (isNaN(n) ? '' : n.toLocaleString('ja-JP', { maximumFractionDigits: dec == null ? 2 : dec }));
   const fmtDate = (iso, style) => {
     // 未入力なら手書き用の枠を残す
-    if (!iso) return { ym: '　　　年　　月', md: '　　月　　日', short: '　 /　 /' }[style] || '　　　年　　月　　日';
+    if (!iso) return { ym: '　　　年　　月', md: '　　月　　日', short: '　 /　 /', 'm/d': '　 /' }[style] || '　　　年　　月　　日';
     const [y, m, d] = iso.split('-').map(Number);
+    if (style === 'm/d') return `${m}/${d}`; // 月/日だけ（本-品質-A0020 の手直期限など、元の様式が「/」の欄）
     if (style === 'ym') return `${y}年 ${m}月`;
     if (style === 'md') return `${m}月 ${d}日`;
     if (style === 'short') return `${String(y).slice(-2)}/${m}/${d}`; // 幅の狭い欄（台帳など）
