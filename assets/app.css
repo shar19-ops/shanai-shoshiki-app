@@ -267,7 +267,8 @@ td.ln-cell textarea.inp { padding-right: 11mm; }
 .pv { display: none; }
 /* 期間（日付〜日付） */
 .range-wrap { display: flex; align-items: center; height: 100%; }
-.range-wrap .date-wrap { flex: 1; }
+.range-wrap .date-wrap { flex: 1; min-width: 0; }
+.range-wrap .date-wrap input { min-width: 0; } /* 狭い欄でも日付の入力がはみ出さないように（本-品質-A0047 のヘッダー） */
 .range-sep { padding: 0 1.5mm; }
 .range-dow { white-space: nowrap; font-size: 9.5pt; padding-right: 1mm; }
 table.grid .date-wrap .pv { text-align: right; font-size: 9.5pt; }

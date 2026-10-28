@@ -53,8 +53,8 @@
         [{ label: '工　番', key: 'koban', lw: 1, span: 2, maxlength: 12 }],
         [{ label: '件　名', key: 'subject', lw: 1, span: 2 }],
         [{ label: '注 文 者', key: 'chumon', lw: 1, span: 2 }],
-        [{ label: '契約金額', key: 'kingaku', type: 'money', lw: 1, span: 2 }],
-        [{ label: '工　期', key: 'kFrom', key2: 'kTo', type: 'daterange', lw: 1, span: 2 }],
+        [{ label: '契約金額', key: 'kingaku', type: 'money', prefix: '￥', align: 'left', lw: 1, span: 2 }],
+        [{ label: '工　期', key: 'kFrom', key2: 'kTo', type: 'daterange', jp: true, lw: 1, span: 2 }],
       ] },
     ],
     blocks: [

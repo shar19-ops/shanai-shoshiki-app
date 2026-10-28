@@ -113,7 +113,7 @@
     if (type === 'daterange') {
       const kind = f.kind || 'date';
       const part = (k) => {
-        const parts = [field({ key: k, type: kind })];
+        const parts = [field({ key: k, type: kind, jp: f.jp, style: f.style })]; // jp・style は日付の見せ方（date と同じ）
         if (f.dow) {
           const w = h('span', { class: 'range-dow' });
           calcs.push(() => { const iso = values[k]; w.textContent = iso ? '（' + '日月火水木金土'[new Date(iso + 'T00:00').getDay()] + '）' : '（　）'; });
@@ -211,7 +211,8 @@
     } else {
       const isNum = type === 'number' || type === 'money';
       el = h('input', {
-        class: 'inp' + (isNum ? ' num' : '') + (f.align === 'center' ? ' center' : ''),
+        // 数値は右寄せ（align: 'left' なら左寄せ。例：「￥」を付けた契約金額）
+        class: 'inp' + (isNum && f.align !== 'left' ? ' num' : '') + (f.align === 'center' ? ' center' : ''),
         type: 'text', value: v, placeholder: f.placeholder || '',
         inputmode: f.inputmode || (isNum ? 'decimal' : (type === 'tel' || type === 'zip' ? 'tel' : null)),
         maxlength: f.maxlength || null,
