@@ -1,6 +1,6 @@
 // 本-品質-A0052 施工検討会開催通知書（品質記録様式。元Excel：本ー品質ーA0052施工検討会開催通知書.xlsx、A4縦1ページ）
 // ISOの要求事項【8.1】はヘッダーの番号の後ろ。要出席の □ はクリックで ■（チェック表のご指示）
-// 出席・欠席の欄は日付（yy/mm/dd、空欄なら「/　/」）と、クリックで三文判風の認印（欄ごとに苗字。本-品質-A0051 の承認印と同じ）
+// 出席・欠席の欄は日付（yy/mm/dd、空欄なら「/　/」）と、クリックで三文判風の認印（欄ごとに苗字。本-品質-A0051 の承認印と同じ）。押印は支店長・工事長・工事課長・作業所長だけ、ほかはマスク
 // 営業担当は読みやすさのため設計事務所・建築会社の行の右へ（元の様式は設計種別の行）。工番・件名・事業所・部署・作業所長・開催日・開催場所の項目名は 本-品質-A0053 施工検討会報告書 と同じにする（A0053 で取り込む）
 (function () {
   // 巡回順：左の列・右の列（元の様式の並び）
@@ -17,10 +17,14 @@
       return btn;
     };
     // 出席・欠席の欄：日付と認印。工事長／工事部長は元の様式どおり「保管」を薄く印字
-    const cell = (key, keep) => h('td', { class: 'h52-st' }, field({ key, type: 'date', jp: true, style: 'yy/mm/dd' }),
-      keep ? h('span', { class: 'h52-keep' }, '保　管') : null, field({ key: `${key}.name`, type: 'inkan' }));
+    // 押印できるのは支店長・工事長／工事部長・工事課長・作業所長だけ（ユーザー指定）。ほかの役職の出席・欠席の欄はマスク
+    const STAMP = [3, 4, 5, 6];
+    const cell = (key, n) => (STAMP.includes(n)
+      ? h('td', { class: 'h52-st' }, field({ key, type: 'date', jp: true, style: 'yy/mm/dd' }),
+        n === 4 ? h('span', { class: 'h52-keep' }, '保　管') : null, field({ key: `${key}.name`, type: 'inkan' }))
+      : h('td', { class: 'h52-st h52-mask' }));
     const half = (role, n) => [h('th', { class: 'h52-role' }, ...br(role)), h('td', { class: 'h52-needc' }, need(`y${n}`)),
-      cell(`s${n}`, n === 4), cell(`k${n}`, n === 4)];
+      cell(`s${n}`, n), cell(`k${n}`, n)];
     const tb = h('tbody', null, h('tr', null, ...['巡　回　順', '要出席', '出　席', '欠　席', '巡　回　順', '要出席', '出　席', '欠　席'].map((t) => h('th', null, t))));
     LEFT.forEach((role, i) => tb.append(h('tr', null, ...half(role, i + 1), ...half(RIGHT[i], i + 9))));
     return h('table', { class: 'grid h52' }, h('colgroup', null, ...[27, 12, null, null, 27, 12, null, null].map((w) => h('col', { style: w ? `width:${w}mm` : null }))), tb);

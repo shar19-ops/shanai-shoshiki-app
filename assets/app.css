@@ -835,6 +835,9 @@ table.grid.h52 td.h52-st { padding: 0; height: 21mm; vertical-align: top; positi
 table.grid.h52 td.h52-st { display: table-cell; }
 table.grid.h52 td.h52-st .date-wrap { height: 4.8mm; }
 table.grid.h52 td.h52-st .date-wrap .pv { justify-content: center; text-align: center; font-size: 8pt; padding: 0; }
-@media screen { table.grid.h52 td.h52-st .date-wrap.jp .pv { inset: 0; } }
+@media screen { table.grid.h52 td.h52-st .date-wrap.jp .pv { inset: 0 4mm 0 0; } }
 table.grid.h52 td.h52-st .inkan-box { height: calc(21mm - 4.8mm); }
-table.grid.h52 .h52-keep { position: absolute; left: 0; right: 0; top: 50%; text-align: center; font-size: 8pt; color: #b3bac6; pointer-events: none; }
+table.grid.h52 .h52-keep { position: absolute; left: 0; right: 0; bottom: 1.2mm; text-align: center; font-size: 8pt; color: #b3bac6; pointer-events: none; }
+/* 出席・欠席の欄：上の罫線が日付の背景に隠れないように1px空ける。押印しない役職の欄はマスク（斜線の網掛け、印刷にも出す） */
+table.grid.h52 td.h52-st { padding: 1px 1px 0; }
+table.grid.h52 td.h52-mask { background: repeating-linear-gradient(45deg, #e9ecf1 0 2px, #f6f7f9 2px 6px); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
