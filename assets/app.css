@@ -447,6 +447,7 @@ table.grid.q-check.a71 td, table.grid.q-check.a71 th { height: 4.8mm; }
 table.grid.q-check.a71 td.q-txt { font-size: 8pt; padding: .4mm 1.2mm; }
 table.grid.q-check.a71 .a71-judge { display: inline-block; width: 42mm; vertical-align: middle; }
 table.grid.q-check.a71 .a71-judge .inp { font-size: 8pt; }
+table.grid.q-check.a71 td.a71-total { text-align: right; padding-right: 2mm; }
 /* 本-工務-A0001 図面管理台帳（1件2段） */
 table.grid.k1 th { height: 5.5mm; font-size: 8.5pt; }
 table.grid.k1 td { height: 7mm; font-size: 9pt; }

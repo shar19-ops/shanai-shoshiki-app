@@ -46,7 +46,8 @@
       h('td', { class: 'q-txt' }, t),
       h('td', { class: 'q-chk' }, field({ key: `r${g + 1}_${i + 1}`, type: 'checks', options: [''], align: 'center' }))))));
     tb.append(h('tr', { class: 'q-grp' },
-      h('td', { class: 'lbl', colspan: 3 }, '計（', h('span', { class: 'a71-judge' }, field({ key: 'judge', type: 'calc', align: 'left',
+      // 計は右詰め（ユーザー指定）
+      h('td', { class: 'lbl a71-total', colspan: 3 }, '計（', h('span', { class: 'a71-judge' }, field({ key: 'judge', type: 'calc', align: 'right',
         calc: (n, v) => (count(v) >= TARGET ? '表彰対象' : `あと${TARGET - count(v)}項目で表彰対象`) })), '）'),
       h('td', { class: 'q-chk' }, field({ key: 'total', type: 'calc', align: 'center', showZero: true, calc: (n, v) => count(v) }))));
     return h('div', null, h('div', { class: 'blk-title' }, '3. 申請理由'), h('table', { class: 'grid dense q-check a71' },
