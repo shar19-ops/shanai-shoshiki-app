@@ -781,3 +781,26 @@ table.grid.h47 .inp { min-height: 0; font-size: 8pt; }
 table.grid.h47 .h47-mark { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; padding: 0; }
 /* 建築現況・電気設備現況・所感の高さ（ユーザー指定で広めに。1枚に収まる範囲） */
 .sheet.h47 table.grid:not(.h47) textarea { height: 20mm !important; }
+/* 本-品質-A0051 個別工事施工プロセス管理表（A3横）：12列の表。■□はクリックで切り替え */
+table.grid.h51 th { font-size: 8pt; line-height: 1.25; letter-spacing: .05em; padding: 0 .5mm; }
+table.grid.h51 td { font-size: 7.4pt; line-height: 1.3; vertical-align: top; text-align: left; padding: .6mm .8mm; }
+table.grid.h51 tr.h51-step td { vertical-align: middle; text-align: center; font-size: 8pt; font-weight: bold; height: 9mm; }
+table.grid.h51 tr.h51-req td div + div { margin-top: .6mm; }
+table.grid.h51 tr.h51-time td, table.grid.h51 tr.h51-appr td { vertical-align: middle; text-align: center; }
+table.grid.h51 tr.h51-date td { padding: 0; height: 6mm; vertical-align: middle; }
+table.grid.h51 tr.h51-date .date-wrap .pv { text-align: center; font-size: 8pt; }
+table.grid.h51 .h51-line { display: flex; gap: 2mm; }
+table.grid.h51 .h51-it { display: flex; align-items: flex-start; gap: .6mm; }
+table.grid.h51 .h51-mark { font: inherit; font-size: 7.6pt; line-height: 1.3; border: 0; background: none; padding: 0; cursor: pointer; color: var(--ink); }
+table.grid.h51 .h51-mark:hover { color: var(--accent); }
+table.grid.h51 tr.h51-stamp td { padding: 0; height: 24mm; }
+table.grid.h51 .h51-st .inp { height: 4.5mm; min-height: 0; font-size: 7.5pt; padding: 0; text-align: center; }
+table.grid.h51 .h51-st .inp::placeholder { color: #888; opacity: 1; }
+@media print { table.grid.h51 .h51-st .inp::placeholder { color: #000 !important; } }
+table.grid.h51 .h51-st.multi { height: 6mm; border-bottom: 1px dotted var(--line); }
+table.grid.h51 .h51-st.multi:last-child { border-bottom: 0; }
+table.grid.h51 tr.h51-who td { height: 13mm; }
+table.grid.h51 tr.h51-dept td { height: 24mm; }
+table.grid.h51 tr.h51-in td { height: 28mm; }
+table.grid.h51 tr.h51-proc td { height: 22mm; }
+table.grid.h51 tr.h51-out td { height: 24mm; }
