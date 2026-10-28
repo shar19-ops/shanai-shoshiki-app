@@ -793,11 +793,21 @@ table.grid.h51 .h51-line { display: flex; gap: 2mm; }
 table.grid.h51 .h51-it { display: flex; align-items: flex-start; gap: .6mm; }
 table.grid.h51 .h51-mark { font: inherit; font-size: 7.6pt; line-height: 1.3; border: 0; background: none; padding: 0; cursor: pointer; color: var(--ink); }
 table.grid.h51 .h51-mark:hover { color: var(--accent); }
-table.grid.h51 tr.h51-stamp td { padding: 0; height: 24mm; }
-table.grid.h51 .h51-st .inp { height: 4.5mm; min-height: 0; font-size: 7.5pt; padding: 0; text-align: center; }
+table.grid.h51 tr.h51-stamp td { padding: 0; height: 30mm; }
+table.grid.h51 .h51-st { display: flex; flex-direction: column; height: 30mm; }
+table.grid.h51 .h51-st .inp { height: 4.5mm; min-height: 0; font-size: 7.5pt; padding: 0; text-align: center; flex: none; }
 table.grid.h51 .h51-st .inp::placeholder { color: #888; opacity: 1; }
 @media print { table.grid.h51 .h51-st .inp::placeholder { color: #000 !important; } }
-table.grid.h51 .h51-st.multi { height: 6mm; border-bottom: 1px dotted var(--line); }
+/* 承認印（クリックで三文判風の認印）。日常管理の4つの欄は日付の横に小さく */
+table.grid.h51 .h51-inkan { flex: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+table.grid.h51 .h51-inkan:hover { background: #f3f6fc; }
+table.grid.h51 .h51-inkan svg { width: 10.5mm; height: 10.5mm; }
+table.grid.h51 .h51-hint { font-size: 6.5pt; color: #8a94a6; }
+table.grid.h51 .h51-st.multi { flex-direction: row; align-items: center; height: 7.5mm; border-bottom: 1px dotted var(--line); }
+table.grid.h51 .h51-st.multi .inp { width: 55%; height: 100%; }
+table.grid.h51 .h51-st.multi .h51-inkan { height: 100%; }
+table.grid.h51 .h51-st.multi .h51-inkan svg { width: 6.8mm; height: 6.8mm; }
+table.grid.h51 .h51-st.multi .h51-hint { font-size: 5.5pt; }
 table.grid.h51 .h51-st.multi:last-child { border-bottom: 0; }
 table.grid.h51 tr.h51-who td { height: 13mm; }
 table.grid.h51 tr.h51-dept td { height: 24mm; }

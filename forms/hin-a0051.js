@@ -1,6 +1,6 @@
 // 本-品質-A0051 個別工事施工プロセス管理表（品質記録様式。元Excel：本ー品質ーA0051 個別工事施工プロセス管理表.xlsx、A3横1ページ）
 // ISOの要求事項【9.1】はヘッダーの番号の後ろ。品質管理のステップ（12列）ごとに、規格要求事項・実施時期・実施予定日・実施者・対象･関連部署・完了承認者・承認印・インプット・プロセス・アウトプット
-// ■（必須）・□（任意）は元の様式の印を初期値に、クリックで ■ ⇔ □ を切り替える。承認印の欄は日付（空欄なら「/　　/」）と押印の余白（日常管理は月ごとに4つ）
+// ■（必須）・□（任意）は元の様式の印を初期値に、クリックで ■ ⇔ □ を切り替える。承認印の欄は日付（空欄なら「/　　/」）と、クリックで三文判風の認印（欄ごとに苗字を入れる。日常管理は月ごとに4つ）
 (function () {
   // 項目：'■名前'（必須）・'□名前'（任意）。配列は1行に並べる（例：□購買 □営業）。名前の '\n' は2行目（例：(支店工事統括)）
   const BUY = [['□購買', '□営業'], ['□見積', '□設計'], ['□安全', '□品質']];
@@ -61,6 +61,23 @@
       btn.addEventListener('click', () => { const next = cur() === '■' ? '□' : '■'; setVal(key, next === d ? '' : next); btn.textContent = next; });
       return btn;
     };
+    // 承認印の欄：クリックで苗字を聞いて三文判風の認印を押す（欄ごとに別の人。空欄で取り消し。ユーザー指定）
+    //   押せる人の制限はしない（ユーザー指定で今は考えない）
+    const inkan = (key) => {
+      const box = h('div', { class: 'h51-inkan', title: 'クリックで押印（苗字を入力）' });
+      const draw = () => { box.innerHTML = values[key] ? DateStamp.inkan({ name: values[key], color: 'red' }) : '<span class="h51-hint no-print">クリックで押印</span>'; };
+      box.addEventListener('click', () => {
+        const last = (() => { try { return localStorage.getItem('shoshiki:_inkan') || ''; } catch (e) { return ''; } })();
+        const v = prompt('押印する苗字を入力してください（空欄で取り消し）', values[key] || last);
+        if (v === null) return;
+        const name = v.trim().slice(0, 4);
+        setVal(key, name);
+        if (name) { try { localStorage.setItem('shoshiki:_inkan', name); } catch (e) { /* noop */ } }
+        draw();
+      });
+      draw();
+      return box;
+    };
     const items = (c, sec, list) => h('td', { class: 'h51-items' }, ...list.map((it, i) => {
       const one = (s, j) => h('span', { class: 'h51-it' }, mark(`m${c}.${sec}.${i}.${j}`, s[0]), h('span', null, ...br(s.slice(1))));
       return h('div', { class: 'h51-line' }, ...(Array.isArray(it) ? it : [it]).map(one));
@@ -74,9 +91,11 @@
       row('実施者', 'h51-who', (c, i) => items(i + 1, 'j', c.jisshi)),
       row('対象･関連\n部署', 'h51-dept', (c, i) => items(i + 1, 't', c.taisho)),
       row('完了承認者', 'h51-appr', (c) => h('td', null, ...br(c.shonin))),
-      // 承認印：日付（空欄なら「/　　/」）と押印の余白。日常管理は月ごとに4つ
-      row('承認印', 'h51-stamp', (c, i) => h('td', null, ...Array.from({ length: c.stamps || 1 }, (_, k) => h('div', { class: 'h51-st' + (c.stamps ? ' multi' : '') },
-        field({ key: `shonin${i + 1}.${k + 1}`, align: 'center', placeholder: '/　　/' }))))),
+      // 承認印：日付（空欄なら「/　　/」）と押印の欄。日常管理は月ごとに4つ
+      row('承認印', 'h51-stamp', (c, i) => h('td', null, ...Array.from({ length: c.stamps || 1 }, (_, k) => {
+        const key = `shonin${i + 1}.${k + 1}`;
+        return h('div', { class: 'h51-st' + (c.stamps ? ' multi' : '') }, field({ key, align: 'center', placeholder: '/　　/' }), inkan(`${key}.name`));
+      }))),
       row('インプット', 'h51-in', (c, i) => items(i + 1, 'i', c.input)),
       row('プロセス', 'h51-proc', (c, i) => items(i + 1, 'p', c.process)),
       row('アウト\nプット', 'h51-out', (c, i) => items(i + 1, 'o', c.output)));
