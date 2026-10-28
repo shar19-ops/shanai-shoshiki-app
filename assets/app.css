@@ -667,3 +667,13 @@ table.grid.b4 .b4-kensa .b4-kv { flex: 1; min-width: 0; }
 .b4-terms p.art { text-indent: -1em; padding-left: 1em; margin-top: .6mm; }
 .b4-terms p.sub { padding-left: 1em; }
 .b4-terms .b4-ijo { text-align: right; margin-top: 1mm; }
+/* 本-購買-A0008 登録電気工事基幹技能者業務注文付属書（A4横、業務の表は左右2段。表の見た目は本-購買-A0004 の b4） */
+table.grid.b8 th.b8-cat { writing-mode: vertical-rl; letter-spacing: .15em; padding: .5mm 0; font-size: 7.5pt; }
+.b8-calc { display: flex; flex-direction: column; align-items: center; gap: 1mm; }
+table.grid.b8-calc-t { width: 109mm; table-layout: fixed; }
+table.grid.b8-calc-t th { font-size: 8pt; height: 4.5mm; }
+table.grid.b8-calc-t td { height: 6mm; font-size: 9pt; }
+table.grid.b8-calc-t td.b8-op { text-align: center; padding: 0; }
+table.grid.b8-calc-t td.b4-auto, table.grid.b8-calc-t td.b4-auto .inp { background: #e9edf5; }
+.b8-warn { align-self: stretch; }
+.b8-warn .inp { width: 100%; font-size: 8pt; color: #b0522a; min-height: 0; height: auto; text-align: center; }
