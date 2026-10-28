@@ -767,3 +767,5 @@ table.grid.h20 .date-wrap .pv { font-size: 9pt; text-align: center; }
 .h20-route td { padding: 0 2mm 0 0; white-space: nowrap; }
 /* 指摘事項・処置：欄の中で折り返し、行の高さを JS で伸ばす（文字の大きさは変えない） */
 table.grid.h20 textarea.h20-wrap { min-height: 0; padding: .6mm 1.5mm; line-height: 1.35; resize: none; overflow: hidden; display: block; }
+/* 本-品質-A0021 検査報告書：添付書類の名前は元の書式どおり字間を空けて */
+table.grid td.h21-doc { text-align: left; padding-left: 2mm; letter-spacing: .12em; }
