@@ -760,6 +760,6 @@ table.grid.h20 th { height: 7mm; font-size: 8pt; line-height: 1.15; letter-spaci
 table.grid.h20 td { height: 7.4mm; font-size: 9pt; }
 table.grid.h20 td.h11-no { text-align: center !important; font-size: 8.5pt; padding: 0; }
 table.grid.h20 .date-wrap .pv { font-size: 9pt; text-align: center; }
-.h20-foot .notes { margin: 0 0 1.5mm; }
+.h20-notes { margin: 0; }
 .h20-route { border-collapse: collapse; font-size: 7.5pt; line-height: 1.35; }
 .h20-route td { padding: 0 2mm 0 0; white-space: nowrap; }
