@@ -50,8 +50,8 @@
     const tb = h('tbody', null, h('tr', null, h('th', { class: 'b4-mh' }, '○✕'), h('th', null, ''), h('th', null, '業務及び作業の内容')));
     groups.forEach(([cat, list, d, cont]) => list.forEach(([t, i], r) => tb.append(h('tr', { class: r === 0 ? 'b4-grp' : null },
       h('td', { class: 'b4-m' }, mark(`m.${cat}.${i}`, d)),
-      // 区分は縦書き。右の段に続く安全管理は区分名を出さない（元の様式のまま）
-      r === 0 ? h('th', { class: 'b4-lbl b8-cat', rowspan: list.length }, cont ? '' : cat) : null,
+      // 区分は縦書き。右の段に続く安全管理にも区分名を出す（ユーザー指定）
+      r === 0 ? h('th', { class: 'b4-lbl b8-cat', rowspan: list.length }, cat) : null,
       t === null ? h('td', { class: 'b4-in' }, field({ key: `free.${cat}.${i}` })) : h('td', { class: 'b4-txt' }, t)))));
     return h('table', { class: 'grid b4 b8' }, h('colgroup', null, h('col', { style: 'width:5.5mm' }), h('col', { style: 'width:6mm' }), h('col')), tb);
   } });
@@ -65,8 +65,9 @@
         h('tr', null, h('th', null, '日　額'), h('th', { colspan: 4 }, '工　期（月）'), h('th', null, '金　額')),
         h('tr', null,
           h('td', { class: 'b8-n' }, field({ key: 'nichigaku', type: 'money', unit: '円' })),
-          h('td', { class: 'b8-op' }, '×'), h('td', { class: 'b8-op' }, String(DAYS)), h('td', { class: 'b8-op' }, '×'),
-          h('td', { class: 'b8-n' }, field({ key: 'kokiMonth', type: 'number', align: 'center', unit: 'か月' })),
+          // 工期（月）の欄の中の縦線はなし（ユーザー指定）
+          h('td', { class: 'b8-op b8-in1' }, '×'), h('td', { class: 'b8-op b8-in' }, String(DAYS)), h('td', { class: 'b8-op b8-in' }, '×'),
+          h('td', { class: 'b8-n b8-in' }, field({ key: 'kokiMonth', type: 'number', align: 'center', unit: 'か月' })),
           h('td', { class: 'b4-auto b8-n' }, field({ key: 'kingaku', type: 'calc', calc: (_, v) => amount(v), unit: '円' }))))),
       h('div', { class: 'b8-warn no-print' }, field({ key: 'warn', type: 'calc', align: 'left', calc: (_, v) => {
         const a = Number(String(v.nichigaku || '').replace(/,/g, '')), m = Number(v.kokiMonth), msg = [];
@@ -77,13 +78,13 @@
   } };
 
   const notes = { type: 'notes', items: [
-    '※1　登録電気工事基幹技能者の配置を求める場合は、当該者が資格を所持していることを確認すること。',
-    '2　登録電気工事基幹技能者に依頼する業務に○、依頼しない業務に✕を記入すること。（○✕の欄はクリックで ○ → ✕ → 空欄）',
-    '3　手当として、下表の日額を支給する。なお、日額は\\2,000を限度とし、1件の工事について、工期1年当たりの金額は、\\500,000.-を限度とする。',
+    '1.　登録電気工事基幹技能者の配置を求める場合は、当該者が資格を所持していることを確認すること。',
+    '2.　登録電気工事基幹技能者に依頼する業務に○、依頼しない業務に✕を記入すること。（○✕の欄はクリックで ○ → ✕ → 空欄）',
+    '3.　手当として、下表の日額を支給する。なお、日額は¥2,000を限度とし、1件の工事について、工期1年当たりの金額は、¥500,000.-を限度とする。',
   ] };
   const notes2 = { type: 'notes', items: [
-    '4　工料注文金額は、工事金額に本金額を合算したものとする。',
-    '5　注文書発行時に、注文書付属書に本書を添付して発行する。',
+    '4.　工料注文金額は、工事金額に本金額を合算したものとする。',
+    '5.　注文書発行時に、注文書付属書に本書を添付して発行する。',
   ] };
 
   FORM_DEFS['kobai-a0008'] = {
@@ -91,9 +92,10 @@
     seitei: '11/12/01', kaitei: '26/11/17', // フッター：制定日は元の様式のまま、最終改訂日はユーザー指定
     orientation: 'landscape',
     meta: [],
+    // 工番・件名は2段にして表題の下（押印欄の左の空き）に（ユーザー指定）
+    headBlocks: [{ type: 'grid', lw: 3, rowH: 6, rows: [[{ label: '工　番', key: 'koban', maxlength: 12, span: 24 }], [{ label: '件　名', key: 'subject', span: 24 }]] }],
     stamps: [{ boxes: ['購買部長', '工事本部長\n支店は支店長'] }],
     blocks: [
-      { type: 'grid', lw: 2, rowH: 6, rows: [[{ label: '工　番', key: 'koban', maxlength: 12, span: 7 }, { label: '件　名', key: 'subject', span: 17 }]] },
       { type: 'row', gap: 4, items: [table(cols[0]), { type: 'col', gap: 2.5, items: [table(cols[1]), notes, calc, notes2] }] },
     ],
   };

@@ -677,3 +677,8 @@ table.grid.b8-calc-t td.b8-op { text-align: center; padding: 0; }
 table.grid.b8-calc-t td.b4-auto, table.grid.b8-calc-t td.b4-auto .inp { background: #e9edf5; }
 .b8-warn { align-self: stretch; }
 .b8-warn .inp { width: 100%; font-size: 8pt; color: #b0522a; min-height: 0; height: auto; text-align: center; }
+table.grid.b8-calc-t td.b8-in { border-left: 0; } /* 工期（月）の欄の中の縦線なし */
+table.grid.b8-calc-t td.b8-in1 { border-right: 0; }
+.sheet:has(table.b8) .head-blocks { max-width: 150mm; } /* 工番・件名の欄が間延びしないように */
+table.grid.b4.b8 td { height: 4.05mm; } /* 工番・件名を上に移した分、行を高く */
+table.grid.b4.b8 .b4-mark { min-height: 3.9mm; }
