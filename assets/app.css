@@ -602,3 +602,38 @@ table.grid.b2-guide td.c { text-align: center; }
 table.grid.b2-guide td.b2-desc > div { display: flex; }
 table.grid.b2-guide td.b2-desc b { flex: none; width: 6.5mm; }
 table.grid.b2-guide td.b2-desc > div.std, table.grid.b2-guide .b2-std-mark { background: #dfe3ea; } /* 標準点の網掛け */
+/* 本-購買-A0003 新規協力会社評価表（区分を選んで、その列の点数をクリック。評価は自動） */
+.b3-kubun { display: flex; align-items: center; gap: 2mm; margin-bottom: 2mm; }
+.b3-kubun-lbl { font-size: 9pt; font-weight: 700; color: var(--accent); margin-right: 1mm; }
+.b3-pick { font: inherit; font-size: 10pt; padding: 1mm 4mm; border: 1px solid var(--line); border-radius: 999px; background: #fff; cursor: pointer; }
+.b3-pick.on { border: 2px solid var(--accent); font-weight: 700; color: var(--accent); }
+.b3-hint { font-size: 8.5pt; color: #66708a; }
+@media print { .b3-pick { border-color: transparent; padding: 1mm 2.5mm; } .b3-pick.on { border: 1.5px solid #000; color: #000; } }
+table.grid.b3 th { font-size: 8.5pt; line-height: 1.15; padding: .8mm .5mm; }
+table.grid.b3 td { font-size: 8.5pt; height: 5.2mm; }
+table.grid.b3 tr.b3-grp > td, table.grid.b3 tr.b3-grp > th { border-top: 1.5px solid var(--line); }
+table.grid.b3 tr.b3-item > td { border-top: 1px solid var(--line); }
+table.grid.b3 td.b3-cat { text-align: center; line-height: 1.3; font-size: 9pt; background: var(--head-bg, #eef1f6); }
+table.grid.b3 td.b3-name { padding: 0 1.5mm; }
+table.grid.b3 td.b3-na { text-align: center; color: #8a92a6; }
+table.grid.b3 td.b3-p { text-align: center; padding: 0; }
+table.grid.b3 .off { color: #b8bfcd; }
+table.grid.b3 td.b3-desc { font-size: 8pt; padding: 0 1.5mm; }
+.b3-pt { font: inherit; width: 5.2mm; height: 5.2mm; line-height: 1; padding: 0; border: 1px solid transparent; border-radius: 50%; background: #fff8d6; cursor: pointer; }
+.b3-pt:hover { border-color: var(--line-weak); }
+.b3-pt.on { border: 1.5px solid #000; font-weight: 700; background: transparent; }
+@media print { .b3-pt { background: transparent; } }
+table.grid.b3 td.b3-auto, table.grid.b3 td.b3-auto .inp { background: #e9edf5; }
+table.grid.b3 td.b3-auto.off { background: transparent; }
+table.grid.b3 td.b3-base { text-align: center; }
+table.grid.b3 td.b3-rate { padding: 1mm 2mm; font-size: 9pt; }
+table.grid.b3 .b3-rate-v { display: inline-block; width: 16mm; vertical-align: middle; background: #e9edf5; }
+table.grid.b3 .b3-rate-v .inp { font-weight: 700; font-size: 11pt; }
+table.grid.b3 .b3-small { font-size: 8pt; margin-left: 2mm; }
+table.grid.b3 .b3-left .inp { font-size: 8pt; color: #b0522a; height: auto; min-height: 0; }
+table.grid.b3 th.b3-eval-h { height: 11mm; }
+table.grid.b3 td.b3-eval { text-align: center; font-size: 11pt; white-space: nowrap; padding: 0; }
+table.grid.b3 .b3-rank { display: inline-block; width: 6.4mm; height: 6.4mm; line-height: 6.1mm; border-radius: 50%; border: 1.5px solid transparent; }
+table.grid.b3 .b3-rank.on { border-color: #000; font-weight: 700; }
+table.grid.b3 .b3-dot { margin: 0 .2mm; }
+table.grid.b3 td.b3-criteria { font-size: 8.5pt; padding: 1mm 3mm; line-height: 1.5; }
