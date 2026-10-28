@@ -40,10 +40,11 @@
   const fmtNum = (n, dec) => (isNaN(n) ? '' : n.toLocaleString('ja-JP', { maximumFractionDigits: dec == null ? 2 : dec }));
   const fmtDate = (iso, style) => {
     // 未入力なら手書き用の枠を残す
-    if (!iso) return { ym: '　　　年　　月', md: '　　月　　日' }[style] || '　　　年　　月　　日';
+    if (!iso) return { ym: '　　　年　　月', md: '　　月　　日', short: '　 /　 /' }[style] || '　　　年　　月　　日';
     const [y, m, d] = iso.split('-').map(Number);
     if (style === 'ym') return `${y}年 ${m}月`;
     if (style === 'md') return `${m}月 ${d}日`;
+    if (style === 'short') return `${String(y).slice(-2)}/${m}/${d}`; // 幅の狭い欄（台帳など）
     return `${y}年 ${m}月 ${d}日`;
   };
 
@@ -883,7 +884,8 @@
       b.items.map((x) => h('div', { style: (x.w ? `width:${x.w}%;flex-shrink:0` : 'flex:1;min-width:0') + ';display:flex;flex-direction:column' }, renderBlock(x)))),
     // col：ブロックを縦に並べる（row の中の1段）。中の grow のブロックが残りの高さを使う
     col: (b) => h('div', { style: `display:flex;flex-direction:column;gap:${b.gap ?? 3}mm;flex:1` }, b.items.map(renderBlock)),
-    custom: (b) => b.render({ h, field, values, setVal }),
+    // rebuild：帳票を作り直す（台帳のページを増やすときなど）。newFile：開いたファイルを忘れる（次の保存は新しいファイル。月報の翌月分など）
+    custom: (b) => b.render({ h, field, values, setVal, rebuild: () => rebuild(true), newFile: () => { fileHandle = null; } }),
   };
   function renderBlock(b) {
     const fn = BLOCKS[b.type];
@@ -993,14 +995,20 @@
     inp.addEventListener('change', async () => { const f = inp.files[0]; if (f) loadText(id, await f.text()); inp.remove(); });
     document.body.append(inp); inp.click();
   }
+  // def.pages は配列、または values からページを作る関数（台帳のようにページ数が入力で変わる帳票）
+  function pageList() {
+    if (typeof def.pages === 'function') return def.pages(values);
+    return def.pages || [{ blocks: def.blocks }];
+  }
   // 帳票を作り直す（ファイルを開いたとき。ページを再読み込みしないので、開いたファイルを覚えたまま）
-  function rebuild() {
-    try { values = JSON.parse(localStorage.getItem(storeKey) || '{}') || {}; } catch (e) { values = {}; }
+  //   keep: true なら今の入力内容のまま作り直す（台帳のページを増やしたときなど）
+  function rebuild(keep) {
+    if (keep !== true) { try { values = JSON.parse(localStorage.getItem(storeKey) || '{}') || {}; } catch (e) { values = {}; } }
     const root = document.getElementById('app');
     root.querySelectorAll('.sheet').forEach((s) => s.remove());
     calcs.length = 0;
     Object.keys(inputs).forEach((k) => delete inputs[k]);
-    const pages = def.pages || [{ blocks: def.blocks }];
+    const pages = pageList();
     pages.forEach((p) => root.append(sheetEl(def, p)));
     if (def.selfStamp) calcs.push(renderSelfStamps);
     recalc();
@@ -1036,7 +1044,7 @@
       def.fileIO ? h('button', { onclick: () => saveFile(id), title: '入力内容をJSONファイルに保存（開いたファイルには上書き）' }, 'ファイルに保存') : null,
       def.selfStamp ? h('button', { onclick: openStampDialog }, '押印設定') : null,
       h('button', { class: 'primary', onclick: () => window.print() }, '印刷')));
-    const pages = def.pages || [{ blocks: def.blocks }];
+    const pages = pageList();
     pages.forEach((p) => root.append(sheetEl(def, p)));
     if (def.selfStamp) calcs.push(renderSelfStamps); // 日付の入力に追従
     recalc();

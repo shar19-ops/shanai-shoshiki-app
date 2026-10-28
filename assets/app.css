@@ -427,6 +427,39 @@ table.grid.q-check td.q-goal-h .q-month { margin: 0 .3mm; } /* 月と見出し�
 table.grid.q-check td.q-goal-h .q-month .inp { padding: 0; font-size: 8pt; text-align: center; }
 table.grid.q-check td.q-goal-h .q-month .inp::placeholder { color: transparent; }
 table.grid.q-check td.q-goal-h .q-vt { writing-mode: vertical-rl; margin: 0 auto; }
+/* sheetClass: 'stamps-2row' … 押印欄のグループを2つずつ2段に（表題の長い帳票。本-工務-A0037） */
+.sheet.stamps-2row .stamps { max-width: 96mm; }
+/* sheetClass: 'tight-gap' … 欄と欄の間を詰める（項目の多い帳票。本-工務-A0070） */
+.sheet.tight-gap .sheet-body { gap: 2.2mm; }
+.sheet.tight-gap .f-header { margin-bottom: 2mm; }
+.sheet.tight-gap table.grid .checks { padding: 0 1mm !important; }
+.sheet.tight-gap table.grid .checks label { font-size: 8pt; }
+.sheet.tight-gap table.grid .checks .box { width: 3.2mm; height: 3.2mm; }
+.sheet.tight-gap table.grid .inp { min-height: 0; }
+/* 本-工務-A0070 月度施工管理月報：翌月分を作るボタン（印刷しない） */
+.a70-roll { display: flex; gap: 8px; align-items: center; margin-bottom: -2mm; }
+.a70-roll button { font: inherit; font-size: 9.5pt; padding: 4px 12px; border: 1px solid var(--accent); border-radius: 4px; background: #fff; color: var(--accent); cursor: pointer; }
+.a70-roll button:hover { background: #eef2fb; }
+.a70-roll span { font-size: 8.5pt; color: #66708a; }
+/* 本-工務-A0071 優良職長表彰申請書：申請理由の表 */
+table.grid.q-check.a71 td.a71-cat { font-size: 8pt; line-height: 1.3; letter-spacing: .1em; }
+table.grid.q-check.a71 td, table.grid.q-check.a71 th { height: 4.8mm; }
+table.grid.q-check.a71 td.q-txt { font-size: 8pt; padding: .4mm 1.2mm; }
+table.grid.q-check.a71 .a71-judge { display: inline-block; width: 42mm; vertical-align: middle; }
+table.grid.q-check.a71 .a71-judge .inp { font-size: 8pt; }
+table.grid.q-check.a71 td.a71-total { text-align: right; padding-right: 2mm; }
+/* 本-工務-A0001 図面管理台帳（1件2段） */
+table.grid.k1 th { height: 5.5mm; font-size: 8.5pt; }
+table.grid.k1 td { height: 7mm; font-size: 9pt; }
+table.grid.k1 tr.k1-top > td { border-top: 1.5px solid var(--line); }
+table.grid.k1 td.k1-sub { border-bottom: 1px dashed var(--line-weak); }
+table.grid.k1 .date-wrap .pv { font-size: 9pt; }
+table.grid.k1 td.k1-ta { position: relative; padding: 0; vertical-align: top; }
+table.grid.k1 td.k1-ta textarea.inp { position: absolute; inset: 0; width: 100%; height: 100%; font-size: 8.5pt; line-height: 1.35; padding: .8mm 1.2mm; }
+.k1-pages { display: flex; gap: 8px; align-items: center; margin-top: 3mm; }
+.k1-pages button { font: inherit; font-size: 9.5pt; padding: 5px 12px; border: 1px solid var(--accent); border-radius: 4px; background: #fff; color: var(--accent); cursor: pointer; }
+.k1-pages button:hover { background: #eef2fb; }
+.k1-pages .k1-hint { font-size: 8.5pt; color: #66708a; }
 /* 表の凡例の行（tableBlock の caption） */
 table.grid th.tbl-cap { height: 4.5mm; font-size: 7pt; letter-spacing: 0; text-align: left; padding: 0 2mm; background: #fff; color: #333; }
 /* 本-営業-A0002 施工能力確認書：納期面・技術面の枠 */
