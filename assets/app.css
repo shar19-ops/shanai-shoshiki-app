@@ -751,3 +751,5 @@ td.stamps-cell .stamps { justify-content: flex-end; max-width: none; gap: 0; }
 .h15-to .h15-onchu { font-size: 11pt; letter-spacing: .3em; padding: 0 1mm 1mm; white-space: nowrap; }
 table.grid td.h15-sec { background: var(--label-bg); font-weight: bold; text-align: left; padding-left: 2mm; height: 6mm; }
 table.grid td.h15-sub { text-align: left; padding-left: 2mm; height: 5.5mm; border-bottom: 0; }
+/* 本-品質-A0018 不適合処理報告書：発行種別は元の様式どおり3つずつ2段 */
+.sheet.h18 .checks:has(input[name="r_shubetsu"]) { display: grid; grid-template-columns: repeat(3, auto); justify-content: start; gap: 0 6mm; }
