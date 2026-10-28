@@ -838,11 +838,10 @@ table.grid.h52 td.h52-st .date-wrap .pv { justify-content: center; text-align: c
 @media screen { table.grid.h52 td.h52-st .date-wrap.jp .pv { inset: 0 4mm 0 0; } }
 table.grid.h52 td.h52-st .inkan-box { height: calc(21mm - 4.8mm); }
 table.grid.h52 .h52-keep { position: absolute; left: 0; right: 0; bottom: 1.2mm; text-align: center; font-size: 8pt; color: #b3bac6; pointer-events: none; }
-/* 出席・欠席の欄：上の罫線が日付の背景に隠れないように1px空ける。押印しない役職の欄はマスク（斜線の網掛け、印刷にも出す） */
+/* 出席・欠席の欄：上の罫線が日付の背景に隠れないように1px空ける */
 table.grid.h52 td.h52-st { padding: 1px 1px 0; }
-/* 網掛けは欄の内側の要素に描く（欄の背景にすると印刷で罫線が消えて、隣の欄とつながって見えるため。ユーザー指摘） */
-table.grid.h52 td.h52-mask { padding: 0; }
-table.grid.h52 .h52-maskin { position: absolute; inset: 1px; background: repeating-linear-gradient(45deg, #d5dae2 0 1px, #fff 1px 5px); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+/* クリックの押印がない役職（紙で回送）は押印の空欄だけ */
+table.grid.h52 td.h52-st .h52-paper { height: calc(21mm - 4.8mm); }
 /* 押印欄の日付：入力欄の最小の高さ（7mm）が枠からはみ出して罫線を隠さないように、枠の高さに合わせる（ユーザー指摘。A0051・A0052） */
 table.grid.h52 td.h52-st .date-wrap input, table.grid.h51 .h51-st .date-wrap input { height: 100%; min-height: 0; padding-top: 0; padding-bottom: 0; }
 table.grid.h51 tr.h51-stamp td { padding: 1px 1px 0; }
