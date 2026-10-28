@@ -47,11 +47,14 @@
     sheetClass: 'h47',
     meta: [],
     stamps: [{ boxes: ['社　長', '本店長', '工事本部長|RE部長', '支店長'], dates: true }, { boxes: ['工事長|工事部長', '工事管理|課長', '安全品質|保証部長\n保　管', '巡回検査者\n発　行'], dates: true }],
-    // 工番・件名は表題の下（押印欄の左の空き）に置く。本-安全-A0001 と同じ（ユーザー指定）
+    // 工番・件名・注文者・契約金額・工期は表題の下（押印欄の左の空き）に置く。本-安全-A0001 と同じ（ユーザー指定）
     headBlocks: [
-      { type: 'grid', cols: 2, colWidths: ['calc((210mm - 24mm) * 2 / 24)', null], rowH: 6, rows: [
+      { type: 'grid', cols: 2, colWidths: ['20mm', null], rowH: 6, rows: [
         [{ label: '工　番', key: 'koban', lw: 1, span: 2, maxlength: 12 }],
         [{ label: '件　名', key: 'subject', lw: 1, span: 2 }],
+        [{ label: '注 文 者', key: 'chumon', lw: 1, span: 2 }],
+        [{ label: '契約金額', key: 'kingaku', type: 'money', lw: 1, span: 2 }],
+        [{ label: '工　期', key: 'kFrom', key2: 'kTo', type: 'daterange', lw: 1, span: 2 }],
       ] },
     ],
     blocks: [
@@ -61,8 +64,6 @@
         [{ label: '部　署', key: 'busho', lw: 2, span: 6 }, { label: '所　長', key: 'shocho', lw: 2, span: 6 },
           { label: '検査日', key: 'kensabi', type: 'date', jp: true, style: 'short', lw: 2, span: 6 },
           { label: '前　回\n検査日', key: 'zenkai', type: 'date', jp: true, style: 'short', lw: 2, span: 6 }],
-        [{ label: '契約金額', key: 'kingaku', type: 'money', lw: 3, span: 7 }, { label: '注文者\n（元請）', key: 'chumon', lw: 2, span: 6 },
-          { label: '工　期', key: 'kFrom', key2: 'kTo', type: 'daterange', lw: 2, span: 11 }],
       ] },
       list,
       { type: 'grid', rows: [
