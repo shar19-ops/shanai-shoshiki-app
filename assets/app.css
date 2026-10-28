@@ -74,6 +74,7 @@ body {
 .f-head-left { flex: 1; min-width: 0; align-self: stretch; display: flex; flex-direction: column; align-items: flex-start; }
 .f-head-left .head-blocks { margin-top: auto; padding-top: 3mm; align-self: stretch; }
 .f-code { font-size: 8pt; color: #555; letter-spacing: .05em; }
+.f-code .f-iso { margin-left: 5mm; letter-spacing: 0; } /* ISOの要求事項（番号の後ろに間を空けて） */
 .f-title {
   font-size: 20pt; font-weight: bold; letter-spacing: .3em;
   margin: 1mm 0 2mm;
@@ -132,6 +133,12 @@ body {
 .stamp-box .sb-label.tight { font-size: 6.5pt; letter-spacing: 0; }
 .stamp-box .sb-label.two { font-size: 6pt; line-height: 2.3mm; padding-top: .2mm; letter-spacing: 0; }
 .stamp-box .sb-area { height: 20mm; position: relative; }
+/* 押印欄の日付（stamps の dates）。空欄なら「/　　/」を印字して手書き */
+.stamp-box .sb-date { height: 4.5mm; } /* 日付の下の罫線なし（ユーザー指定） */
+.stamp-box .sb-date .inp { height: 100%; min-height: 0; padding: 0; font-size: 8pt; text-align: center; }
+.stamp-box .sb-date .inp::placeholder { color: #888; opacity: 1; }
+@media print { .stamp-box .sb-date .inp::placeholder { color: #000 !important; } }
+.stamp-box .sb-area.dated { height: 15.5mm; }
 /* 兼務の役職名（工事本部長・RE部長・支店長など）は押印部に薄く印字 */
 .stamp-box .sb-roles {
   position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
@@ -572,3 +579,125 @@ table.grid.q15 .q15-ev .mark-btn { position: absolute; inset: 0; font-size: 26pt
 .inline-wrap.stack { flex-direction: column; align-items: stretch; justify-content: center; gap: 0; padding: 0; }
 .inline-wrap.stack > .iw { flex: 1; min-height: 0; }
 .inline-wrap.stack > .iw > * { flex: 1; }
+/* 本-購買-A0001 購買業者台帳（A3横、1社2段：工事番号／評価点） */
+table.grid.b1 th { height: 4.6mm; font-size: 7.5pt; line-height: 1.2; }
+table.grid.b1 td { height: 5mm; font-size: 7.5pt; }
+table.grid.b1 tr.b1-top > td { border-top: 1.5px solid var(--line); }
+table.grid.b1 td.b1-sub { border-bottom: 1px dashed var(--line-weak); }
+table.grid.b1 td.b1-no { text-align: center; }
+table.grid.b1 td.b1-auto, table.grid.b1 td.b1-auto .inp { background: #e9edf5; } /* 自動計算の欄（入力欄の黄色と分ける） */
+table.grid.b1 td.b1-rank .inp { font-size: 9pt; font-weight: 700; }
+table.grid.b1 .inp { font-size: 8pt; padding: 0 .4mm; min-height: 0; height: 100%; }
+table.grid.b1 td.b1-koban .inp { font-family: Arial, sans-serif; font-size: 6.2pt; letter-spacing: -.03em; padding: 0 .2mm; } /* 12桁の工番が入るよう、数字の幅の狭い書体 */
+/* 本-購買-A0002-1〜3 協力会社評価表（A4横5社。1社4段） */
+table.grid.b2 th { height: 4.6mm; font-size: 7.5pt; line-height: 1.15; }
+table.grid.b2 td { height: 5mm; font-size: 8pt; }
+table.grid.b2 th.b2-kai { font-size: 6.5pt; }
+table.grid.b2 th.b2-no.off { color: #a3abbd; }
+table.grid.b2 td.b2-off { text-align: center; color: #a3abbd; background: #f4f5f8; }
+table.grid.b2 tr.b2-score td { height: 6mm; }
+table.grid.b2 tr.b2-score select.inp { font-size: 9pt; padding: 0 0 0 1mm; }
+table.grid.b2 td.b2-base { text-align: center; }
+table.grid.b2 td.b2-auto, table.grid.b2 td.b2-auto .inp { background: #e9edf5; }
+table.grid.b2 td.b2-rate .inp { font-weight: 700; font-size: 10pt; }
+table.grid.b2 td.b2-ta { position: relative; padding: 0; height: 8.3mm; } /* 所属長所見は2行 */
+table.grid.b2 td.b2-ta textarea.inp { position: absolute; inset: 0; width: 100%; height: 100%; font-size: 8pt; line-height: 1.3; padding: .6mm 1.2mm; }
+table.grid.b2 .inp { min-height: 0; }
+table.grid.b2-guide th { font-size: 8pt; height: 5mm; }
+table.grid.b2-guide td { font-size: 7pt; line-height: 1.25; padding: .3mm 1mm; }
+table.grid.b2-guide td.c { text-align: center; }
+table.grid.b2-guide td.b2-desc > div { display: flex; }
+table.grid.b2-guide td.b2-desc b { flex: none; width: 6.5mm; }
+table.grid.b2-guide td.b2-desc > div.std, table.grid.b2-guide .b2-std-mark { background: #dfe3ea; } /* 標準点の網掛け */
+/* 本-購買-A0003 新規協力会社評価表（区分を選んで、その列の点数をクリック。評価は自動） */
+.b3-kubun { display: flex; align-items: center; gap: 2mm; margin-bottom: 2mm; }
+.b3-kubun-lbl { font-size: 9pt; font-weight: 700; color: var(--accent); margin-right: 1mm; }
+.b3-pick { font: inherit; font-size: 10pt; padding: 1mm 4mm; border: 1px solid var(--line); border-radius: 999px; background: #fff; cursor: pointer; }
+.b3-pick.on { border: 2px solid var(--accent); font-weight: 700; color: var(--accent); }
+.b3-hint { font-size: 8.5pt; color: #66708a; }
+@media print { .b3-pick { border-color: transparent; padding: 1mm 2.5mm; } .b3-pick.on { border: 1.5px solid #000; color: #000; } }
+table.grid.b3 th { font-size: 8.5pt; line-height: 1.15; padding: .8mm .5mm; }
+table.grid.b3 td { font-size: 8.5pt; height: 5.2mm; }
+table.grid.b3 tr.b3-grp > td, table.grid.b3 tr.b3-grp > th { border-top: 1.5px solid var(--line); }
+table.grid.b3 tr.b3-item > td { border-top: 1px solid var(--line); }
+table.grid.b3 td.b3-cat { text-align: center; line-height: 1.3; font-size: 9pt; background: var(--head-bg, #eef1f6); }
+table.grid.b3 td.b3-name { padding: 0 1.5mm; }
+table.grid.b3 td.b3-na { text-align: center; color: #8a92a6; }
+table.grid.b3 td.b3-p { text-align: center; padding: 0; }
+table.grid.b3 .off { color: #b8bfcd; }
+table.grid.b3 td.b3-desc { font-size: 8pt; padding: 0 1.5mm; }
+.b3-pt { font: inherit; width: 5.2mm; height: 5.2mm; line-height: 1; padding: 0; border: 1px solid transparent; border-radius: 50%; background: #fff8d6; cursor: pointer; }
+.b3-pt:hover { border-color: var(--line-weak); }
+.b3-pt.on { border: 1.5px solid #000; font-weight: 700; background: transparent; }
+@media print { .b3-pt { background: transparent; } }
+table.grid.b3 td.b3-auto, table.grid.b3 td.b3-auto .inp { background: #e9edf5; }
+table.grid.b3 td.b3-auto.off { background: transparent; }
+table.grid.b3 td.b3-base { text-align: center; }
+table.grid.b3 td.b3-rate { padding: 1mm 2mm; font-size: 9pt; }
+table.grid.b3 .b3-rate-v { display: inline-block; width: 16mm; vertical-align: middle; background: #e9edf5; }
+table.grid.b3 .b3-rate-v .inp { font-weight: 700; font-size: 11pt; }
+table.grid.b3 .b3-small { font-size: 8pt; margin-left: 2mm; }
+table.grid.b3 .b3-left .inp { font-size: 8pt; color: #b0522a; height: auto; min-height: 0; }
+table.grid.b3 th.b3-eval-h { height: 11mm; }
+table.grid.b3 td.b3-eval { text-align: center; font-size: 11pt; white-space: nowrap; padding: 0; }
+table.grid.b3 .b3-rank { display: inline-block; width: 6.4mm; height: 6.4mm; line-height: 6.1mm; border-radius: 50%; border: 1.5px solid transparent; }
+table.grid.b3 .b3-rank.on { border-color: #000; font-weight: 700; }
+table.grid.b3 .b3-dot { margin: 0 .2mm; }
+table.grid.b3 td.b3-criteria { font-size: 8.5pt; padding: 1mm 3mm; line-height: 1.5; }
+/* 本-購買-A0004-1・2 見積依頼書／注文書付属書（A4横の両面。表面は表を左右2段、裏面は約款） */
+table.grid.b4 { flex: 1; } /* 左右の表の下端をそろえる（数pxの差は各行に配分） */
+table.grid.b4 th { font-size: 7pt; height: 3.5mm; padding: 0 .5mm; line-height: 1.1; }
+table.grid.b4 td { font-size: 7pt; height: 3.6mm; line-height: 1.12; padding: 0 1mm; }
+table.grid.b4 tr.b4-grp > td, table.grid.b4 tr.b4-grp > th { border-top: 1.2px solid var(--line); }
+table.grid.b4 th.b4-lbl { font-weight: 400; text-align: center; }
+table.grid.b4 th.b4-mh { font-size: 5.8pt; letter-spacing: -.05em; }
+table.grid.b4 td.b4-m { padding: 0; text-align: center; }
+.b4-mark { font: inherit; font-size: 8pt; line-height: 1; width: 100%; height: 100%; min-height: 3.4mm; padding: 0; border: 0; background: #fff8d6; cursor: pointer; display: block; }
+@media print { .b4-mark { background: transparent; } }
+table.grid.b4 td.b4-txt.red, table.grid.b4 td.b4-txt.red label { color: #c0392b; }
+table.grid.b4 .inp { font-size: 7pt; min-height: 0; height: 3.5mm; padding-top: 0; padding-bottom: 0; line-height: 3.5mm; }
+table.grid.b4 td.b4-in { padding: 0; }
+table.grid.b4 .date-wrap, table.grid.b4 .range-wrap { min-height: 0; height: 3.5mm; }
+table.grid.b4 .date-wrap .pv { font-size: 7pt; line-height: 3.4mm; }
+table.grid.b4 .b4-inline { display: flex; align-items: center; gap: 1mm; }
+table.grid.b4 .b4-inline > .inp, table.grid.b4 .b4-inline > .date-wrap { flex: 1; min-width: 0; }
+table.grid.b4 .b4-lt { flex: none; width: 44mm; }
+table.grid.b4 .b4-inline .checks { padding: 0 !important; gap: 0 3mm; min-height: 0; }
+table.grid.b4 .b4-inline .checks label { font-size: 7pt; }
+table.grid.b4 .b4-inline .checks .box { width: 2.6mm; height: 2.6mm; }
+table.grid.b4 .b4-kensa .b4-sub { flex: none; padding-left: 2mm; }
+table.grid.b4 .b4-kensa .b4-kv { flex: 1; min-width: 0; }
+.b4-terms { columns: 2; column-gap: 7mm; font-size: 7.4pt; line-height: 1.42; text-align: justify; }
+.b4-terms-title { font-weight: 700; font-size: 9pt; margin-bottom: 1mm; }
+.b4-terms p { margin: 0; break-inside: avoid-column; }
+.b4-terms p.art { text-indent: -1em; padding-left: 1em; margin-top: .6mm; }
+.b4-terms p.sub { padding-left: 1em; }
+.b4-terms .b4-ijo { text-align: right; margin-top: 1mm; }
+/* 本-購買-A0008 登録電気工事基幹技能者業務注文付属書（A4横、業務の表は左右2段。表の見た目は本-購買-A0004 の b4） */
+table.grid.b8 th.b8-cat { writing-mode: vertical-rl; letter-spacing: .15em; padding: .5mm 0; font-size: 7.5pt; }
+.b8-calc { display: flex; flex-direction: column; align-items: center; gap: 1mm; }
+table.grid.b8-calc-t { width: 109mm; table-layout: fixed; }
+table.grid.b8-calc-t th { font-size: 8pt; height: 4.5mm; }
+table.grid.b8-calc-t td { height: 6mm; font-size: 9pt; }
+table.grid.b8-calc-t td.b8-op { text-align: center; padding: 0; }
+table.grid.b8-calc-t td.b4-auto, table.grid.b8-calc-t td.b4-auto .inp { background: #e9edf5; }
+.b8-warn { align-self: stretch; }
+.b8-warn .inp { width: 100%; font-size: 8pt; color: #b0522a; min-height: 0; height: auto; text-align: center; }
+/* 工期（月）の欄の中の縦線なし（罫線を重ねて描く表なので、隣り合う両側の線を消す） */
+table.grid.b8-calc-t td.b8-in1 { border-right: none; }
+table.grid.b8-calc-t td.b8-in { border-left: none; border-right: none; }
+table.grid.b8-calc-t td.b8-in.b8-last { border-right: 1px solid var(--line); }
+.sheet:has(table.b8) .head-blocks { width: calc((297mm - 24mm - 4mm) / 2); max-width: none; align-self: flex-start; } /* 工番・件名の幅を下の左の表とそろえる */
+table.grid.b4.b8 td { height: 4.05mm; } /* 工番・件名を上に移した分、行を高く */
+table.grid.b4.b8 .b4-mark { min-height: 3.9mm; }
+/* 本-購買-A0004 業者名（左の表の上、幅は左の表とそろえる）と業者の追加・削除 */
+.b4-head { display: flex; align-items: center; gap: 4mm; }
+table.grid.b4-vendor { width: calc((297mm - 24mm - 4mm) / 2); flex: none; }
+table.grid.b4-vendor th { width: 23mm; height: 6.5mm; font-size: 9pt; }
+table.grid.b4-vendor td { height: 6.5mm; font-size: 10pt; }
+table.grid.b4-vendor td.b4-dono { width: 8mm; text-align: center; border-left: none; }
+table.grid.b4-vendor td.b4-vname { border-right: none; } /* 殿の前の罫線なし（両側とも消す） */
+.b4-pages { display: flex; flex-wrap: nowrap; gap: 1.5mm; white-space: nowrap; }
+.b4-pages button { font: inherit; font-size: 8pt; padding: 2px 6px; border: 1px solid var(--accent); border-radius: 4px; background: #fff; color: var(--accent); cursor: pointer; }
+.b4-pages button:hover { background: #eef2fb; }
+.sheet:has(table.b4-right) .notes { font-size: 7.5pt; line-height: 1.38; } /* 本-購買-A0004 右の表の下の注意書き */
