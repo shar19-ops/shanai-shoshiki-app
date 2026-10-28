@@ -818,3 +818,6 @@ table.grid.h51 tr.h51-out td { height: 24mm; }
 table.grid.h51 .h51-st .date-wrap { height: 4.5mm; flex: none; }
 table.grid.h51 .h51-st .date-wrap .pv { text-align: center; font-size: 7.5pt; padding: 0; }
 table.grid.h51 .h51-st.multi .date-wrap { width: 55%; height: 100%; }
+/* 本-品質-A0051：日常管理以外の日付（実施予定日・承認印の日付）は欄の中央に（ユーザー指定）。画面ではカレンダーの印の分を空けずに中央へ */
+table.grid.h51 tr.h51-date .date-wrap .pv, table.grid.h51 .h51-st:not(.multi) .date-wrap .pv { justify-content: center; text-align: center; }
+@media screen { table.grid.h51 tr.h51-date .date-wrap.jp .pv, table.grid.h51 .h51-st:not(.multi) .date-wrap.jp .pv { inset: 0; padding: 0; } }
