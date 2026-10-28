@@ -13,6 +13,8 @@
   FORM_DEFS['hin-a0014'] = {
     code: '本-品質-A0014', title: '検査／試験依頼書・通知書',
     seitei: '99/01/04', kaitei: '26/11/17', // フッター：制定日は元の様式のまま、最終改訂日はユーザー指定
+    fileIO: true, // JSONファイルに保存・読み込み（ユーザー指定）
+    fileKeys: ['koban', 'subject'], // ファイル名は「本-品質-A0014_工番_件名_日付.json」
     selfStamp: '作業所長',
     meta: [{ label: '依頼日', key: 'iraibi', type: 'date', jp: true }],
     stamps: [], // 押印欄は依頼書・通知書の表の中（元の様式どおり）
