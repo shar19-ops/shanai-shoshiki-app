@@ -47,11 +47,17 @@
     sheetClass: 'h47',
     meta: [],
     stamps: [{ boxes: ['社　長', '本店長', '工事本部長|RE部長', '支店長'], dates: true }, { boxes: ['工事長|工事部長', '工事管理|課長', '安全品質|保証部長\n保　管', '巡回検査者\n発　行'], dates: true }],
+    // 工番・件名は表題の下（押印欄の左の空き）に置く。本-安全-A0001 と同じ（ユーザー指定）
+    headBlocks: [
+      { type: 'grid', cols: 2, colWidths: ['calc((210mm - 24mm) * 2 / 24)', null], rowH: 6, rows: [
+        [{ label: '工　番', key: 'koban', lw: 1, span: 2, maxlength: 12 }],
+        [{ label: '件　名', key: 'subject', lw: 1, span: 2 }],
+      ] },
+    ],
     blocks: [
       // 上の表・監視及び測定項目・現況と所感は隙間なくつなぐ（1枚に収めるため）
       { type: 'col', fit: true, gap: 0, items: [
       { type: 'grid', rowH: 5.6, rows: [
-        [{ label: '工　番', key: 'koban', maxlength: 12, lw: 2, span: 7 }, { label: '件　名', key: 'subject', lw: 2, span: 17 }],
         [{ label: '部　署', key: 'busho', lw: 2, span: 6 }, { label: '所　長', key: 'shocho', lw: 2, span: 6 },
           { label: '検査日', key: 'kensabi', type: 'date', jp: true, style: 'short', lw: 2, span: 6 },
           { label: '前　回\n検査日', key: 'zenkai', type: 'date', jp: true, style: 'short', lw: 2, span: 6 }],
