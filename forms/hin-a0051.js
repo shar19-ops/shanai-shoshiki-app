@@ -61,23 +61,6 @@
       btn.addEventListener('click', () => { const next = cur() === '■' ? '□' : '■'; setVal(key, next === d ? '' : next); btn.textContent = next; });
       return btn;
     };
-    // 承認印の欄：クリックで苗字を聞いて三文判風の認印を押す（欄ごとに別の人。空欄で取り消し。ユーザー指定）
-    //   押せる人の制限はしない（ユーザー指定で今は考えない）
-    const inkan = (key) => {
-      const box = h('div', { class: 'h51-inkan', title: 'クリックで押印（苗字を入力）' });
-      const draw = () => { box.innerHTML = values[key] ? DateStamp.inkan({ name: values[key], color: 'red' }) : '<span class="h51-hint no-print">クリックで押印</span>'; };
-      box.addEventListener('click', () => {
-        const last = (() => { try { return localStorage.getItem('shoshiki:_inkan') || ''; } catch (e) { return ''; } })();
-        const v = prompt('押印する苗字を入力してください（空欄で取り消し）', values[key] || last);
-        if (v === null) return;
-        const name = v.trim().slice(0, 4);
-        setVal(key, name);
-        if (name) { try { localStorage.setItem('shoshiki:_inkan', name); } catch (e) { /* noop */ } }
-        draw();
-      });
-      draw();
-      return box;
-    };
     const items = (c, sec, list) => h('td', { class: 'h51-items' }, ...list.map((it, i) => {
       const one = (s, j) => h('span', { class: 'h51-it' }, mark(`m${c}.${sec}.${i}.${j}`, s[0]), h('span', null, ...br(s.slice(1))));
       return h('div', { class: 'h51-line' }, ...(Array.isArray(it) ? it : [it]).map(one));
@@ -94,7 +77,7 @@
       // 承認印：日付（空欄なら「/　　/」）と押印の欄。日常管理は月ごとに4つ
       row('承認印', 'h51-stamp', (c, i) => h('td', null, ...Array.from({ length: c.stamps || 1 }, (_, k) => {
         const key = `shonin${i + 1}.${k + 1}`;
-        return h('div', { class: 'h51-st' + (c.stamps ? ' multi' : '') }, field({ key, type: 'date', jp: true, style: 'yy/mm/dd' }), inkan(`${key}.name`));
+        return h('div', { class: 'h51-st' + (c.stamps ? ' multi' : '') }, field({ key, type: 'date', jp: true, style: 'yy/mm/dd' }), field({ key: `${key}.name`, type: 'inkan' }));
       }))),
       row('インプット', 'h51-in', (c, i) => items(i + 1, 'i', c.input)),
       row('プロセス', 'h51-proc', (c, i) => items(i + 1, 'p', c.process)),

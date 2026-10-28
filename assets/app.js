@@ -109,6 +109,27 @@
 
     if (type === 'image') return imageField(f);
 
+    // inkan：クリックで苗字を聞いて三文判風の認印を押す欄（欄ごとに別の人。空欄で取り消し。押せる人の制限はしない）
+    //   値は苗字。前に押した苗字を次の入力の初期値にする（このPCのブラウザに保存）。本-品質-A0051・A0052
+    if (type === 'inkan') {
+      const LAST = STORE_PREFIX + '_inkan';
+      const box = h('div', { class: 'inkan-box', title: 'クリックで押印（苗字を入力）' });
+      const draw = () => { box.innerHTML = values[key] ? DateStamp.inkan({ name: values[key], color: 'red' }) : '<span class="inkan-hint no-print">クリックで押印</span>'; };
+      box.addEventListener('click', () => {
+        let last = '';
+        try { last = localStorage.getItem(LAST) || ''; } catch (e) { /* 既定値のまま */ }
+        const s = prompt('押印する苗字を入力してください（空欄で取り消し）', values[key] || last);
+        if (s === null) return;
+        const name = s.trim().slice(0, 4);
+        setVal(key, name);
+        if (name) { try { localStorage.setItem(LAST, name); } catch (e) { /* noop */ } }
+        draw();
+      });
+      draw();
+      inputs[key] = box;
+      return box;
+    }
+
     // 期間（日付〜日付、kind: 'time' なら時刻〜時刻）を1つの欄に。間に縦罫線を入れない
     // dow: true なら日付の後ろに曜日（例：（木））を自動表示
     if (type === 'daterange') {

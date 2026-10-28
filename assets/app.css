@@ -799,15 +799,15 @@ table.grid.h51 .h51-st .inp { height: 4.5mm; min-height: 0; font-size: 7.5pt; pa
 table.grid.h51 .h51-st .inp::placeholder { color: #888; opacity: 1; }
 @media print { table.grid.h51 .h51-st .inp::placeholder { color: #000 !important; } }
 /* 承認印（クリックで三文判風の認印）。日常管理の4つの欄は日付の横に小さく */
-table.grid.h51 .h51-inkan { flex: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-table.grid.h51 .h51-inkan:hover { background: #f3f6fc; }
-table.grid.h51 .h51-inkan svg { width: 10.5mm; height: 10.5mm; }
-table.grid.h51 .h51-hint { font-size: 6.5pt; color: #8a94a6; }
+table.grid.h51 .inkan-box { flex: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+table.grid.h51 .inkan-box:hover { background: #f3f6fc; }
+table.grid.h51 .inkan-box svg { width: 10.5mm; height: 10.5mm; }
+table.grid.h51 .inkan-hint { font-size: 6.5pt; color: #8a94a6; }
 table.grid.h51 .h51-st.multi { flex-direction: row; align-items: center; height: 7.5mm; border-bottom: 1px dotted var(--line); }
 table.grid.h51 .h51-st.multi .inp { width: 55%; height: 100%; }
-table.grid.h51 .h51-st.multi .h51-inkan { height: 100%; }
-table.grid.h51 .h51-st.multi .h51-inkan svg { width: 6.8mm; height: 6.8mm; }
-table.grid.h51 .h51-st.multi .h51-hint { font-size: 5.5pt; }
+table.grid.h51 .h51-st.multi .inkan-box { height: 100%; }
+table.grid.h51 .h51-st.multi .inkan-box svg { width: 6.8mm; height: 6.8mm; }
+table.grid.h51 .h51-st.multi .inkan-hint { font-size: 5.5pt; }
 table.grid.h51 .h51-st.multi:last-child { border-bottom: 0; }
 table.grid.h51 tr.h51-who td { height: 13mm; }
 table.grid.h51 tr.h51-dept td { height: 24mm; }
@@ -821,3 +821,20 @@ table.grid.h51 .h51-st.multi .date-wrap { width: 55%; height: 100%; }
 /* 本-品質-A0051：日常管理以外の日付（実施予定日・承認印の日付）は欄の中央に（ユーザー指定）。画面ではカレンダーの印の分を空けずに中央へ */
 table.grid.h51 tr.h51-date .date-wrap .pv, table.grid.h51 .h51-st:not(.multi) .date-wrap .pv { justify-content: center; text-align: center; }
 @media screen { table.grid.h51 tr.h51-date .date-wrap.jp .pv, table.grid.h51 .h51-st:not(.multi) .date-wrap.jp .pv { inset: 0; padding: 0; } }
+/* クリックで押す三文判風の認印（field の inkan） */
+.inkan-box { display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.inkan-box:hover { background: #f3f6fc; }
+.inkan-box svg { width: 10.5mm; height: 10.5mm; }
+.inkan-hint { font-size: 6.5pt; color: #8a94a6; }
+/* 本-品質-A0052 施工検討会開催通知書：巡回順の表（要出席は □ ⇔ ■、出席・欠席は日付と認印） */
+table.grid.h52 th { font-size: 8.5pt; letter-spacing: .1em; height: 6mm; }
+table.grid.h52 th.h52-role { font-size: 9pt; line-height: 1.3; letter-spacing: .05em; }
+table.grid.h52 td.h52-needc { text-align: center; }
+table.grid.h52 .h52-need { font: inherit; font-family: "MS Gothic", monospace; font-size: 13pt; border: 0; background: none; cursor: pointer; padding: 0; color: #000; -webkit-text-fill-color: #000; }
+table.grid.h52 td.h52-st { padding: 0; height: 21mm; vertical-align: top; position: relative; }
+table.grid.h52 td.h52-st { display: table-cell; }
+table.grid.h52 td.h52-st .date-wrap { height: 4.8mm; }
+table.grid.h52 td.h52-st .date-wrap .pv { justify-content: center; text-align: center; font-size: 8pt; padding: 0; }
+@media screen { table.grid.h52 td.h52-st .date-wrap.jp .pv { inset: 0; } }
+table.grid.h52 td.h52-st .inkan-box { height: calc(21mm - 4.8mm); }
+table.grid.h52 .h52-keep { position: absolute; left: 0; right: 0; top: 50%; text-align: center; font-size: 8pt; color: #b3bac6; pointer-events: none; }
