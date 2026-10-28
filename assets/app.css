@@ -572,3 +572,13 @@ table.grid.q15 .q15-ev .mark-btn { position: absolute; inset: 0; font-size: 26pt
 .inline-wrap.stack { flex-direction: column; align-items: stretch; justify-content: center; gap: 0; padding: 0; }
 .inline-wrap.stack > .iw { flex: 1; min-height: 0; }
 .inline-wrap.stack > .iw > * { flex: 1; }
+/* 本-購買-A0001 購買業者台帳（A3横、1社2段：工事番号／評価点） */
+table.grid.b1 th { height: 4.6mm; font-size: 7.5pt; line-height: 1.2; }
+table.grid.b1 td { height: 5mm; font-size: 7.5pt; }
+table.grid.b1 tr.b1-top > td { border-top: 1.5px solid var(--line); }
+table.grid.b1 td.b1-sub { border-bottom: 1px dashed var(--line-weak); }
+table.grid.b1 td.b1-no { text-align: center; }
+table.grid.b1 td.b1-auto, table.grid.b1 td.b1-auto .inp { background: #e9edf5; } /* 自動計算の欄（入力欄の黄色と分ける） */
+table.grid.b1 td.b1-rank .inp { font-size: 9pt; font-weight: 700; }
+table.grid.b1 .inp { font-size: 8pt; padding: 0 .4mm; min-height: 0; height: 100%; }
+table.grid.b1 td.b1-koban .inp { font-family: Arial, sans-serif; font-size: 6.2pt; letter-spacing: -.03em; padding: 0 .2mm; } /* 12桁の工番が入るよう、数字の幅の狭い書体 */
