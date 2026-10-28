@@ -299,6 +299,8 @@
   function stampSvg() {
     const c = stampCfg;
     if (!c.enabled || !c.sei) return '';
+    // selfStampStyle: 'inkan'：デート印ではなく三文判風の認印（苗字だけ、朱。本-品質-A0020 の検査者。ユーザー指定）
+    if (def.selfStampStyle === 'inkan') return DateStamp.inkan({ name: c.sei, color: 'red' });
     // 役職なし：苗字を上下に分割／役職あり：上に苗字・下に役職／支店長：上に事業所名（「支店」を除く）
     const names = c.title === '支店長' ? { nameTop: (values.office || c.office || '').replace(/支店$/, ''), nameBottom: '支店長' }
       : c.title ? { nameTop: c.sei, nameBottom: c.title } : { name: c.sei };
@@ -320,7 +322,7 @@
       h('select', { onchange: (e) => set('office', e.target.value) },
         LISTS.offices.filter((o) => o !== '本店').map((o) => h('option', { value: o, selected: o === stampCfg.office }, o))));
     const dlg = h('dialog', { class: 'stamp-dialog' }, h('form', { method: 'dialog' },
-      h('h3', null, '押印設定（本人欄のデート印）'),
+      h('h3', null, def.selfStampStyle === 'inkan' ? '押印設定（本人欄の認印）' : '押印設定（本人欄のデート印）'),
       h('p', { class: 'sd-note' }, '全帳票共通の設定です（このPCのブラウザにだけ保存）。日付は帳票の作成日・発行日、未入力なら今日の日付になります。承認・確認欄には押されません。'),
       h('div', { class: 'sd-body' },
         h('div', { class: 'sd-fields' },

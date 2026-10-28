@@ -73,5 +73,29 @@
     return parts.join('');
   }
 
-  root.DateStamp = { svg: svg, formatDate: formatDate };
+  // 三文判風の認印：丸枠に苗字を縦書き（日付なし）。DateStamp.inkan({ name: '佐藤', color: 'red' })
+  function inkan(o) {
+    o = o || {};
+    var color = COLORS[o.color] || COLORS.red;
+    var bw = Math.max(R * 0.05, 1.5);
+    var name = (o.name || '').trim().slice(0, 4);
+    var n = Math.max(name.length, 1);
+    // 文字は縦に並べる。1〜2文字は大きく、3〜4文字は縦につめる
+    var size = n === 1 ? R * 0.9 : n === 2 ? R * 0.68 : R * 1.6 / n;
+    var step = n === 1 ? 0 : Math.min(size * 1.02, (R * 1.6 - size) / (n - 1));
+    var parts = [
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + -(R + bw) + ' ' + -(R + bw) + ' ' + 2 * (R + bw) + ' ' + 2 * (R + bw) + '" class="inkan-stamp">',
+      '<circle cx="0" cy="0" r="' + R + '" fill="none" stroke="' + color + '" stroke-width="' + bw + '"/>',
+      '<g fill="' + color + '" text-anchor="middle" dominant-baseline="central" font-family="\'Yu Mincho\', \'HG正楷書体-PRO\', \'MS Mincho\', serif" font-weight="bold">',
+    ];
+    for (var i = 0; i < name.length; i++) {
+      var y = (i - (n - 1) / 2) * step;
+      var w = 2 * Math.sqrt(Math.max(R * R - y * y, 0)) * 0.82; // 円の中に収まる幅
+      parts.push('<text x="0" y="' + y.toFixed(2) + '" font-size="' + size.toFixed(1) + '"' + (size > w ? ' textLength="' + w.toFixed(1) + '" lengthAdjust="spacingAndGlyphs"' : '') + '>' + esc(name[i]) + '</text>');
+    }
+    parts.push('</g></svg>');
+    return parts.join('');
+  }
+
+  root.DateStamp = { svg: svg, inkan: inkan, formatDate: formatDate };
 })(window);

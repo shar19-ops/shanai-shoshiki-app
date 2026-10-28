@@ -149,6 +149,8 @@ body {
 .self-stamp { display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: visible; }
 .self-stamp:hover { background: #f3f6fc; }
 .self-stamp svg { width: 14.4mm; height: 14.4mm; flex-shrink: 0; display: block; overflow: visible; position: relative; z-index: 1; }
+/* 三文判風の認印（selfStampStyle: inkan）は直径10.5mm */
+.self-stamp svg.inkan-stamp { width: 10.5mm; height: 10.5mm; }
 /* 本文中の「氏名［　］印」欄 */
 table.grid td.stamp-cell { position: relative; overflow: visible; }
 table.grid td.stamp-cell .self-stamp { position: absolute; inset: 0; }
