@@ -1,5 +1,5 @@
 // 本-品質-A0020 検査指摘事項・確認書（品質記録様式。元Excel：本ー品質ーA0020 検査指摘事項・確認書.xlsx、A4縦2ページ）
-// 1ページ目：押印欄（検査者の発行印と、保管・承認などの4つ）はヘッダーの右上にまとめる（ユーザー指定）。工番・件名・検査種別・検査者・被検査者、指摘事項の表、注意書き・回送順
+// 1ページ目：保管・承認などの4つの押印欄はヘッダーの右上、検査者の発行印は上の表の右（ユーザー指定）。工番・件名・検査種別・検査者・被検査者、指摘事項の表、注意書き・回送順
 // 2ページ目以降：指摘事項の表の続き。最後のページの最後の行に書いたら自動でページを足す（ユーザー指定）。ボタンでも足し引きできる
 // No は自動で通し番号。手直期限・再検査合格日は日付を選ぶ（空欄なら「/」で手書き）。作業所長にデート印
 (function () {
@@ -10,10 +10,25 @@
   const list = (page) => ({ type: 'custom', render: ({ h, field, values, setVal, rebuild }) => {
     const date = (key) => field({ key, type: 'date', jp: true, style: 'm/d' });
     const [from, to] = rowsOf(page);
+    // 指摘事項・処置：長い文は欄の中で自動で折り返す。行の高さはそのままで、入りきらなければ文字を小さくして2〜3行に（ユーザー指定）
+    const SIZES = [9, 8, 7, 6]; // pt
+    const fit = (ta) => {
+      for (const pt of SIZES) {
+        ta.style.fontSize = pt + 'pt';
+        if (ta.scrollHeight <= ta.clientHeight + 1) return;
+      }
+    };
+    const wrap = (key) => {
+      const ta = field({ key, type: 'textarea', plain: true, lines: 1 });
+      ta.classList.add('h20-wrap');
+      ta.addEventListener('input', () => fit(ta));
+      requestAnimationFrame(() => fit(ta));
+      return ta;
+    };
     const tb = h('tbody', null, h('tr', null, ...['No', '指　摘　事　項', '処　　置', '手直\n期限', '再検査\n合格日'].map((t) => h('th', null, ...t.split('\n').flatMap((s, i) => (i ? [h('br'), s] : [s]))))));
     for (let n = from; n <= to; n++) {
       tb.append(h('tr', null, h('td', { class: 'h11-no' }, String(n)),
-        h('td', null, field({ key: `r${n}.shiteki` })), h('td', null, field({ key: `r${n}.shochi` })),
+        h('td', null, wrap(`r${n}.shiteki`)), h('td', null, wrap(`r${n}.shochi`)),
         h('td', null, date(`r${n}.kigen`)), h('td', null, date(`r${n}.gokaku`))));
     }
     // 最後のページの最後の行に書いたら、次のページを自動で足す（入力を終えて欄を離れたとき）
@@ -38,8 +53,10 @@
       h('span', { class: 'k1-hint' }, '最後の行に書くと、次のページが自動で増えます。')));
   } });
 
-  const head = { type: 'grid', cols: 4, colWidths: ['20mm', '40mm', '14mm', null], rowH: 6.5, rows: [
-    [{ label: '工　番', key: 'koban', maxlength: 12, lw: 1, span: 2 }, { label: '件　名', key: 'subject', lw: 1, span: 2 }],
+  // 検査者の発行印は元の様式どおり上の表の右（ユーザー指定）
+  const head = { type: 'grid', cols: 5, colWidths: ['20mm', '40mm', '14mm', null, '20mm'], rowH: 6.5, rows: [
+    [{ label: '工　番', key: 'koban', maxlength: 12, lw: 1, span: 2 }, { label: '件　名', key: 'subject', lw: 1, span: 2 },
+      { stamps: [{ boxes: ['検査者\n発　行'], dates: true, stampKey: 'h.' }], span: 1, rs: 4 }],
     [{ label: '検査種別', key: 'shubetsu', type: 'radio', lw: 1, span: 4,
       options: ['1．工程内検査', '2．現場巡回検査', '3．中間検査', '4．最終検査', '5．安全･衛生現場巡回検査', '6．その他'] }],
     [{ label: '検 査 者', key: 'kensa', lw: 1, span: 4 }],
@@ -68,9 +85,8 @@
     selfStamp: '作業所長',
     sheetClass: 'h18', // 検査種別は3つずつ2段（本-品質-A0018 と同じ）
     meta: [],
-    // 押印欄は1ページ目のヘッダーの右上（2ページ目以降は出さない）
-    stamps: [{ boxes: ['検査者\n発　行'], dates: true, stampKey: 'h.' },
-      { boxes: ['安全品質|保証部長\n保　管', '検査者|（合否判定者）\n承　認', '工事長|工事部長', '作業所長'], dates: true }],
+    // 保管・承認などの押印欄は1ページ目のヘッダーの右上（2ページ目以降は出さない）。検査者の発行印は上の表の中
+    stamps: [{ boxes:['安全品質|保証部長\n保　管', '検査者|（合否判定者）\n承　認', '工事長|工事部長', '作業所長'], dates: true }],
     pages: (v) => Array.from({ length: pageCount(v) }, (_, i) => ({
       subtitle: pageCount(v) > 1 ? `（${i + 1}/${pageCount(v)}）` : '',
       ...(i ? { stamps: [] } : {}),
