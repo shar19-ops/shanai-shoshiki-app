@@ -67,7 +67,7 @@
           h('td', { class: 'b8-n' }, field({ key: 'nichigaku', type: 'money', unit: '円' })),
           // 工期（月）の欄の中の縦線はなし（ユーザー指定）
           h('td', { class: 'b8-op b8-in1' }, '×'), h('td', { class: 'b8-op b8-in' }, String(DAYS)), h('td', { class: 'b8-op b8-in' }, '×'),
-          h('td', { class: 'b8-n b8-in' }, field({ key: 'kokiMonth', type: 'number', align: 'center', unit: 'か月' })),
+          h('td', { class: 'b8-n b8-in b8-last' }, field({ key: 'kokiMonth', type: 'number', align: 'center', unit: 'か月' })),
           h('td', { class: 'b4-auto b8-n' }, field({ key: 'kingaku', type: 'calc', calc: (_, v) => amount(v), unit: '円' }))))),
       h('div', { class: 'b8-warn no-print' }, field({ key: 'warn', type: 'calc', align: 'left', calc: (_, v) => {
         const a = Number(String(v.nichigaku || '').replace(/,/g, '')), m = Number(v.kokiMonth), msg = [];
@@ -79,7 +79,8 @@
 
   const notes = { type: 'notes', items: [
     '1.　登録電気工事基幹技能者の配置を求める場合は、当該者が資格を所持していることを確認すること。',
-    '2.　登録電気工事基幹技能者に依頼する業務に○、依頼しない業務に✕を記入すること。（○✕の欄はクリックで ○ → ✕ → 空欄）',
+    '2.　登録電気工事基幹技能者に依頼する業務に○、依頼しない業務に✕を記入すること。',
+    '　　（○✕の欄はクリックで ○ → ✕ → 空欄）', // 括弧書きは行を分けて、途中で折り返さないように（ユーザー指定）
     '3.　手当として、下表の日額を支給する。なお、日額は¥2,000を限度とし、1件の工事について、工期1年当たりの金額は、¥500,000.-を限度とする。',
   ] };
   const notes2 = { type: 'notes', items: [
