@@ -14,25 +14,25 @@
     meta: [],
     stamps: [{ boxes: ['本店長', '工事本部長|RE部長\n受領', '購買部長\n受領', '営業本部長\n支店は支店長', '営業担当者'] }],
     blocks: [
-      // 48分割（金額の行で、見出し・金額・粗利の幅を細かく合わせるため）
-      { type: 'grid', cols: 48, lw: 6, rowH: 6.5, dense: true, rows: [
-        [{ label: '受注報告', key: 'jucyu', type: 'date', span: 18 },
-          { label: '引継会', key: 'hikitsugiW', type: 'inline', span: 30, parts: [
+      // 48分割。どの行も見出しは5列、区切りは16列目・32列目にそろえる（金額の行と縦の罫線をそろえる。ユーザー指定）
+      { type: 'grid', cols: 48, lw: 5, rowH: 6.5, dense: true, rows: [
+        [{ label: '受注報告', key: 'jucyu', type: 'date', span: 16 },
+          { label: '引継会', key: 'hikitsugiW', type: 'inline', span: 32, parts: [
             { key: 'hikitsugi', type: 'date', jp: true, w: 36 }, dow('hikitsugi'), { key: 'hikitsugiT', type: 'time' }] }],
-        [{ label: '工　番', key: 'koban', maxlength: 12, span: 18 }, { label: '見積No.', key: 'mitsumoriNo', span: 30 }],
-        [{ label: '契約先', key: 'keiyakusaki', span: 18 }, { label: '件　名', key: 'subject', span: 30 }],
+        [{ label: '工　番', key: 'koban', maxlength: 12, span: 16 }, { label: '見積No.', key: 'mitsumoriNo', span: 32 }],
+        [{ label: '契約先', key: 'keiyakusaki', span: 16 }, { label: '件　名', key: 'subject', span: 32 }],
         // 金額は11桁（100億円単位）まで入る幅に（ユーザー指定）
-        [{ label: '見積金額', key: 'mitsumori', type: 'money', unit: '円', lw: 5, span: 16 },
-          { label: '契約金額', key: 'keiyaku', type: 'money', unit: '円', lw: 5, span: 16 },
-          { label: '実行金額', key: 'jikko', type: 'money', unit: '円', lw: 5, span: 16 }],
+        [{ label: '見積金額', key: 'mitsumori', type: 'money', unit: '円', span: 16 },
+          { label: '契約金額', key: 'keiyaku', type: 'money', unit: '円', span: 16 },
+          { label: '実行金額', key: 'jikko', type: 'money', unit: '円', span: 16 }],
         // 注文書の行は金額の行の直下（ユーザー指定）
-        [{ label: '注文書', key: 'chumon', type: 'ym', span: 18 }, { label: '第1回請求', key: 'seikyu1', type: 'ym', lw: 8, span: 16 },
+        [{ label: '注文書', key: 'chumon', type: 'ym', span: 16 }, { label: '第1回請求', key: 'seikyu1', type: 'ym', span: 16 },
           // 粗利＝（契約金額−実行金額）÷契約金額、小数点第1位まで（第2位以下は切り捨て。ユーザー指定）
-          { label: '粗　利', key: 'arari', type: 'calc', unit: '%', dec: 1, lw: 5, span: 14,
+          { label: '粗　利', key: 'arari', type: 'calc', unit: '%', dec: 1, span: 16,
             calc: (n) => (n('keiyaku') ? (Math.trunc(Math.round((n('keiyaku') - n('jikko')) / n('keiyaku') * 1e6) / 1e4 * 10) / 10).toFixed(1) : '') }],
-        [{ label: '現場状況', key: 'genbaW', type: 'inline', span: 30, parts: [
+        [{ label: '現場状況', key: 'genbaW', type: 'inline', span: 32, parts: [
             { key: 'genbaDate', type: 'date', jp: true, w: 36 }, '現在', { key: 'genba' }] },
-          { label: '設計協力', key: 'sekkeiW', type: 'inline', span: 18, parts: [
+          { label: '設計協力', key: 'sekkeiW', type: 'inline', span: 16, parts: [
             { key: 'sekkei', type: 'radio', options: ['有'] }, '（', { key: 'sekkeiNote' }, '）', { key: 'sekkei', type: 'radio', options: ['無'] }] }],
         [{ label: '営業背景', key: 'haikei', type: 'textarea', plain: true, h: 14, span: 48 }], // 3行程度（ユーザー指定）
       ] },
