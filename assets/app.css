@@ -729,3 +729,11 @@ table.grid.s13 td.s13-k { text-align: center; font-size: 7.5pt; padding: 0; }
 table.grid.s13 td.s13-m { padding: 0; }
 table.grid.s13 td.s13-m .mark-btn { font-size: 9pt; color: #1F3F8F; }
 table.grid.s13 tr.s13-mrow td { height: 3.4mm; font-size: 6pt; text-align: center; color: #555; padding: 0; }
+/* 本-品質-A0011 計測機器借用依頼書（17行）・A0013 計測機器使用前点検表（22行） */
+table.grid.h11 th, table.grid.h13 th { height: 6mm; font-size: 8.5pt; letter-spacing: .05em; }
+table.grid.h11 td { height: 9.6mm; font-size: 9pt; }
+table.grid.h11 td.h11-no { text-align: center !important; font-size: 8.5pt; padding: 0; }
+table.grid.h13 td { height: 8.8mm; font-size: 9pt; }
+table.grid.h13 td.h13-sel .checks { padding: 0 !important; gap: 0 2.5mm; justify-content: center; }
+table.grid.h13 td.h13-sel .checks label { font-size: 8.5pt; }
+table.grid.h11 .date-wrap .pv, table.grid.h13 .date-wrap .pv { font-size: 9pt; text-align: center; }
