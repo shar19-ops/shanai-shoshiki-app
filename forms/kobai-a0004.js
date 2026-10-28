@@ -1,6 +1,7 @@
 // 本-購買-A0004-1・2 見積依頼書／注文書付属書（労務・材料労務／物品納品）の共通定義（品質記録様式。元Word：本-購買-A0004-1・2….doc）
 // forms/kobai-a0004-1.js などが FORM_NEEDS でこのファイルを読み込む
 // A4横の両面印刷（ユーザー指定）：表面は項目の表を左右2段、裏面は約款（見積依頼書付属書類／物品売買契約約款）
+// 業者名は左の表の上。同じ現場で多数の業者に出すので、業者ごとに表裏の1組を増やせて、JSONファイルに保存・読み込み（ユーザー指定）
 // 各項目の○／✕欄はクリックで「空欄 → ○ → ✕ → 空欄」。元の様式で○・✕が入っていた項目は、最初からその印
 // 注文書付属書・見積依頼書の発行の欄（元は表の右下）は、押印欄として右上に置く（ユーザー指定）
 (function () {
@@ -98,12 +99,23 @@
   };
 
   const MARKS = ['', '○', '✕'];
+  // 同じ現場で多数の業者に出すので、業者ごとに表面・裏面の1組を増やせる（ユーザー指定）。JSONファイルに保存・読み込み
+  // 現場で共通の項目（工事番号・工事名称・施工場所・工事命令書工期・休工日）はどの業者のページも同じ値。
+  // それ以外（業者名・○✕・見積の欄など）は業者ごと：1社目はそのままのキー、2社目からは 'p2.' などを付ける
+  const COMMON = ['koban', 'kojiName', 'basho', 'meirei', 'meireiTo', 'kyuko'];
+  const pk = (n, key) => (COMMON.includes(key) || n === 1 ? key : `p${n}.${key}`);
+  const pageCount = (v) => Math.max(1, Number(v.pageCount) || 1);
+  // n 社目のキーか（共通の項目と pageCount を除く）。キーの n 社目の部分を外した名前を返す
+  const ownKey = (key, n) => {
+    if (n === 1) return /^p\d+\./.test(key) || COMMON.includes(key) || key === 'pageCount' ? null : key;
+    return key.startsWith(`p${n}.`) ? key.slice(`p${n}.`.length) : null;
+  };
 
   // 表（左右どちらか1段分）
-  const table = (groups, tail, kind) => ({ type: 'custom', render: ({ h, field, values, setVal }) => {
-    let n = 0;
+  const table = (groups, tail, kind, vn) => ({ type: 'custom', render: ({ h, field, values, setVal }) => {
     // ○／✕の欄：クリックで切り替え。値が未設定なら元の様式の印（d）
-    const mark = (key, d) => {
+    const mark = (k0, d) => {
+      const key = pk(vn, k0);
       const cur = () => (values[key] === undefined ? (d || '') : values[key]);
       const b = h('button', { type: 'button', class: 'b4-mark', title: 'クリックで ○ → ✕ → 空欄' }, cur());
       b.addEventListener('click', () => { const next = MARKS[(MARKS.indexOf(cur()) + 1) % MARKS.length]; setVal(key, next); b.textContent = next; });
@@ -113,23 +125,23 @@
     const body = (it) => {
       if (typeof it === 'string') it = { t: it };
       const cls = 'b4-txt' + (it.red ? ' red' : '');
+      const k = (x) => pk(vn, x);
       switch (it.f) {
-        case 'text': return h('td', { class: 'b4-in' }, field({ key: it.key, maxlength: it.max }));
-        case 'date': return h('td', { class: 'b4-in' }, field({ key: it.key, type: 'date', jp: true }));
-        case 'range': return h('td', { class: 'b4-in' }, field({ key: it.key, key2: it.key + 'To', type: 'daterange', jp: true }));
-        case 'lines': return h('td', { class: cls + ' b4-lines' }, h('div', { class: 'b4-inline' }, h('span', { class: 'b4-lt' }, it.t), field({ key: it.key })));
+        case 'text': return h('td', { class: 'b4-in' }, field({ key: k(it.key), maxlength: it.max }));
+        case 'date': return h('td', { class: 'b4-in' }, field({ key: k(it.key), type: 'date', jp: true }));
+        case 'range': return h('td', { class: 'b4-in' }, field({ key: k(it.key), key2: k(it.key + 'To'), type: 'daterange', jp: true }));
+        case 'lines': return h('td', { class: cls + ' b4-lines' }, h('div', { class: 'b4-inline' }, h('span', { class: 'b4-lt' }, it.t), field({ key: k(it.key) })));
         case 'kyuko': return h('td', { class: cls }, h('div', { class: 'b4-inline' }, '工期設定チェックリスト添付／休工日：',
-          field({ key: it.key, type: 'radio', options: ['4週8休', '4週8閉所'], nowrap: true })));
+          field({ key: k(it.key), type: 'radio', options: ['4週8休', '4週8閉所'], nowrap: true })));
         // 検査の欄は2行に（検査者・検査日／検査基準・出荷許可の方法）
         case 'kensa': return h('td', { class: cls + ' b4-kensa' }, h('div', null, it.t),
           ...[[['検査者', 'kensasha'], ['検査日', 'kensabi']], [['検査基準', 'kijun'], ['出荷許可の方法', 'shukka']]].map((pair) => h('div', { class: 'b4-inline' },
-            ...pair.flatMap(([l, k]) => [h('span', { class: 'b4-sub' }, l + '：'), h('span', { class: 'b4-kv' }, field({ key: `${it.key}.${k}`, type: k === 'kensabi' ? 'date' : 'text', jp: true }))]))));
+            ...pair.flatMap(([l, k]) => [h('span', { class: 'b4-sub' }, l + '：'), h('span', { class: 'b4-kv' }, field({ key: pk(vn, `${it.key}.${k}`), type: k === 'kensabi' ? 'date' : 'text', jp: true }))]))));
         default: return h('td', { class: cls }, ...lines(it.t));
       }
     };
     const tb = h('tbody', null, h('tr', null, h('th', null, '項　目'), h('th', { class: 'b4-mh' }, '○✕'), h('th', null, '摘　　　　要')));
     groups.forEach(([label, items], g) => items.forEach((it, i) => {
-      n++;
       const key = (typeof it === 'object' && it.key) ? `m.${it.key}` : `m.${kind}.${label}.${i}`;
       // 右の表の最後の項目（その他）は、下の指定メーカ・業者などの行まで見出しの欄を続ける（間の横罫線なし。ユーザー指定）
       const extra = tail && g === groups.length - 1 ? 2 + tail.length : 0;
@@ -153,6 +165,29 @@
     ...TERMS[kind][1].map((p) => h('p', { class: /^［/.test(p) ? 'art' : 'sub' }, p)),
     h('p', { class: 'b4-ijo' }, '以　上')) });
 
+  // 業者名（左の表の上。幅は左の表とそろえる）と、最後の業者のページだけ業者の追加・削除のボタン（印刷しない）
+  const vendorHead = (vn) => ({ type: 'custom', render: ({ h, field, values, setVal, rebuild }) => {
+    const total = pageCount(values);
+    const add = (copy) => {
+      const next = total + 1;
+      if (copy) Object.keys(values).forEach((key) => { const own = ownKey(key, total); if (own && own !== 'gyosha') values[pk(next, own)] = values[key]; });
+      setVal('pageCount', String(next)); rebuild();
+    };
+    const del = () => {
+      const has = Object.keys(values).some((key) => ownKey(key, total) && String(values[key] ?? '') !== '');
+      if (has && !confirm(`${total}社目（${values[pk(total, 'gyosha')] || '業者名なし'}）の入力を消して、ページを減らしますか？`)) return;
+      Object.keys(values).filter((key) => ownKey(key, total)).forEach((key) => delete values[key]);
+      setVal('pageCount', String(total - 1)); rebuild();
+    };
+    return h('div', { class: 'b4-head' },
+      h('table', { class: 'grid b4-vendor' }, h('tbody', null, h('tr', null, h('th', null, '業 者 名'), h('td', null, field({ key: pk(vn, 'gyosha') })),
+        h('td', { class: 'b4-dono' }, '殿')))),
+      vn === total ? h('div', { class: 'b4-pages no-print' },
+        h('button', { type: 'button', onclick: () => add(false) }, '＋ 業者を追加'),
+        h('button', { type: 'button', onclick: () => add(true), title: '○✕と見積の欄を前の業者からコピー（業者名は空欄）' }, '＋ コピーして追加'),
+        total > 1 ? h('button', { type: 'button', onclick: del }, `${total}社目を削除`) : null) : null);
+  } });
+
   const make = (no, kind) => {
     FORM_DEFS[`kobai-a0004-${no}`] = {
       code: `本-購買-A0004-${no}`, title: `見積依頼書／注文書付属書（${kind === 1 ? '労務・材料労務' : '物品納品'}）`,
@@ -163,15 +198,17 @@
       stamps: [{ boxes: ['注文書付属書\n発行', '見積依頼書\n発行'] }],
       iso: '【8.4.3】外部提供者に対する情報', // 元の様式の右上の表示。ヘッダーの番号の後ろに（ユーザー指定）
       meta: [],
-      pages: [
-        { subtitle: '（表面）', blocks: [
-          { type: 'row', gap: 4, items: [table(LEFT(kind), null, kind), table(RIGHT(kind), TAIL(kind), kind)] }, // 左右の高さをそろえる（stretch）
+      fileIO: true,
+      // 業者ごとに表面・裏面の1組（両面印刷で業者ごとに1枚）
+      pages: (v) => Array.from({ length: pageCount(v) }, (_, i) => i + 1).flatMap((vn) => [
+        { subtitle: pageCount(v) > 1 ? `（表面 ${vn}/${pageCount(v)}）` : '（表面）', headBlocks: [vendorHead(vn)], blocks: [
+          { type: 'row', gap: 4, items: [table(LEFT(kind), null, kind, vn), table(RIGHT(kind), TAIL(kind), kind, vn)] }, // 左右の高さをそろえる（stretch）
           { type: 'notes', items: ['○：見積･契約に含む･条件内、✕：見積･契約に含まない･条件外（○✕の欄はクリックで ○ → ✕ → 空欄）',
             '※1. 見積依頼時に、工事内容に含める場合は○、含めない場合は✕を記入して協力会社に交付する。　2. 協力会社は、見積書提出時に本書を添付して提出する。　3. 注文書発行時に、本書を添付して発行する。'] },
         ] },
         // 裏面（両面印刷の2枚目）：約款
-        { subtitle: '（裏面）', stamps: [], blocks: [terms(kind)] }, // 押印欄は表面だけ
-      ],
+        { subtitle: pageCount(v) > 1 ? `（裏面 ${vn}/${pageCount(v)}）` : '（裏面）', stamps: [], blocks: [terms(kind)] }, // 押印欄は表面だけ
+      ]),
     };
   };
 

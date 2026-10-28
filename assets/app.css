@@ -684,3 +684,12 @@ table.grid.b8-calc-t td.b8-in.b8-last { border-right: 1px solid var(--line); }
 .sheet:has(table.b8) .head-blocks { width: calc((297mm - 24mm - 4mm) / 2); max-width: none; align-self: flex-start; } /* 工番・件名の幅を下の左の表とそろえる */
 table.grid.b4.b8 td { height: 4.05mm; } /* 工番・件名を上に移した分、行を高く */
 table.grid.b4.b8 .b4-mark { min-height: 3.9mm; }
+/* 本-購買-A0004 業者名（左の表の上、幅は左の表とそろえる）と業者の追加・削除 */
+.b4-head { display: flex; align-items: center; gap: 4mm; }
+table.grid.b4-vendor { width: calc((297mm - 24mm - 4mm) / 2); flex: none; }
+table.grid.b4-vendor th { width: 23mm; height: 6.5mm; font-size: 9pt; }
+table.grid.b4-vendor td { height: 6.5mm; font-size: 10pt; }
+table.grid.b4-vendor td.b4-dono { width: 8mm; text-align: center; border-left: none; }
+.b4-pages { display: flex; flex-wrap: nowrap; gap: 1.5mm; white-space: nowrap; }
+.b4-pages button { font: inherit; font-size: 8pt; padding: 2px 6px; border: 1px solid var(--accent); border-radius: 4px; background: #fff; color: var(--accent); cursor: pointer; }
+.b4-pages button:hover { background: #eef2fb; }
