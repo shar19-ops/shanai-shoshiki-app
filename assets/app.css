@@ -701,3 +701,31 @@ table.grid.b4-vendor td.b4-vname { border-right: none; } /* 殿の前の罫線�
 .b4-pages button { font: inherit; font-size: 8pt; padding: 2px 6px; border: 1px solid var(--accent); border-radius: 4px; background: #fff; color: var(--accent); cursor: pointer; }
 .b4-pages button:hover { background: #eef2fb; }
 .sheet:has(table.b4-right) .notes { font-size: 7.5pt; line-height: 1.38; } /* 本-購買-A0004 右の表の下の注意書き */
+/* 本-総務-A0001〜A0003 文書の台帳（A4横、1ページ16件） */
+table.grid.s1 th { height: 7mm; font-size: 9pt; letter-spacing: .1em; }
+table.grid.s1 td { height: 8.2mm; font-size: 9pt; }
+table.grid.s1 .date-wrap .pv { font-size: 9pt; }
+/* 本-総務-A0012 教育訓練実施記録（受講者40名） */
+table.grid.s12 th { height: 5.5mm; font-size: 8.5pt; }
+table.grid.s12 td { height: 5.6mm; font-size: 9pt; }
+table.grid.s12 td.s12-no { text-align: center; font-size: 8pt; }
+table.grid.s12 .inp { min-height: 0; }
+/* 本-総務-A0013 年度教育訓練計画（A4横、1ページ5項目、スケジュールは月をクリックで■） */
+.sheet:has(table.s13) .head-blocks { width: 90mm; align-self: flex-start; }
+table.grid.s13 th { height: 4.6mm; font-size: 8pt; line-height: 1.2; }
+table.grid.s13 th.s13-l { font-size: 7.5pt; }
+table.grid.s13 td { height: 4.6mm; font-size: 8.5pt; }
+table.grid.s13 tr.s13-top > td { border-top: 1.5px solid var(--line); }
+table.grid.s13 td.s13-item { padding: 0; vertical-align: top; }
+table.grid.s13 .s13-line { height: 5mm; border-bottom: 1px dashed var(--line-weak); display: flex; align-items: center; }
+table.grid.s13 .s13-line:last-child { border-bottom: 0; }
+table.grid.s13 .s13-line .inp { min-height: 0; height: 100%; font-size: 8.5pt; }
+table.grid.s13 .s13-period > span { flex: none; font-size: 8pt; padding: 0 .3mm; }
+table.grid.s13 .s13-period .date-wrap { flex: 1; min-width: 0; }
+table.grid.s13 .s13-period > .inp { width: 7mm; flex: none; }
+table.grid.s13 td.s13-ta { position: relative; padding: 0; }
+table.grid.s13 td.s13-ta textarea.inp { position: absolute; inset: 0; width: 100%; height: 100%; font-size: 8.5pt; line-height: 1.35; padding: .8mm 1.2mm; }
+table.grid.s13 td.s13-k { text-align: center; font-size: 7.5pt; padding: 0; }
+table.grid.s13 td.s13-m { padding: 0; }
+table.grid.s13 td.s13-m .mark-btn { font-size: 9pt; color: #1F3F8F; }
+table.grid.s13 tr.s13-mrow td { height: 3.4mm; font-size: 6pt; text-align: center; color: #555; padding: 0; }
