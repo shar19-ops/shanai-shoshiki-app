@@ -639,7 +639,7 @@ table.grid.b3 .b3-dot { margin: 0 .2mm; }
 table.grid.b3 td.b3-criteria { font-size: 8.5pt; padding: 1mm 3mm; line-height: 1.5; }
 /* 本-購買-A0004-1・2 見積依頼書／注文書付属書（A4横の両面。表面は表を左右2段、裏面は約款） */
 table.grid.b4 th { font-size: 7pt; height: 3.5mm; padding: 0 .5mm; line-height: 1.1; }
-table.grid.b4 td { font-size: 7pt; height: 3.85mm; line-height: 1.12; padding: 0 1mm; }
+table.grid.b4 td { font-size: 7pt; height: 3.6mm; line-height: 1.12; padding: 0 1mm; }
 table.grid.b4 tr.b4-grp > td, table.grid.b4 tr.b4-grp > th { border-top: 1.2px solid var(--line); }
 table.grid.b4 th.b4-lbl { font-weight: 400; text-align: center; }
 table.grid.b4 th.b4-mh { font-size: 5.8pt; letter-spacing: -.05em; }
@@ -647,9 +647,9 @@ table.grid.b4 td.b4-m { padding: 0; text-align: center; }
 .b4-mark { font: inherit; font-size: 8pt; line-height: 1; width: 100%; height: 100%; min-height: 3.4mm; padding: 0; border: 0; background: #fff8d6; cursor: pointer; display: block; }
 @media print { .b4-mark { background: transparent; } }
 table.grid.b4 td.b4-txt.red, table.grid.b4 td.b4-txt.red label { color: #c0392b; }
-table.grid.b4 .inp { font-size: 7pt; min-height: 0; height: 3.7mm; padding-top: 0; padding-bottom: 0; line-height: 3.7mm; }
+table.grid.b4 .inp { font-size: 7pt; min-height: 0; height: 3.5mm; padding-top: 0; padding-bottom: 0; line-height: 3.5mm; }
 table.grid.b4 td.b4-in { padding: 0; }
-table.grid.b4 .date-wrap, table.grid.b4 .range-wrap { min-height: 0; height: 3.7mm; }
+table.grid.b4 .date-wrap, table.grid.b4 .range-wrap { min-height: 0; height: 3.5mm; }
 table.grid.b4 .date-wrap .pv { font-size: 7pt; line-height: 3.4mm; }
 table.grid.b4 .b4-inline { display: flex; align-items: center; gap: 1mm; }
 table.grid.b4 .b4-inline > .inp, table.grid.b4 .b4-inline > .date-wrap { flex: 1; min-width: 0; }
@@ -659,12 +659,6 @@ table.grid.b4 .b4-inline .checks label { font-size: 7pt; }
 table.grid.b4 .b4-inline .checks .box { width: 2.6mm; height: 2.6mm; }
 table.grid.b4 .b4-kensa .b4-sub { flex: none; padding-left: 2mm; }
 table.grid.b4 .b4-kensa .b4-kv { flex: 1; min-width: 0; }
-table.grid.b4 td.b4-split { position: relative; padding-right: 43mm; }
-table.b4-issue { position: absolute; right: 0; top: 0; width: 42mm; border-collapse: collapse; }
-table.b4-issue th, table.b4-issue td { border-left: 1px solid var(--line); border-bottom: 1px solid var(--line); text-align: center; font-size: 6.5pt; font-weight: 400; height: 3.4mm; padding: 0 .5mm; }
-table.b4-issue td { height: 3.6mm; }
-table.b4-issue td .inp { font-size: 7pt; text-align: center; }
-table.b4-issue .b4-hakko { flex: none; font-size: 6.5pt; }
 .b4-terms { columns: 2; column-gap: 7mm; font-size: 7.4pt; line-height: 1.42; text-align: justify; }
 .b4-terms-title { font-weight: 700; font-size: 9pt; margin-bottom: 1mm; }
 .b4-terms p { margin: 0; break-inside: avoid-column; }

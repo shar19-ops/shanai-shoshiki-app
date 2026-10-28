@@ -2,7 +2,7 @@
 // forms/kobai-a0004-1.js などが FORM_NEEDS でこのファイルを読み込む
 // A4横の両面印刷（ユーザー指定）：表面は項目の表を左右2段、裏面は約款（見積依頼書付属書類／物品売買契約約款）
 // 各項目の○／✕欄はクリックで「空欄 → ○ → ✕ → 空欄」。元の様式で○・✕が入っていた項目は、最初からその印
-// 元の様式に押印欄はない。注文書付属書・見積依頼書の発行日は表の下の欄に書く
+// 注文書付属書・見積依頼書の発行の欄（元は表の右下）は、押印欄として右上に置く（ユーザー指定）
 (function () {
   // 表の行：[項目名, [ 摘要, … ]]。摘要は文字列（印だけ）か { t: 文字, d: 最初の印, f: 入力欄, red: 赤字 }
   //   f：'text'（文字）・'date'・'range'（期間）・'lines'（見出しの下に書く欄）・'kyuko'（休工日）・'kensa'（検査の欄）
@@ -136,13 +136,10 @@
         h('td', { class: 'b4-m' }, mark(key, typeof it === 'object' ? it.d : '')), body(it)));
     }));
     if (tail) {
-      // 下請等指定メーカ・業者の有無と、注文書付属書・見積依頼書の発行日
+      // 下請等指定メーカ・業者の有無（注文書付属書・見積依頼書の発行の欄は押印欄として右上）
       tb.append(
         h('tr', { class: 'b4-grp' }, h('th', { class: 'b4-lbl', rowspan: 2 + tail.length }, ''),
-          h('td', { class: 'b4-m' }, mark('m.maker', '')), h('td', { class: 'b4-txt b4-split' }, h('span', null, '下請等指定メーカの有無'),
-            h('table', { class: 'b4-issue' }, h('tbody', null,
-              h('tr', null, h('th', null, '注文書付属書'), h('th', null, '見積依頼書')),
-              h('tr', null, ...['chumon', 'irai'].map((k) => h('td', null, h('div', { class: 'b4-inline' }, field({ key: `hakko.${k}`, type: 'date', jp: true, style: 'short' }), h('span', { class: 'b4-hakko' }, '発行'))))))))),
+          h('td', { class: 'b4-m' }, mark('m.maker', '')), h('td', { class: 'b4-txt' }, '下請等指定メーカの有無')),
         h('tr', null, h('td', { class: 'b4-m' }, mark('m.gyosha', '')), h('td', { class: 'b4-txt' }, '下請等指定業者の有無')),
         ...tail.map((it, i) => h('tr', null, h('td', { class: 'b4-m' }, mark(`m.tail${i}`, it.d)), body(it))));
     }
@@ -161,7 +158,8 @@
       seitei: '99/01/04', kaitei: '26/11/17', // フッター：制定日は元の様式のまま、最終改訂日はユーザー指定
       orientation: 'landscape',
       sheetClass: 'b4-sheet',
-      stamps: [], // 元の様式に押印欄なし
+      // 元は表の右下の「注文書付属書／見積依頼書 ／／ 発行」の欄 → 押印欄として右上（ユーザー指定）
+      stamps: [{ boxes: ['注文書付属書\n発行', '見積依頼書\n発行'] }],
       meta: [],
       pages: [
         { subtitle: '（表面）', blocks: [
@@ -171,7 +169,7 @@
             '※1. 見積依頼時に、工事内容に含める場合は○、含めない場合は✕を記入して協力会社に交付する。　2. 協力会社は、見積書提出時に本書を添付して提出する。　3. 注文書発行時に、本書を添付して発行する。'] },
         ] },
         // 裏面（両面印刷の2枚目）：約款
-        { subtitle: '（裏面）', blocks: [terms(kind)] },
+        { subtitle: '（裏面）', stamps: [], blocks: [terms(kind)] }, // 押印欄は表面だけ
       ],
     };
   };
