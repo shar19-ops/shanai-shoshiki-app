@@ -945,7 +945,9 @@
   function fileName() {
     const d = new Date();
     const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
-    const name = String(values.subject || values.bukken || '').replace(/[\\/:*?"<>|\s]+/g, '_').slice(0, 40);
+    // fileKeys：ファイル名に使う項目（例：計測機器の管理番号・機器名。省略は件名）
+    const pick = def.fileKeys ? def.fileKeys.map((k) => values[k]).filter(Boolean).join('_') : (values.subject || values.bukken || '');
+    const name = String(pick).replace(/[\\/:*?"<>|\s]+/g, '_').slice(0, 40);
     return `${def.code}_${name ? name + '_' : ''}${ymd}.json`;
   }
   async function saveFile(id) {
