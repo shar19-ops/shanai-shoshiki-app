@@ -1,4 +1,4 @@
-// 本-総務-A0001 文書番号台帳・A0002 文書台帳・A0003 外部文書台帳の共通定義（品質記録様式。元Word：本-総務-A0001〜A0003….doc、A4横1ページ＝16件）
+// 本-総務-A0001 文書番号台帳・A0002 文書台帳・A0003 外部文書台帳（A4横1ページ＝16件）と本-品質-A0001 品質記録様式管理台帳（A4縦1ページ＝25件）の共通定義（品質記録様式）
 // forms/somu-a0001.js などが FORM_NEEDS でこのファイルを読み込む。3つの台帳は列だけが違う
 // 台帳なので、入力内容をJSONファイルに保存・読み込みできる（fileIO）。件数が増えたらページを足す（1ページ16件）
 // 元の様式に押印欄はない（A0001 の記入者・承認は行ごとの欄のまま）。元の右上の「1/000」はページ番号（表題の横に出す）
@@ -18,10 +18,15 @@
         ['備　考', 'note', 46, ''], ['記入者', 'writer', 15, 'c'], ['承　認', 'approve', 15, 'c']] },
     'somu-a0002': { code: '本-総務-A0002', title: '文書台帳', seitei: '99/01/04', cols: DOC_COLS('文書番号', '文　書　名', '発行部署') },
     'somu-a0003': { code: '本-総務-A0003', title: '外部文書台帳', seitei: '99/01/04', cols: DOC_COLS('外部文書番号', '外部文書名', '発行者') },
+    // 本-品質-A0001（元Excel：本ー品質ーA0001 品質記録様式管理台帳.xlsx）。A4縦
+    'hin-a0001': { code: '本-品質-A0001', title: '品質記録様式管理台帳', seitei: '99/01/04', orientation: 'portrait', per: 25,
+      cols: [['品質記録様式番号', 'no', 34, ''], ['品質記録様式名', 'name', null, ''], ['発行部署', 'dept', 26, ''], ['発行日', 'issue', 18, 'date'], ['廃止日', 'abolish', 18, 'date'],
+        ['備　考', 'note', 24, ''], ['記入者', 'writer', 15, 'c'], ['承　認', 'approve', 14, 'c']] },
   };
 
   // 1ページ分の表
-  const ledger = (cols, page) => ({ type: 'custom', render: ({ h, field, values, setVal, rebuild }) => {
+  // PER_PAGE：1ページの件数（台帳ごと。省略は16）
+  const ledger = (cols, page, PER_PAGE = 16) => ({ type: 'custom', render: ({ h, field, values, setVal, rebuild }) => {
     const cell = ([, key, , type], n) => {
       if (type === 'date') return field({ key: k(n, key), type: 'date', jp: true, style: 'short' }); // 画面でも「26/11/5」の形（クリックでカレンダー）
       return field({ key: k(n, key), align: type === 'c' ? 'center' : undefined });
@@ -52,13 +57,13 @@
     FORM_DEFS[id] = {
       code: d.code, title: d.title,
       seitei: d.seitei, kaitei: '26/11/17', // フッター：制定日は元の様式のまま、最終改訂日はユーザー指定
-      orientation: 'landscape',
+      orientation: d.orientation || 'landscape',
       fileIO: true,
       meta: [],
       stamps: [], // 元の様式に押印欄なし
       pages: (v) => Array.from({ length: pageCount(v) }, (_, i) => ({
         subtitle: `（${i + 1}/${pageCount(v)}）`,
-        blocks: [ledger(d.cols, i + 1)],
+        blocks: [ledger(d.cols, i + 1, d.per)],
       })),
     };
   });
