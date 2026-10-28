@@ -362,7 +362,8 @@
           return h('div', { class: 'stamp-box' },
             h('div', { class: 'sb-label' + (hl.length > 1 ? ' two' : head.length >= 6 ? ' tight' : '') }, hl.flatMap((s, i) => (i ? [h('br'), s] : [s]))),
             // dates：見出しの下に日付の欄。空欄なら「/　　/」を印字して手書きできるように（押印部はその分低く、枠の高さは同じ）
-            g.dates ? h('div', { class: 'sb-date' }, field({ key: `${(d && d.stampKey) || ''}sdate.${head}`, align: 'center', placeholder: '/　　/' })) : null,
+            // 日付の項目名は「sdate.見出し」。同じ見出しの欄が2つあるときは groups の stampKey で分ける
+            g.dates ? h('div', { class: 'sb-date' }, field({ key: `${g.stampKey || (d && d.stampKey) || ''}sdate.${head}`, align: 'center', placeholder: '/　　/' })) : null,
             h('div', self ? { class: 'sb-area self-stamp' + (g.dates ? ' dated' : ''), title: 'クリックで押印設定', onclick: openStampDialog } : { class: 'sb-area' + (g.dates ? ' dated' : '') },
               roles.length ? h('div', { class: 'sb-roles' }, roles.flatMap((r, i) => (i ? [h('br'), r] : [r]))) : null));
         }))));
@@ -455,7 +456,10 @@
       return h('td', { class: 'stamp-cell', colspan: span, rowspan: rs, style },
         h('div', { class: 'self-stamp', 'data-empty': '印', title: 'クリックで押印設定', onclick: openStampDialog }));
     }
-    if (it.text != null && !it.key) return h('td', { class: it.note ? 'note' : 'txt', colspan: span, rowspan: rs, style: style + (it.align ? `;text-align:${it.align}` : '') }, it.text);
+    // stamps：表の中の押印欄（stamps と同じ groups。欄の右下に置く。本-品質-A0015）
+    if (it.stamps) return h('td', { class: 'stamps-cell', colspan: span, rowspan: rs, style }, stampsEl(it.stamps, null, def));
+    // cls：文字だけの欄の見た目を追加（例：欄の見出し）
+    if (it.text != null && !it.key) return h('td', { class: (it.note ? 'note' : 'txt') + (it.cls ? ' ' + it.cls : ''), colspan: span, rowspan: rs, style: style + (it.align ? `;text-align:${it.align}` : '') }, it.text);
     if (!it.key) return h('td', { colspan: span, rowspan: rs, style });
     const td = h('td', { colspan: span, rowspan: rs, style }, field(it));
     // 表の中の記述欄：罫線は初期値なし（plain: false なら初期値あり）、右上の「罫線」ボタンで切り替え（lineToggle: false で付けない）

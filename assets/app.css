@@ -740,3 +740,16 @@ table.grid.h11 .date-wrap .pv, table.grid.h13 .date-wrap .pv { font-size: 9pt; t
 
 /* col の fit：つないだ表の境目の罫線を1本に（本-品質-A0014） */
 .col-fit > * + * { margin-top: -1px; }
+
+/* 表の中の押印欄（grid の stamps。本-品質-A0015）：欄の右下に置き、枠は表の罫線と重ねる */
+table.grid td.stamps-cell { vertical-align: bottom; padding: 0; }
+td.stamps-cell .stamps { justify-content: flex-end; max-width: none; gap: 0; }
+td.stamps-cell .stamp-group { border-width: 1px 0 0 0; }
+td.stamps-cell .stamp-group + .stamp-group, td.stamps-cell .stamp-box + .stamp-box { border-left: 1px solid var(--line); }
+/* 本-品質-A0015 是正処置報告書 */
+.h15-to { display: flex; align-items: flex-end; gap: 6mm; margin: 0; }
+.h15-to .h15-ate { display: flex; align-items: flex-end; width: 80mm; border-bottom: 1px solid var(--line); }
+.h15-to .h15-ate .inp { font-size: 11pt; }
+.h15-to .h15-onchu { font-size: 11pt; letter-spacing: .3em; padding: 0 1mm 1mm; white-space: nowrap; }
+table.grid td.h15-sec { background: var(--label-bg); font-weight: bold; text-align: left; padding-left: 2mm; height: 6mm; }
+table.grid td.h15-sub { text-align: left; padding-left: 2mm; height: 5.5mm; border-bottom: 0; }
