@@ -25,15 +25,16 @@
         [{ label: '見積金額', key: 'mitsumori', type: 'money', unit: '円', lw: 5, span: 16 },
           { label: '契約金額', key: 'keiyaku', type: 'money', unit: '円', lw: 5, span: 16 },
           { label: '実行金額', key: 'jikko', type: 'money', unit: '円', lw: 5, span: 16 }],
+        // 注文書の行は金額の行の直下（ユーザー指定）
+        [{ label: '注文書', key: 'chumon', type: 'ym', span: 18 }, { label: '第1回請求', key: 'seikyu1', type: 'ym', lw: 8, span: 16 },
+          // 粗利＝（契約金額−実行金額）÷契約金額、小数点第1位まで（第2位以下は切り捨て。ユーザー指定）
+          { label: '粗　利', key: 'arari', type: 'calc', unit: '%', dec: 1, lw: 5, span: 14,
+            calc: (n) => (n('keiyaku') ? (Math.trunc(Math.round((n('keiyaku') - n('jikko')) / n('keiyaku') * 1e6) / 1e4 * 10) / 10).toFixed(1) : '') }],
         [{ label: '現場状況', key: 'genbaW', type: 'inline', span: 30, parts: [
             { key: 'genbaDate', type: 'date', jp: true, w: 36 }, '現在', { key: 'genba' }] },
           { label: '設計協力', key: 'sekkeiW', type: 'inline', span: 18, parts: [
             { key: 'sekkei', type: 'radio', options: ['有'] }, '（', { key: 'sekkeiNote' }, '）', { key: 'sekkei', type: 'radio', options: ['無'] }] }],
-        [{ label: '注文書', key: 'chumon', type: 'ym', span: 18 }, { label: '第1回請求', key: 'seikyu1', type: 'ym', lw: 8, span: 16 },
-          // 粗利＝（契約金額−実行金額）÷契約金額（金額の行に入りきらないのでこの行に）
-          { label: '粗　利', key: 'arari', type: 'calc', unit: '%', dec: 1, lw: 5, span: 14,
-            calc: (n) => (n('keiyaku') ? (n('keiyaku') - n('jikko')) / n('keiyaku') * 100 : NaN) }],
-        [{ label: '営業背景', key: 'haikei', type: 'textarea', plain: true, h: 10, span: 48 }],
+        [{ label: '営業背景', key: 'haikei', type: 'textarea', plain: true, h: 14, span: 48 }], // 3行程度（ユーザー指定）
       ] },
       // 推薦・分類は記号で選ぶ（一覧を開くと意味も出る）。凡例は表の見出しの上に小さな文字で（ユーザー指定）
       { type: 'table', key: 'maker', rows: 5, rowH: 5.5, dense: true, headH: 6,
