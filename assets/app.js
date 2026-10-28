@@ -485,6 +485,8 @@
     } else {
       tbl.append(h('thead', null, h('tr', null, cols.map((c) => h('th', { style: hh }, ...lbl(c.label))))));
     }
+    // caption：見出しの上に、表全体にわたる小さな文字の行（凡例など。例：本-営業-A0004 の推薦・分類の記号）
+    if (b.caption) tbl.querySelector('thead').prepend(h('tr', null, h('th', { class: 'tbl-cap', colspan: cols.length }, b.caption)));
     const tb = h('tbody');
     // groupRows: n 行を1組にする（例：日報の1日3行）。grouped: true の列は組ごとに縦にまとめ（rowspan）、
     // 組の先頭行の r で rowCalc を呼ぶ。組の境目は罫線を太くする

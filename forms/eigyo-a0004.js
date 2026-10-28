@@ -14,29 +14,31 @@
     meta: [],
     stamps: [{ boxes: ['本店長', '工事本部長|RE部長\n受領', '購買部長\n受領', '営業本部長\n支店は支店長', '営業担当者'] }],
     blocks: [
-      { type: 'grid', lw: 3, rowH: 6.5, dense: true, rows: [
-        [{ label: '受注報告', key: 'jucyu', type: 'date', span: 9 },
-          { label: '引継会', key: 'hikitsugiW', type: 'inline', span: 15, parts: [
+      // 48分割（金額の行で、見出し・金額・粗利の幅を細かく合わせるため）
+      { type: 'grid', cols: 48, lw: 6, rowH: 6.5, dense: true, rows: [
+        [{ label: '受注報告', key: 'jucyu', type: 'date', span: 18 },
+          { label: '引継会', key: 'hikitsugiW', type: 'inline', span: 30, parts: [
             { key: 'hikitsugi', type: 'date', jp: true, w: 36 }, dow('hikitsugi'), { key: 'hikitsugiT', type: 'time' }] }],
-        [{ label: '工　番', key: 'koban', maxlength: 12, span: 9 }, { label: '見積No.', key: 'mitsumoriNo', span: 15 }],
-        [{ label: '契約先', key: 'keiyakusaki', span: 9 }, { label: '件　名', key: 'subject', span: 15 }],
-        // 金額は9桁（億）まで入る幅に
-        [{ label: '見積金額', key: 'mitsumori', type: 'money', unit: '円', lw: 2, span: 6 },
-          { label: '契約金額', key: 'keiyaku', type: 'money', unit: '円', lw: 2, span: 6 },
-          { label: '実行金額', key: 'jikko', type: 'money', unit: '円', lw: 2, span: 6 },
-          // 粗利＝（契約金額−実行金額）÷契約金額
-          { label: '粗　利', key: 'arari', type: 'calc', unit: '%', dec: 1, lw: 2, span: 6,
-            calc: (n) => (n('keiyaku') ? (n('keiyaku') - n('jikko')) / n('keiyaku') * 100 : NaN) }],
-        [{ label: '現場状況', key: 'genbaW', type: 'inline', span: 15, parts: [
+        [{ label: '工　番', key: 'koban', maxlength: 12, span: 18 }, { label: '見積No.', key: 'mitsumoriNo', span: 30 }],
+        [{ label: '契約先', key: 'keiyakusaki', span: 18 }, { label: '件　名', key: 'subject', span: 30 }],
+        // 金額は11桁（100億円単位）まで入る幅に（ユーザー指定）
+        [{ label: '見積金額', key: 'mitsumori', type: 'money', unit: '円', lw: 5, span: 16 },
+          { label: '契約金額', key: 'keiyaku', type: 'money', unit: '円', lw: 5, span: 16 },
+          { label: '実行金額', key: 'jikko', type: 'money', unit: '円', lw: 5, span: 16 }],
+        [{ label: '現場状況', key: 'genbaW', type: 'inline', span: 30, parts: [
             { key: 'genbaDate', type: 'date', jp: true, w: 36 }, '現在', { key: 'genba' }] },
-          { label: '設計協力', key: 'sekkeiW', type: 'inline', span: 9, parts: [
+          { label: '設計協力', key: 'sekkeiW', type: 'inline', span: 18, parts: [
             { key: 'sekkei', type: 'radio', options: ['有'] }, '（', { key: 'sekkeiNote' }, '）', { key: 'sekkei', type: 'radio', options: ['無'] }] }],
-        [{ label: '注文書', key: 'chumon', type: 'ym', span: 9 }, { label: '第1回請求', key: 'seikyu1', type: 'ym', lw: 4, span: 15 }],
-        [{ label: '営業背景', key: 'haikei', type: 'textarea', plain: true, h: 10, span: 24 }],
+        [{ label: '注文書', key: 'chumon', type: 'ym', span: 18 }, { label: '第1回請求', key: 'seikyu1', type: 'ym', lw: 8, span: 16 },
+          // 粗利＝（契約金額−実行金額）÷契約金額（金額の行に入りきらないのでこの行に）
+          { label: '粗　利', key: 'arari', type: 'calc', unit: '%', dec: 1, lw: 5, span: 14,
+            calc: (n) => (n('keiyaku') ? (n('keiyaku') - n('jikko')) / n('keiyaku') * 100 : NaN) }],
+        [{ label: '営業背景', key: 'haikei', type: 'textarea', plain: true, h: 10, span: 48 }],
       ] },
-      // 推薦・分類は記号で選ぶ（一覧を開くと意味も出る）。凡例は下の注記
+      // 推薦・分類は記号で選ぶ（一覧を開くと意味も出る）。凡例は表の見出しの上に小さな文字で（ユーザー指定）
       { type: 'table', key: 'maker', rows: 5, rowH: 5.5, dense: true, headH: 6,
-        title: '指定メーカーリスト（推薦：施・事・建・社／分類：◎・○・△）',
+        title: '指定メーカーリスト',
+        caption: '推薦〔施主（施）・設計事務所（事）・ゼネコン（建）・社内（社）〕　　分類〔指定（◎）・金額が合えば（○）・見積を取って下さい（△）〕',
         columns: [
           { label: 'No', key: 'no', w: 5, rowNo: true },
           { label: '品　名', key: 'hinmei', w: 22 },
@@ -69,7 +71,6 @@
           { key: 'sekoHoncho', type: 'radio', options: ['出席', '欠席'], nowrap: true, span: 4 }, { key: 'sekoOthers', span: 8 }],
       ] },
       { type: 'notes', items: [
-        '※ 指定メーカーリスト　推薦〔施主（施）・設計事務所（事）・ゼネコン（建）・社内（社）〕　分類〔指定（◎）・金額が合えば（○）・見積を取って下さい（△）〕',
         '※ 添付書類の系統毎とは、電力幹線、弱電幹線、Fユニット等をいう。　※ 施工検討会は、NET検討会後1ヶ月以内に開催する。',
         '※ 工事本部長（工事部長）･購買部長にそれぞれ配布し、受領印を受けたものを品質保証部に配布し、営業担当者が保管する。',
       ] },

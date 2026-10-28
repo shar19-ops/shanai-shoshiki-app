@@ -427,6 +427,8 @@ table.grid.q-check td.q-goal-h .q-month { margin: 0 .3mm; } /* 月と見出し�
 table.grid.q-check td.q-goal-h .q-month .inp { padding: 0; font-size: 8pt; text-align: center; }
 table.grid.q-check td.q-goal-h .q-month .inp::placeholder { color: transparent; }
 table.grid.q-check td.q-goal-h .q-vt { writing-mode: vertical-rl; margin: 0 auto; }
+/* 表の凡例の行（tableBlock の caption） */
+table.grid th.tbl-cap { height: 4.5mm; font-size: 7pt; letter-spacing: 0; text-align: left; padding: 0 2mm; background: #fff; color: #333; }
 /* 本-営業-A0002 施工能力確認書：納期面・技術面の枠 */
 .e2-wrap { display: flex; flex-direction: column; gap: 5mm; }
 table.grid.e2 td.e2-h { height: 8mm; font-size: 11pt; font-weight: bold; letter-spacing: .2em; padding-left: 3mm; }
