@@ -394,7 +394,8 @@
   function headerEl(d) {
     return h('div', { class: 'f-header' },
       h('div', { class: 'f-head-left' },
-        h('div', { class: 'f-code' }, d.code),
+        // iso：ISOの要求事項の表示（例：'【8.4.3】外部提供者に対する情報'）。番号の後ろに間を空けて置く（ユーザー指定）
+        h('div', { class: 'f-code' }, d.code, d.iso ? h('span', { class: 'f-iso' }, d.iso) : null),
         // titleSide：表題の横に置く項目（例：年度・事故種別。紙で保管したときに探しやすいように）
         d.titleSide
           ? h('div', { class: 'f-title-row' }, h('div', { class: 'f-title' }, d.title, d.subtitle ? h('span', { class: 'f-sub' }, d.subtitle) : null),
