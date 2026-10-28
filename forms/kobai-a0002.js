@@ -3,7 +3,7 @@
 // 元のExcelは得点の欄の「入力メッセージ」に得点の付け方があった → 得点は一覧から選ぶ（一覧を開くと付け方の文が出る）、
 //   項目の欄にマウスを乗せると付け方を表示、2ページ目に「評価の付け方」の一覧表
 // 得点計・評価点（得点計÷基準点×100 を四捨五入）は自動（元のExcelの式のまま）
-// 押印欄は右上、右端の作業所長にデート印（評価する人）。元の日付欄はなし。工事部長の欄は工事本部長（支店は支店長）
+// 最後のページの「評価の付け方」は画面のみで印刷しない（標準点に網掛け）。押印欄は右上、右端の作業所長にデート印（評価する人）。元の日付欄はなし。工事部長の欄は工事本部長（支店は支店長）
 // 1ページ5社。6社以上はページを足す（ユーザー指定）。JSONファイルに保存・読み込み
 (function () {
   // 評価項目：[名称, 配点の一覧（高い順）, { 点: 付け方 }]（元のExcelの入力メッセージ。明らかな誤字は直した）
@@ -71,15 +71,19 @@
           h('td', { colspan: 23, class: 'b2-ta' }, field({ key: k(b, 'shoken'), type: 'textarea', plain: true, lines: 2 }))))) };
   };
 
-  // 2ページ目：評価の付け方（この様式で使う項目だけ）
+  // 最後のページ：評価の付け方（この様式で使う項目だけ）。画面で見るだけで印刷しない（ユーザー指定）
+  // 標準点（真ん中の点数。本-購買-00002 協力会社評価基準の網掛け）の行に網掛け（ユーザー指定）
   const guide = (use) => ({ type: 'custom', render: ({ h }) => h('table', { class: 'grid b2-guide' },
     h('colgroup', null, h('col', { style: 'width:7mm' }), h('col', { style: 'width:36mm' }), h('col', { style: 'width:11mm' }), h('col')),
     h('tbody', null,
-      h('tr', null, h('th', null, 'No'), h('th', null, '評価項目'), h('th', null, '配点'), h('th', null, '得点の付け方（間の点数は中間の評価）')),
+      h('tr', null, h('th', null, 'No'), h('th', null, '評価項目'), h('th', null, '配点'),
+        h('th', null, '得点の付け方（間の点数は中間の評価。', h('span', { class: 'b2-std-mark' }, '　　'), '：標準点）')),
       ...use.map((n) => {
         const [name, pts, desc] = ITEMS[n - 1];
+        const std = pts[2];
         return h('tr', null, h('td', { class: 'c' }, String(n)), h('td', null, name), h('td', { class: 'c' }, `${pts[0]}〜${pts[pts.length - 1]}`),
-          h('td', { class: 'b2-desc' }, ...pts.filter((p) => desc[p]).map((p) => h('div', null, h('b', null, `${p}点`), h('span', null, desc[p])))));
+          h('td', { class: 'b2-desc' }, ...pts.filter((p) => desc[p] || p === std).map((p) => h('div', { class: p === std ? 'std' : null },
+            h('b', null, `${p}点`), h('span', null, desc[p] || '')))));
       }))) });
 
   // 最後の評価のページの下に、ページの追加・削除（印刷しない）
@@ -119,10 +123,11 @@
           blocks: [
             ...Array.from({ length: N_VENDOR }, (_, i) => vendor(p * N_VENDOR + i + 1, use, base)),
             ...(p === pageCount(v) - 1 ? [pageButtons(p + 1)] : []),
-            { type: 'notes', items: ['得点は一覧から選んでください（一覧を開くと得点の付け方が出ます。項目の番号にマウスを乗せても出ます）。得点計・評価点（得点計÷基準点×100）は自動。得点の付け方は最後のページ。'] },
+            { type: 'notes', items: ['得点は一覧から選んでください（一覧を開くと得点の付け方が出ます。項目の番号にマウスを乗せても出ます）。得点計・評価点（得点計÷基準点×100）は自動。得点の付け方は最後のページ（画面のみ。印刷されません）。'] },
           ] })),
         // 最後のページは付け方の一覧（押印欄なし。項目が多いのでA4縦）
-        { subtitle: '（評価の付け方）', orientation: 'portrait', stamps: [], blocks: [guide(use)] },
+        // 画面で見るだけで印刷しない（no-print。ユーザー指定）
+        { subtitle: '（評価の付け方）', orientation: 'portrait', stamps: [], sheetClass: 'tight-gap no-print', blocks: [guide(use)] },
       ],
     };
   };

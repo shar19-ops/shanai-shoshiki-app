@@ -601,3 +601,4 @@ table.grid.b2-guide td { font-size: 7pt; line-height: 1.25; padding: .3mm 1mm; }
 table.grid.b2-guide td.c { text-align: center; }
 table.grid.b2-guide td.b2-desc > div { display: flex; }
 table.grid.b2-guide td.b2-desc b { flex: none; width: 6.5mm; }
+table.grid.b2-guide td.b2-desc > div.std, table.grid.b2-guide .b2-std-mark { background: #dfe3ea; } /* 標準点の網掛け */
