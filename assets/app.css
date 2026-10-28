@@ -133,6 +133,12 @@ body {
 .stamp-box .sb-label.tight { font-size: 6.5pt; letter-spacing: 0; }
 .stamp-box .sb-label.two { font-size: 6pt; line-height: 2.3mm; padding-top: .2mm; letter-spacing: 0; }
 .stamp-box .sb-area { height: 20mm; position: relative; }
+/* 押印欄の日付（stamps の dates）。空欄なら「/　　/」を印字して手書き */
+.stamp-box .sb-date { height: 4.5mm; border-bottom: 1px solid var(--line); }
+.stamp-box .sb-date .inp { height: 100%; min-height: 0; padding: 0; font-size: 8pt; text-align: center; }
+.stamp-box .sb-date .inp::placeholder { color: #888; opacity: 1; }
+@media print { .stamp-box .sb-date .inp::placeholder { color: #000 !important; } }
+.stamp-box .sb-area.dated { height: 15.5mm; }
 /* 兼務の役職名（工事本部長・RE部長・支店長など）は押印部に薄く印字 */
 .stamp-box .sb-roles {
   position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
@@ -690,6 +696,7 @@ table.grid.b4-vendor { width: calc((297mm - 24mm - 4mm) / 2); flex: none; }
 table.grid.b4-vendor th { width: 23mm; height: 6.5mm; font-size: 9pt; }
 table.grid.b4-vendor td { height: 6.5mm; font-size: 10pt; }
 table.grid.b4-vendor td.b4-dono { width: 8mm; text-align: center; border-left: none; }
+table.grid.b4-vendor td.b4-vname { border-right: none; } /* 殿の前の罫線なし（両側とも消す） */
 .b4-pages { display: flex; flex-wrap: nowrap; gap: 1.5mm; white-space: nowrap; }
 .b4-pages button { font: inherit; font-size: 8pt; padding: 2px 6px; border: 1px solid var(--accent); border-radius: 4px; background: #fff; color: var(--accent); cursor: pointer; }
 .b4-pages button:hover { background: #eef2fb; }

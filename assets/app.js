@@ -344,7 +344,8 @@
   }
 
   // ---------- ヘッダー ----------
-  function stampsEl(groups, cls) {
+  // d：ページの定義（押印欄の日付のキーに stampKey を前に付ける。業者ごとのページなど）
+  function stampsEl(groups, cls, d) {
     if (!groups || !groups.length) return null;
     // 文字列配列だけなら1グループ扱い
     if (typeof groups[0] === 'string') groups = [{ boxes: groups }];
@@ -360,7 +361,9 @@
           const hl = head.split('|');
           return h('div', { class: 'stamp-box' },
             h('div', { class: 'sb-label' + (hl.length > 1 ? ' two' : head.length >= 6 ? ' tight' : '') }, hl.flatMap((s, i) => (i ? [h('br'), s] : [s]))),
-            h('div', self ? { class: 'sb-area self-stamp', title: 'クリックで押印設定', onclick: openStampDialog } : { class: 'sb-area' },
+            // dates：見出しの下に日付の欄。空欄なら「/　　/」を印字して手書きできるように（押印部はその分低く、枠の高さは同じ）
+            g.dates ? h('div', { class: 'sb-date' }, field({ key: `${(d && d.stampKey) || ''}sdate.${head}`, align: 'center', placeholder: '/　　/' })) : null,
+            h('div', self ? { class: 'sb-area self-stamp' + (g.dates ? ' dated' : ''), title: 'クリックで押印設定', onclick: openStampDialog } : { class: 'sb-area' + (g.dates ? ' dated' : '') },
               roles.length ? h('div', { class: 'sb-roles' }, roles.flatMap((r, i) => (i ? [h('br'), r] : [r]))) : null));
         }))));
   }
@@ -407,7 +410,7 @@
           h('span', { class: 'm-val', style: m.w ? `min-width:${m.w}mm` + ((m.cls || '').split(' ').includes('fixw') ? `;width:${m.w}mm` : '') : '' }, field(m))))) : null,
         // headBlocks：タイトルの下（押印欄の左側の空き）に置く項目。下端を押印欄の下端にそろえる
         d.headBlocks ? h('div', { class: 'head-blocks' }, d.headBlocks.map(renderBlock)) : null),
-      stampsEl(d.stamps, d.stampClass));
+      stampsEl(d.stamps, d.stampClass, d));
   }
 
   // ---------- ブロック ----------

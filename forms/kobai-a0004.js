@@ -170,7 +170,7 @@
     const total = pageCount(values);
     const add = (copy) => {
       const next = total + 1;
-      if (copy) Object.keys(values).forEach((key) => { const own = ownKey(key, total); if (own && own !== 'gyosha') values[pk(next, own)] = values[key]; });
+      if (copy) Object.keys(values).forEach((key) => { const own = ownKey(key, total); if (own && own !== 'gyosha' && !own.startsWith('sdate.')) values[pk(next, own)] = values[key]; /* 業者名と押印欄の日付はコピーしない */ });
       setVal('pageCount', String(next)); rebuild();
     };
     const del = () => {
@@ -180,7 +180,7 @@
       setVal('pageCount', String(total - 1)); rebuild();
     };
     return h('div', { class: 'b4-head' },
-      h('table', { class: 'grid b4-vendor' }, h('tbody', null, h('tr', null, h('th', null, '業 者 名'), h('td', null, field({ key: pk(vn, 'gyosha') })),
+      h('table', { class: 'grid b4-vendor' }, h('tbody', null, h('tr', null, h('th', null, '業 者 名'), h('td', { class: 'b4-vname' }, field({ key: pk(vn, 'gyosha') })),
         h('td', { class: 'b4-dono' }, '殿')))),
       vn === total ? h('div', { class: 'b4-pages no-print' },
         h('button', { type: 'button', onclick: () => add(false) }, '＋ 業者を追加'),
@@ -195,13 +195,14 @@
       orientation: 'landscape',
       sheetClass: 'b4-sheet',
       // 元は表の右下の「注文書付属書／見積依頼書 ／／ 発行」の欄 → 押印欄として右上（ユーザー指定）
-      stamps: [{ boxes: ['注文書付属書\n発行', '見積依頼書\n発行'] }],
+      // 押印欄の上部に日付（空欄なら「/　　/」で手書き。ユーザー指定）
+      stamps: [{ boxes: ['注文書付属書\n発行', '見積依頼書\n発行'], dates: true }],
       iso: '【8.4.3】外部提供者に対する情報', // 元の様式の右上の表示。ヘッダーの番号の後ろに（ユーザー指定）
       meta: [],
       fileIO: true,
       // 業者ごとに表面・裏面の1組（両面印刷で業者ごとに1枚）
       pages: (v) => Array.from({ length: pageCount(v) }, (_, i) => i + 1).flatMap((vn) => [
-        { subtitle: pageCount(v) > 1 ? `（表面 ${vn}/${pageCount(v)}）` : '（表面）', headBlocks: [vendorHead(vn)], blocks: [
+        { subtitle: pageCount(v) > 1 ? `（表面 ${vn}/${pageCount(v)}）` : '（表面）', stampKey: pk(vn, ''), headBlocks: [vendorHead(vn)], blocks: [
           { type: 'row', gap: 4, items: [table(LEFT(kind), null, kind, vn), table(RIGHT(kind), TAIL(kind), kind, vn)] }, // 左右の高さをそろえる（stretch）
           { type: 'notes', items: ['○：見積･契約に含む･条件内、✕：見積･契約に含まない･条件外（○✕の欄はクリックで ○ → ✕ → 空欄）',
             '※1. 見積依頼時に、工事内容に含める場合は○、含めない場合は✕を記入して協力会社に交付する。　2. 協力会社は、見積書提出時に本書を添付して提出する。　3. 注文書発行時に、本書を添付して発行する。'] },
