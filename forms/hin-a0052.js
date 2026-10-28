@@ -22,7 +22,7 @@
     const cell = (key, n) => (STAMP.includes(n)
       ? h('td', { class: 'h52-st' }, field({ key, type: 'date', jp: true, style: 'yy/mm/dd' }),
         n === 4 ? h('span', { class: 'h52-keep' }, '保　管') : null, field({ key: `${key}.name`, type: 'inkan' }))
-      : h('td', { class: 'h52-st h52-mask' }));
+      : h('td', { class: 'h52-st h52-mask' }, h('div', { class: 'h52-maskin' })));
     const half = (role, n) => [h('th', { class: 'h52-role' }, ...br(role)), h('td', { class: 'h52-needc' }, need(`y${n}`)),
       cell(`s${n}`, n), cell(`k${n}`, n)];
     const tb = h('tbody', null, h('tr', null, ...['巡　回　順', '要出席', '出　席', '欠　席', '巡　回　順', '要出席', '出　席', '欠　席'].map((t) => h('th', null, t))));
