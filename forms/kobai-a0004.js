@@ -12,7 +12,8 @@
     ['工事名称', [{ d: '○', f: 'text', key: 'kojiName' }]],
     ['施工場所', [{ d: '○', f: 'text', key: 'basho' }]],
     ['工事命令書工期', [{ d: '○', f: 'range', key: 'meirei' }]],
-    ...(kind === 1 ? [['工期設定確認', [{ d: '○', f: 'kyuko', key: 'kyuko', red: true }]]] : []),
+    // 工期設定確認は、記載の行の下に書き込める空欄の行（ユーザー指定）
+    ...(kind === 1 ? [['工期設定確認', [{ d: '○', f: 'kyuko', key: 'kyuko', red: true }, { f: 'text', key: 'kyukoFree' }]]] : []),
     ['見積提出日', [{ d: '○', f: 'date', key: 'teishutsu' }]],
     ['見積･工事対象', [{ d: '○', f: 'text', key: 'taisho' }]],
     ['見積書工期', [{ d: '○', f: 'range', key: 'mitsuKoki' }]],
@@ -44,7 +45,7 @@
     ...(kind === 1 ? [{ t: '工事契約時は工事下請負契約約款参照', d: '○' }] : []),
     { t: '契約前「おそれ情報」通知書確認保存', d: '○', red: true },
     // 余白の行：左右の表の高さをそろえる数（ユーザー指定）
-    ...Array.from({ length: 3 }, (_, i) => ({ f: 'text', key: `free${i + 1}` })), // 残りの数pxは表の高さをそろえて各行に配分
+    ...Array.from({ length: 1 }, (_, i) => ({ f: 'text', key: `free${i + 1}` })), // 右の表の下に注意書きを置くので1行。残りは表の高さをそろえて各行に配分
   ];
 
   // 裏面の約款（元の文書のまま。段落ごと）
@@ -102,7 +103,7 @@
   // 同じ現場で多数の業者に出すので、業者ごとに表面・裏面の1組を増やせる（ユーザー指定）。JSONファイルに保存・読み込み
   // 現場で共通の項目（工事番号・工事名称・施工場所・工事命令書工期・休工日）はどの業者のページも同じ値。
   // それ以外（業者名・○✕・見積の欄など）は業者ごと：1社目はそのままのキー、2社目からは 'p2.' などを付ける
-  const COMMON = ['koban', 'kojiName', 'basho', 'meirei', 'meireiTo', 'kyuko'];
+  const COMMON = ['koban', 'kojiName', 'basho', 'meirei', 'meireiTo', 'kyuko', 'kyukoFree'];
   const pk = (n, key) => (COMMON.includes(key) || n === 1 ? key : `p${n}.${key}`);
   const pageCount = (v) => Math.max(1, Number(v.pageCount) || 1);
   // n 社目のキーか（共通の項目と pageCount を除く）。キーの n 社目の部分を外した名前を返す
@@ -203,9 +204,14 @@
       // 業者ごとに表面・裏面の1組（両面印刷で業者ごとに1枚）
       pages: (v) => Array.from({ length: pageCount(v) }, (_, i) => i + 1).flatMap((vn) => [
         { subtitle: pageCount(v) > 1 ? `（表面 ${vn}/${pageCount(v)}）` : '（表面）', stampKey: pk(vn, ''), headBlocks: [vendorHead(vn)], blocks: [
-          { type: 'row', gap: 4, items: [table(LEFT(kind), null, kind, vn), table(RIGHT(kind), TAIL(kind), kind, vn)] }, // 左右の高さをそろえる（stretch）
-          { type: 'notes', items: ['○：見積･契約に含む･条件内、✕：見積･契約に含まない･条件外（○✕の欄はクリックで ○ → ✕ → 空欄）',
-            '※1. 見積依頼時に、工事内容に含める場合は○、含めない場合は✕を記入して協力会社に交付する。　2. 協力会社は、見積書提出時に本書を添付して提出する。　3. 注文書発行時に、本書を添付して発行する。'] },
+          // 注意書きは右の表の下（元の様式と同じ）。凡例の下に1.〜3.を縦に並べる（ユーザー指定）
+          { type: 'row', gap: 4, items: [table(LEFT(kind), null, kind, vn), { type: 'col', gap: 1.5, items: [table(RIGHT(kind), TAIL(kind), kind, vn), { type: 'notes', items: [
+            '○：見積･契約に含む･条件内、✕：見積･契約に含まない･条件外',
+            '　（○✕の欄はクリックで ○ → ✕ → 空欄）',
+            '1.　見積依頼時に、工事内容に含める場合は○、含めない場合は✕を記入して協力会社に交付する。',
+            '2.　協力会社は、見積書提出時に本書を添付して提出する。',
+            '3.　注文書発行時に、本書を添付して発行する。',
+          ] }] }] }, // 左右の高さをそろえる（stretch）
         ] },
         // 裏面（両面印刷の2枚目）：約款
         { subtitle: pageCount(v) > 1 ? `（裏面 ${vn}/${pageCount(v)}）` : '（裏面）', stamps: [], blocks: [terms(kind)] }, // 押印欄は表面だけ
