@@ -427,6 +427,8 @@ table.grid.q-check td.q-goal-h .q-month { margin: 0 .3mm; } /* 月と見出し�
 table.grid.q-check td.q-goal-h .q-month .inp { padding: 0; font-size: 8pt; text-align: center; }
 table.grid.q-check td.q-goal-h .q-month .inp::placeholder { color: transparent; }
 table.grid.q-check td.q-goal-h .q-vt { writing-mode: vertical-rl; margin: 0 auto; }
+/* sheetClass: 'stamps-2row' … 押印欄のグループを2つずつ2段に（表題の長い帳票。本-工務-A0037） */
+.sheet.stamps-2row .stamps { max-width: 96mm; }
 /* 本-工務-A0001 図面管理台帳（1件2段） */
 table.grid.k1 th { height: 5.5mm; font-size: 8.5pt; }
 table.grid.k1 td { height: 7mm; font-size: 9pt; }
