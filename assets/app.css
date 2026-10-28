@@ -737,3 +737,6 @@ table.grid.h13 td { height: 8.8mm; font-size: 9pt; }
 table.grid.h13 td.h13-sel .checks { padding: 0 !important; gap: 0 2.5mm; justify-content: center; }
 table.grid.h13 td.h13-sel .checks label { font-size: 8.5pt; }
 table.grid.h11 .date-wrap .pv, table.grid.h13 .date-wrap .pv { font-size: 9pt; text-align: center; }
+
+/* col の fit：つないだ表の境目の罫線を1本に（本-品質-A0014） */
+.col-fit > * + * { margin-top: -1px; }
