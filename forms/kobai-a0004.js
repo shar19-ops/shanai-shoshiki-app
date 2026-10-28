@@ -206,8 +206,7 @@
         { subtitle: pageCount(v) > 1 ? `（表面 ${vn}/${pageCount(v)}）` : '（表面）', stampKey: pk(vn, ''), headBlocks: [vendorHead(vn)], blocks: [
           // 注意書きは右の表の下（元の様式と同じ）。凡例の下に1.〜3.を縦に並べる（ユーザー指定）
           { type: 'row', gap: 4, items: [table(LEFT(kind), null, kind, vn), { type: 'col', gap: 1.5, items: [table(RIGHT(kind), TAIL(kind), kind, vn), { type: 'notes', items: [
-            '○：見積･契約に含む･条件内、✕：見積･契約に含まない･条件外',
-            '　（○✕の欄はクリックで ○ → ✕ → 空欄）',
+            '○：見積･契約に含む･条件内、✕：見積･契約に含まない･条件外（○✕の欄はクリックで ○ → ✕ → 空欄）',
             '1.　見積依頼時に、工事内容に含める場合は○、含めない場合は✕を記入して協力会社に交付する。',
             '2.　協力会社は、見積書提出時に本書を添付して提出する。',
             '3.　注文書発行時に、本書を添付して発行する。',
