@@ -12,8 +12,8 @@
     ['工事名称', [{ d: '○', f: 'text', key: 'kojiName' }]],
     ['施工場所', [{ d: '○', f: 'text', key: 'basho' }]],
     ['工事命令書工期', [{ d: '○', f: 'range', key: 'meirei' }]],
-    // 工期設定確認は、記載の行の下に書き込める空欄の行（ユーザー指定）
-    ...(kind === 1 ? [['工期設定確認', [{ d: '○', f: 'kyuko', key: 'kyuko', red: true }, { f: 'text', key: 'kyukoFree' }]]] : []),
+    // 工期設定確認：休工日は 4週8休・4週8閉所・□（自由入力）。下の空欄の行は除く（修正指示書）
+    ...(kind === 1 ? [['工期設定確認', [{ d: '○', f: 'kyuko', key: 'kyuko', red: true }]]] : []),
     ['見積提出日', [{ d: '○', f: 'date', key: 'teishutsu' }]],
     ['見積･工事対象', [{ d: '○', f: 'text', key: 'taisho' }]],
     ['見積書工期', [{ d: '○', f: 'range', key: 'mitsuKoki' }]],
@@ -133,7 +133,8 @@
         case 'range': return h('td', { class: 'b4-in' }, field({ key: k(it.key), key2: k(it.key + 'To'), type: 'daterange', jp: true }));
         case 'lines': return h('td', { class: cls + ' b4-lines' }, h('div', { class: 'b4-inline' }, h('span', { class: 'b4-lt' }, it.t), field({ key: k(it.key) })));
         case 'kyuko': return h('td', { class: cls }, h('div', { class: 'b4-inline' }, '工期設定チェックリスト添付／休工日：',
-          field({ key: k(it.key), type: 'radio', options: ['4週8休', '4週8閉所'], nowrap: true })));
+          field({ key: k(it.key), type: 'radio', options: ['4週8休', '4週8閉所', 'その他'], labels: ['4週8休', '4週8閉所', ''], nowrap: true }),
+          '（', h('span', { class: 'b4-kv' }, field({ key: k('kyukoFree') })), '）'));
         // 検査の欄は2行に（検査者・検査日／検査基準・出荷許可の方法）
         case 'kensa': return h('td', { class: cls + ' b4-kensa' }, h('div', null, it.t),
           ...[[['検査者', 'kensasha'], ['検査日', 'kensabi']], [['検査基準', 'kijun'], ['出荷許可の方法', 'shukka']]].map((pair) => h('div', { class: 'b4-inline' },
@@ -201,6 +202,7 @@
       iso: '【8.4.3】外部提供者に対する情報', // 元の様式の右上の表示。ヘッダーの番号の後ろに（ユーザー指定）
       meta: [],
       fileIO: true,
+      printNote: '印刷の設定で「両面印刷」を選んでください。表面が項目の表、裏面が約款です。', // 修正指示書
       // 業者ごとに表面・裏面の1組（両面印刷で業者ごとに1枚）
       pages: (v) => Array.from({ length: pageCount(v) }, (_, i) => i + 1).flatMap((vn) => [
         { subtitle: pageCount(v) > 1 ? `（表面 ${vn}/${pageCount(v)}）` : '（表面）', stampKey: pk(vn, ''), headBlocks: [vendorHead(vn)], blocks: [

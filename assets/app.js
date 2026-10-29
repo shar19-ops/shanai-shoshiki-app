@@ -181,7 +181,8 @@
       const name = 'r_' + key;
       // nowrap：選択肢を折り返さず1行に（性別など幅の狭い欄）
       const wrap = h('div', { class: 'checks', style: (f.vertical ? 'flex-direction:column;align-items:flex-start' : f.nowrap ? 'flex-wrap:nowrap;gap:0 2mm;padding:1mm 1.5mm' : '') + (f.align === 'center' ? ';justify-content:center' : '') },
-        f.options.map((o) => {
+        // labels：選択肢の表示（値と別にするとき。'' なら箱だけ）
+        f.options.map((o, i) => {
           const cb = h('input', {
             type: multi ? 'checkbox' : 'radio', name, value: o, checked: cur.has(o),
             onchange: () => {
@@ -194,7 +195,7 @@
             },
           });
           cb.dataset.was = cur.has(o) ? '1' : '0';
-          return h('label', null, cb, h('span', { class: 'box' }), o);
+          return h('label', null, cb, h('span', { class: 'box' }), f.labels ? f.labels[i] : o);
         }));
       inputs[key] = wrap;
       return wrap;
@@ -253,7 +254,8 @@
     if (f.prefix || f.unit) {
       return h('div', { class: 'cell-wrap' },
         f.prefix ? h('span', { class: 'unit' }, f.prefix) : null, ...parts,
-        f.unit ? h('span', { class: 'unit' }, f.unit) : null);
+        // unitInkan：「印」の位置に本人欄と同じ苗字の三文判風の認印（押印設定の苗字。本-安全-A0001 の検査者＝発行者。修正指示書）
+        f.unit ? (f.unitInkan ? h('span', { class: 'unit self-inkan', title: 'クリックで押印設定', onclick: openStampDialog }, f.unit) : h('span', { class: 'unit' }, f.unit)) : null);
     }
     return parts.length > 1 ? h('div', { style: 'height:100%' }, ...parts) : el;
   }
@@ -334,6 +336,8 @@
     document.querySelectorAll('.self-stamp').forEach((el) => {
       el.innerHTML = svg || (el.dataset.empty === '印' ? '<span class="stamp-mark">印</span>' : '<span class="self-hint no-print">クリックで<br>押印設定</span>');
     });
+    const c = stampCfg, inkan = c.enabled && c.sei ? DateStamp.inkan({ name: c.sei, color: 'red' }) : '';
+    document.querySelectorAll('.self-inkan').forEach((el) => { el.innerHTML = '印' + inkan; el.classList.toggle('on', !!inkan); });
   }
 
   function openStampDialog() {
@@ -501,7 +505,7 @@
     // cls：文字だけの欄の見た目を追加（例：欄の見出し）
     if (it.text != null && !it.key) return h('td', { class: (it.note ? 'note' : 'txt') + (it.cls ? ' ' + it.cls : ''), colspan: span, rowspan: rs, style: style + (it.align ? `;text-align:${it.align}` : '') }, it.text);
     if (!it.key) return h('td', { colspan: span, rowspan: rs, style });
-    const td = h('td', { colspan: span, rowspan: rs, style }, field(it));
+    const td = h('td', { class: it.cls || null, colspan: span, rowspan: rs, style }, field(it)); // cls：入力欄にも見た目を追加（本-安全-A0014 の年月）
     // 表の中の記述欄：罫線は初期値なし（plain: false なら初期値あり）、右上の「罫線」ボタンで切り替え（lineToggle: false で付けない）
     if (it.type === 'textarea' && it.lineToggle !== false && !it.plain) {
       const ta = td.querySelector('textarea');
@@ -993,6 +997,8 @@
     // fileKeys：ファイル名に使う項目（例：計測機器の管理番号・機器名。省略は件名）
     const pick = def.fileKeys ? def.fileKeys.map((k) => values[k]).filter(Boolean).join('_') : (values.subject || values.bukken || '');
     const name = String(pick).replace(/[\\/:*?"<>|\s]+/g, '_').slice(0, 40);
+    // fileNameStyle: 'title'：「帳票名_工番.json」（日付なし。同じ台帳を上書きしていく。本-工務-A0001。修正指示書）
+    if (def.fileNameStyle === 'title') return `${def.title}${name ? '_' + name : ''}.json`;
     return `${def.code}_${name ? name + '_' : ''}${ymd}.json`;
   }
   async function saveFile(id) {
@@ -1097,7 +1103,12 @@
       def.fileIO ? h('button', { onclick: () => openFile(id), title: '保存したJSONファイルを読み込む' }, 'ファイルを開く') : null,
       def.fileIO ? h('button', { onclick: () => saveFile(id), title: '入力内容をJSONファイルに保存（開いたファイルには上書き）' }, 'ファイルに保存') : null,
       def.selfStamp ? h('button', { onclick: openStampDialog }, '押印設定') : null,
-      h('button', { class: 'primary', onclick: () => window.print() }, '印刷')));
+      // printNote：印刷の前に注意を出す（両面印刷など。A3の帳票は用紙の注意を自動で出す。修正指示書）
+      h('button', { class: 'primary', onclick: () => {
+        const note = def.printNote || (paper === 'A3' ? '用紙サイズは「A3」を選んで印刷してください。（A4のままだと縮小されたり、はみ出したりします）' : '');
+        if (note && !confirm(note + '\n\nこのまま印刷画面を開きますか？')) return;
+        window.print();
+      } }, '印刷')));
     const pages = pageList();
     pages.forEach((p) => root.append(sheetEl(def, p)));
     if (def.selfStamp) calcs.push(renderSelfStamps); // 日付の入力に追従

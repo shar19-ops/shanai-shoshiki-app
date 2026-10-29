@@ -60,7 +60,8 @@
     orientation: 'landscape',
     fileIO: true,
     meta: [],
-    stamps: [{ label: '計画時', boxes: ['承認', '審査', '作成'] }, { label: '上期', boxes: ['審査', '作成'] }, { label: '下期', boxes: ['承認', '審査', '作成'] }],
+    // 押印欄の上に日付（空欄なら「/　　/」を印刷して手書き。修正指示書）
+    stamps: [{ label: '計画時', boxes: ['承認', '審査', '作成'], dates: true }, { label: '上期', boxes: ['審査', '作成'], dates: true }, { label: '下期', boxes: ['承認', '審査', '作成'], dates: true }],
     pages: (v) => Array.from({ length: pageCount(v) }, (_, i) => ({
       subtitle: `（${i + 1}/${pageCount(v)}）`,
       headBlocks: [head],

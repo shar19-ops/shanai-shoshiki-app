@@ -29,7 +29,7 @@
     code: '本-工務-A0070', title: '月度施工管理月報',
     seitei: '97/04/01', kaitei: '26/11/17', // フッター：制定日は元の様式のまま、最終改訂日はユーザー指定
     selfStamp: '工事担当',
-    sheetClass: 'tight-gap', // 項目が多いので、欄と欄の間を詰めて1ページに
+    sheetClass: 'tight-gap k70', // 項目が多いので、欄と欄の間を詰めて1ページに。k70：月度を大きく・指示事項の見出しを詰める（修正指示書）
     fileIO: true,
     meta: [{ label: '月　度', key: 'ym', type: 'ym' }],
     stamps: [{ boxes: ['社長', '本店長', '工事本部長|RE部長\n支店は支店長', '工事長\n指示', '工事担当\n発行'] }],
@@ -50,12 +50,12 @@
       ] },
       // 中間での自己評価：今月（A〜D）・前月・コメント
       { type: 'grid', cols: 48, rowH: 4.6, dense: true, rows: [
-        [{ label: '中間での自己評価（A：良い、B：やや良い、C：やや悪い、D：悪い）', lalign: 'left', span: 32 }, { label: '前月', span: 4 }, { label: 'コメント', span: 12 }],
+        [{ label: '中間での自己評価（A：良い、B：やや良い、C：やや悪い、D：悪い）', lalign: 'left', span: 26 }, { label: '前月', span: 4 }, { label: 'コメント', span: 18 }], // コメント欄を広く、前月を左へ（修正指示書）
         ...EVAL.map((t, i) => [
-          { text: `${i + 1}．${t}`, span: 20 },
-          { key: `eval${i + 1}`, type: 'radio', options: ABCD, nowrap: true, span: 12 },
+          { text: `${i + 1}．${t}`, span: 17 },
+          { key: `eval${i + 1}`, type: 'radio', options: ABCD, nowrap: true, span: 9 },
           { key: `prev${i + 1}`, type: 'select', options: ABCD, align: 'center', span: 4 },
-          ...(i === 0 ? [{ key: 'evalComment', type: 'textarea', plain: true, span: 12, rs: EVAL.length }] : [])]),
+          ...(i === 0 ? [{ key: 'evalComment', type: 'textarea', plain: true, span: 18, rs: EVAL.length }] : [])]),
       ] },
       // 提出状況（工事部長確認）：月ごとにクリックで〇
       { type: 'grid', cols: 48, rowH: 4.6, dense: true, rows: [
