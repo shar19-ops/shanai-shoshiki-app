@@ -857,3 +857,5 @@ table.grid.h53 td.h53-no { text-align: center; font-size: 9pt; }
 /* 回送先の押印欄はヘッダーの右上に4つずつ4段（枠の幅はほかの帳票と同じ。ユーザー指定）。段の間は線を1本に */
 .stamps.h53s { max-width: none; gap: 0; }
 .stamps.h53s .stamp-group + .stamp-group { border-top: 0; }
+/* 検討事項・実施計画：欄の中で折り返し、行の高さを JS で伸ばす（文字の大きさは変えない。本-品質-A0020 と同じ） */
+table.grid.h53 textarea.h53-wrap { min-height: 0; padding: .6mm 1.5mm; line-height: 1.35; resize: none; overflow: hidden; display: block; }
