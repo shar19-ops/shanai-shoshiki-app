@@ -1,6 +1,7 @@
 // 本-品質-A0055 工事反省会議事録（品質記録様式。元Excel：本ー品質ーＡ0055工事反省会議事録.xlsx、A4縦3ページ）
 // 本-品質-A0053 施工検討会報告書に寄せる（ユーザー指定）
 //   1ページ目：回送先の押印欄はヘッダーの右上に4つずつ4段（工事長はデート印、ほかはクリックで斜線＝回送不要）、その横にヘッダーの情報と出席者。
+//             指示事項は基本9pt。2行で書く欄が多く1ページ目に入りきらないときだけ、文字を自動で小さくする（ユーザー指定）
 //             問題点・指示事項の表（原価問題点 A〜O区分・発注者／注文者からの評価・着工前／中間／竣工時・労務・工事担当者の評価・改善点・コメント）
 //   2ページ目以降：検討項目（1〜7）と、No・問題点・原因及び再発防止策の表。長文は折り返して行の高さを伸ばし、あふれた行は次のページへ。
 //             最後の行に書いたら、または入りきらなくなったらページを自動で足す。ページの追加・削除のボタンもある（ページ数は議事で増減＝チェック表のご指示）
@@ -114,7 +115,26 @@
         tb.append(h('tr', null, j === 0 ? h('th', { rowspan: subs.length, class: 'h55-cat' }, cat) : null, h('th', { class: 'h55-sub' }, s), h('td', null, wrap(`q${i}`))));
       });
     });
-    return h('table', { class: 'grid h55p' }, h('colgroup', null, ...[20, 38, null].map((w) => h('col', { style: w ? `width:${w}mm` : null }))), tb);
+    const table = h('table', { class: 'grid h55p' }, h('colgroup', null, ...[20, 38, null].map((w) => h('col', { style: w ? `width:${w}mm` : null }))), tb);
+    // 1ページ目は次のページに回せないので、指示事項が増えて入りきらないときだけ文字を小さくする（基本は9pt。ユーザー指定）。
+    //   小さくするときは指示事項の欄すべてを同じ大きさに。行の高さが空欄のとき（8.2mm）より伸びた分の合計が、1ページ目の余白（SLACK）を超えないように
+    const SIZES = [9, 8.5, 8, 7.5, 7], SLACK = 6; // pt, mm（SLACK は印刷で確かめた1ページ目の余白より少なめ）
+    const mm = (v) => v * 96 / 25.4;
+    const fit = () => {
+      const tas = [...table.querySelectorAll('textarea')];
+      const trs = [...table.querySelectorAll('tbody tr')].slice(1);
+      // 行ごとの空のときの高さ（入力欄を縮めて測る）
+      tas.forEach((ta) => { ta.style.height = '0'; });
+      const base = trs.map((tr) => tr.getBoundingClientRect().height);
+      for (const pt of SIZES) {
+        tas.forEach((ta) => { ta.style.fontSize = pt + 'pt'; ta.style.height = '0'; ta.style.height = ta.scrollHeight + 'px'; });
+        const extra = trs.reduce((s, tr, i) => s + Math.max(0, tr.getBoundingClientRect().height - base[i]), 0);
+        if (extra <= mm(SLACK)) return;
+      }
+    };
+    table.addEventListener('input', () => requestAnimationFrame(fit));
+    requestAnimationFrame(() => requestAnimationFrame(fit));
+    return table;
   } };
 
   // 2ページ目の検討項目（決まった文言）
