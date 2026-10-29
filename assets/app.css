@@ -859,3 +859,10 @@ table.grid.h53 td.h53-no { text-align: center; font-size: 9pt; }
 .stamps.h53s .stamp-group + .stamp-group { border-top: 0; }
 /* 検討事項・実施計画：欄の中で折り返し、行の高さを JS で伸ばす（文字の大きさは変えない。本-品質-A0020 と同じ） */
 table.grid.h53 textarea.h53-wrap { min-height: 0; padding: .6mm 1.5mm; line-height: 1.35; resize: none; overflow: hidden; display: block; }
+/* 押印欄の斜線（def.stampSlash）：クリックで枠に左下から右上への斜線（回送不要の部署）。線は要素で描くので印刷にも出る */
+.stamp-box.slashable { position: relative; cursor: pointer; }
+.stamp-box .sb-slash { display: none; position: absolute; inset: 0; pointer-events: none; z-index: 2;
+  background: linear-gradient(to bottom right, transparent calc(50% - .7px), #000 calc(50% - .7px), #000 calc(50% + .7px), transparent calc(50% + .7px));
+  -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.stamp-box.slashed .sb-slash { display: block; }
+@media screen { .stamp-box.slashable:hover { background: #f3f6fc; } }

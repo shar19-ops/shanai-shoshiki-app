@@ -8,7 +8,9 @@
 (function () {
   // 検討事項の行数（どの行も1行分の高さのとき）。1ページ目・2ページ目以降。予定日の欄（TAIL 行分）がそのページに入るときはその分減る
   const FIRST = 15, NEXT = 31, TAIL = 9;
-  const FIXED = { 2: '施工検討書（本－工務－A0032）（添付資料 参照）', 4: 'その他の施工検討事項' }; // 1ページ目の決まった行（元の様式の太字）
+  // 決まった行：No.1 は施工検討書（固定）、その下に「その他の施工検討事項」（固定）。入力は3行目からで、No は 2 からの通し番号（ユーザー指定）
+  const FIXED = { 1: '施工検討書（本－工務－A0032）（添付資料 参照）', 2: 'その他の施工検討事項' };
+  const noOf = (n) => (n === 1 ? '1' : n === 2 ? '' : String(n - 1));
   const pageCount = (v) => Math.max(1, Number(v.pageCount) || 1);
   let counts = {}; // ページごとの行数（画面で行の高さを測って決める）
   const cap = (p, pages) => (p === 1 ? FIRST : NEXT) - (p === pages ? TAIL : 0);
@@ -17,7 +19,7 @@
     for (let q = 1; q < p; q++) from += counts[q] ?? cap(q, pages);
     return [from, from + (counts[p] ?? cap(p, pages)) - 1];
   };
-  const hasData = (values, n) => ['kento', 'keikaku', 'no'].some((k) => String(values[`r${n}.${k}`] ?? '') !== '');
+  const hasData = (values, n) => ['kento', 'keikaku'].some((k) => String(values[`r${n}.${k}`] ?? '') !== '');
   // 行の高さを測ってページごとの行数を決め直す（本-品質-A0020 と同じ考え方）。変わったときだけ作り直す
   //   edited：入力して欄を離れたとき（最後の行に書いたらページを足す）。開いたときは、入りきらない行があるときだけ足す
   const relayout = (values, setVal, rebuild, edited) => {
@@ -37,7 +39,7 @@
     }
     const last = n - 1;
     const maxData = Math.max(0, ...Object.keys(values).map((key) => Number((/^r(\d+)\./.exec(key) || [])[1] || 0)).filter((x) => x && hasData(values, x)));
-    const addPage = maxData > last || (edited && maxData === last && maxData > 4); // 決まった行（2・4行目）だけのときは足さない
+    const addPage = maxData > last || (edited && maxData === last && maxData > 2); // 決まった行（1・2行目）だけのときは足さない
     const same = Object.keys(next).length === Object.keys(counts).length && Object.keys(next).every((p) => counts[p] === next[p]);
     if (same && !addPage) return;
     counts = next;
@@ -104,7 +106,7 @@
     };
     const tb = h('tbody', null, h('tr', null, h('th', null, 'No'), h('th', null, '検　討　事　項'), h('th', null, '実　施　計　画')));
     for (let n = from; n <= to; n++) {
-      tb.append(h('tr', { 'data-n': n }, h('td', null, field({ key: `r${n}.no`, align: 'center' })),
+      tb.append(h('tr', { 'data-n': n }, h('td', { class: 'h53-no' }, noOf(n)),
         FIXED[n] ? h('td', { class: 'h53-fixed' }, FIXED[n]) : h('td', null, wrap(`r${n}.kento`)),
         h('td', null, wrap(`r${n}.keikaku`))));
     }
@@ -137,6 +139,8 @@
     fileIO: true, // 回送して押印してもらうのでファイルに保存
     fileKeys: ['koban', 'subject'], // ファイル名は「本-品質-A0053_工番_件名_日付.json」
     sheetClass: 'h53',
+    selfStamp: '工事長|工事部長', // 発行の工事長／工事部長はクリックでデート印（ユーザー指定）
+    stampSlash: true, // それ以外の押印欄はクリックで斜線（回送不要の部署。ユーザー指定）
     meta: [],
     // 回送先の押印欄は1ページ目のヘッダーの右上（ユーザー指定）。16個を4つずつ4段、枠の幅はほかの帳票と同じ（20mm）
     stampClass: 'stack h53s',

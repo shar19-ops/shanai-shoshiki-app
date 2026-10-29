@@ -385,13 +385,27 @@
           const self = def && def.selfStamp === head;
           // 見出しの '|' は改行（'総括安全|衛生管理者' のように長い役職名を2行で）
           const hl = head.split('|');
-          return h('div', { class: 'stamp-box' },
+          const prefix = g.stampKey || (d && d.stampKey) || '';
+          // def.stampSlash：本人欄以外の押印欄は、クリックで枠に斜線（回送不要の部署。もう一度で消す。本-品質-A0053）
+          const slashKey = `${prefix}slash.${head}`;
+          const slashable = def && def.stampSlash && !self;
+          const box = h('div', { class: 'stamp-box' + (slashable ? ' slashable' : '') + (slashable && values[slashKey] ? ' slashed' : ''), title: slashable ? 'クリックで斜線（回送不要）' : null },
+            slashable ? h('span', { class: 'sb-slash' }) : null,
             h('div', { class: 'sb-label' + (hl.length > 1 ? ' two' : head.length >= 6 ? ' tight' : '') }, hl.flatMap((s, i) => (i ? [h('br'), s] : [s]))),
             // dates：見出しの下に日付の欄。空欄なら「/　　/」を印字して手書きできるように（押印部はその分低く、枠の高さは同じ）
             // 日付の項目名は「sdate.見出し」。同じ見出しの欄が2つあるときは groups の stampKey で分ける
-            g.dates ? h('div', { class: 'sb-date' }, field({ key: `${g.stampKey || (d && d.stampKey) || ''}sdate.${head}`, align: 'center', placeholder: '/　　/' })) : null,
+            g.dates ? h('div', { class: 'sb-date' }, field({ key: `${prefix}sdate.${head}`, align: 'center', placeholder: '/　　/' })) : null,
             h('div', self ? { class: 'sb-area self-stamp' + (g.dates ? ' dated' : ''), title: 'クリックで押印設定', onclick: openStampDialog } : { class: 'sb-area' + (g.dates ? ' dated' : '') },
               roles.length ? h('div', { class: 'sb-roles' }, roles.flatMap((r, i) => (i ? [h('br'), r] : [r]))) : null));
+          if (slashable) {
+            box.addEventListener('click', (e) => {
+              if (e.target.closest('input')) return; // 日付の欄の入力では切り替えない
+              const on = !values[slashKey];
+              setVal(slashKey, on ? '1' : '');
+              box.classList.toggle('slashed', on);
+            });
+          }
+          return box;
         }))));
   }
 
