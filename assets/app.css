@@ -149,6 +149,8 @@ body {
 .self-stamp { display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: visible; }
 .self-stamp:hover { background: #f3f6fc; }
 .self-stamp svg { width: 14.4mm; height: 14.4mm; flex-shrink: 0; display: block; overflow: visible; position: relative; z-index: 1; }
+/* 三文判風の認印（selfStampStyle: inkan）は直径10.5mm */
+.self-stamp svg.inkan-stamp { width: 10.5mm; height: 10.5mm; }
 /* 本文中の「氏名［　］印」欄 */
 table.grid td.stamp-cell { position: relative; overflow: visible; }
 table.grid td.stamp-cell .self-stamp { position: absolute; inset: 0; }
@@ -265,7 +267,8 @@ td.ln-cell textarea.inp { padding-right: 11mm; }
 .pv { display: none; }
 /* 期間（日付〜日付） */
 .range-wrap { display: flex; align-items: center; height: 100%; }
-.range-wrap .date-wrap { flex: 1; }
+.range-wrap .date-wrap { flex: 1; min-width: 0; }
+.range-wrap .date-wrap input { min-width: 0; } /* 狭い欄でも日付の入力がはみ出さないように（本-品質-A0047 のヘッダー） */
 .range-sep { padding: 0 1.5mm; }
 .range-dow { white-space: nowrap; font-size: 9.5pt; padding-right: 1mm; }
 table.grid .date-wrap .pv { text-align: right; font-size: 9.5pt; }
@@ -729,3 +732,137 @@ table.grid.s13 td.s13-k { text-align: center; font-size: 7.5pt; padding: 0; }
 table.grid.s13 td.s13-m { padding: 0; }
 table.grid.s13 td.s13-m .mark-btn { font-size: 9pt; color: #1F3F8F; }
 table.grid.s13 tr.s13-mrow td { height: 3.4mm; font-size: 6pt; text-align: center; color: #555; padding: 0; }
+/* 本-品質-A0011 計測機器借用依頼書（17行）・A0013 計測機器使用前点検表（22行） */
+table.grid.h11 th, table.grid.h13 th { height: 6mm; font-size: 8.5pt; letter-spacing: .05em; }
+table.grid.h11 td { height: 9.6mm; font-size: 9pt; }
+table.grid.h11 td.h11-no { text-align: center !important; font-size: 8.5pt; padding: 0; }
+table.grid.h13 td { height: 8.8mm; font-size: 9pt; }
+table.grid.h13 td.h13-sel .checks { padding: 0 !important; gap: 0 2.5mm; justify-content: center; }
+table.grid.h13 td.h13-sel .checks label { font-size: 8.5pt; }
+table.grid.h11 .date-wrap .pv, table.grid.h13 .date-wrap .pv { font-size: 9pt; text-align: center; }
+
+/* col の fit：つないだ表の境目の罫線を1本に（本-品質-A0014） */
+.col-fit > * + * { margin-top: -1px; }
+
+/* 表の中の押印欄（grid の stamps。本-品質-A0015）：欄の右下に置く。列の幅は押印欄ちょうど（20mm×個数）にして、
+   左・右・下の枠は表の罫線を使う（押印欄の枠を重ねると幅が枠の分はみ出して、表の罫線とずれて見える。ユーザー指摘） */
+table.grid td.stamps-cell { vertical-align: bottom; padding: 0; }
+td.stamps-cell .stamps { justify-content: flex-end; max-width: none; gap: 0; }
+td.stamps-cell .stamp-group { border-width: 1px 0 0 1px; }
+/* 左の線は押印欄側でも引く（隣の欄の入力の背景が表の罫線に重なって、画面で線が切れて見えるため。ユーザー指摘）。幅は線の分だけ詰める */
+td.stamps-cell .stamp-box:first-child { width: calc(20mm - 1px); }
+/* 本-品質-A0015 是正処置報告書 */
+.h15-to { display: flex; align-items: flex-end; gap: 6mm; margin: 0; }
+.h15-to .h15-ate { display: flex; align-items: flex-end; width: 80mm; border-bottom: 1px solid var(--line); }
+.h15-to .h15-ate .inp { font-size: 11pt; }
+.h15-to .h15-onchu { font-size: 11pt; letter-spacing: .3em; padding: 0 1mm 1mm; white-space: nowrap; }
+table.grid td.h15-sec { background: var(--label-bg); font-weight: bold; text-align: left; padding-left: 2mm; height: 6mm; }
+table.grid td.h15-sub { text-align: left; padding-left: 2mm; height: 5.5mm; border-bottom: 0; }
+/* 本-品質-A0018 不適合処理報告書：発行種別は元の様式どおり3つずつ2段 */
+.sheet.h18 .checks:has(input[name="r_shubetsu"]) { display: grid; grid-template-columns: repeat(3, auto); justify-content: start; gap: 0 6mm; }
+/* 本-品質-A0020 検査指摘事項・確認書 */
+table.grid.h20 th { height: 7mm; font-size: 8pt; line-height: 1.15; letter-spacing: .05em; }
+table.grid.h20 td { height: 7.4mm; font-size: 9pt; }
+table.grid.h20 td.h11-no { text-align: center !important; font-size: 8.5pt; padding: 0; }
+table.grid.h20 .date-wrap .pv { font-size: 9pt; text-align: center; }
+.h20-notes { margin: 0; }
+.h20-route { border-collapse: collapse; font-size: 7.5pt; line-height: 1.35; }
+.h20-route td { padding: 0 2mm 0 0; white-space: nowrap; }
+/* 指摘事項・処置：欄の中で折り返し、行の高さを JS で伸ばす（文字の大きさは変えない） */
+table.grid.h20 textarea.h20-wrap { min-height: 0; padding: .6mm 1.5mm; line-height: 1.35; resize: none; overflow: hidden; display: block; }
+/* 本-品質-A0021 検査報告書：添付書類の名前は元の書式どおり字間を空けて */
+table.grid td.h21-doc { text-align: left; padding-left: 2mm; letter-spacing: .12em; }
+/* 本-品質-A0047 現場巡回検査報告書：31項目を1枚に収めるため行を詰める */
+table.grid.h47 th { height: 5mm; font-size: 8pt; letter-spacing: .05em; }
+table.grid.h47 td { height: 4.3mm; font-size: 7.5pt; padding: 0; }
+table.grid.h47 td.h47-cat { text-align: center; font-weight: bold; font-size: 8.5pt; }
+table.grid.h47 td.h47-item { text-align: left; padding: .2mm 1.2mm; line-height: 1.2; }
+table.grid.h47 .inp { min-height: 0; font-size: 8pt; }
+table.grid.h47 .h47-mark { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; padding: 0; }
+/* 建築現況・電気設備現況・所感の高さ（ユーザー指定で広めに。1枚に収まる範囲） */
+.sheet.h47 table.grid:not(.h47) textarea { height: 20mm !important; }
+/* 本-品質-A0051 個別工事施工プロセス管理表（A3横）：12列の表。■□はクリックで切り替え */
+table.grid.h51 th { font-size: 8pt; line-height: 1.25; letter-spacing: .05em; padding: 0 .5mm; }
+table.grid.h51 td { font-size: 7.4pt; line-height: 1.3; vertical-align: top; text-align: left; padding: .6mm .8mm; }
+table.grid.h51 tr.h51-step td { vertical-align: middle; text-align: center; font-size: 8pt; font-weight: bold; height: 9mm; }
+table.grid.h51 tr.h51-req td div + div { margin-top: .6mm; }
+table.grid.h51 tr.h51-time td, table.grid.h51 tr.h51-appr td { vertical-align: middle; text-align: center; }
+table.grid.h51 tr.h51-date td { padding: 0; height: 6mm; vertical-align: middle; }
+table.grid.h51 tr.h51-date .date-wrap .pv { text-align: center; font-size: 8pt; }
+table.grid.h51 .h51-line { display: flex; gap: 2mm; }
+table.grid.h51 .h51-it { display: flex; align-items: flex-start; gap: .6mm; }
+table.grid.h51 .h51-mark { font: inherit; font-size: 7.6pt; line-height: 1.3; border: 0; background: none; padding: 0; cursor: pointer; color: var(--ink); }
+table.grid.h51 .h51-mark:hover { color: var(--accent); }
+table.grid.h51 tr.h51-stamp td { padding: 0; height: 30mm; }
+table.grid.h51 .h51-st { display: flex; flex-direction: column; height: 30mm; }
+table.grid.h51 .h51-st .inp { height: 4.5mm; min-height: 0; font-size: 7.5pt; padding: 0; text-align: center; flex: none; }
+table.grid.h51 .h51-st .inp::placeholder { color: #888; opacity: 1; }
+@media print { table.grid.h51 .h51-st .inp::placeholder { color: #000 !important; } }
+/* 承認印（クリックで三文判風の認印）。日常管理の4つの欄は日付の横に小さく */
+table.grid.h51 .inkan-box { flex: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+table.grid.h51 .inkan-box:hover { background: #f3f6fc; }
+table.grid.h51 .inkan-box svg { width: 10.5mm; height: 10.5mm; }
+table.grid.h51 .inkan-hint { font-size: 6.5pt; color: #8a94a6; }
+table.grid.h51 .h51-st.multi { flex-direction: row; align-items: center; height: 7.5mm; border-bottom: 1px dotted var(--line); }
+table.grid.h51 .h51-st.multi .inp { width: 55%; height: 100%; }
+table.grid.h51 .h51-st.multi .inkan-box { height: 100%; }
+table.grid.h51 .h51-st.multi .inkan-box svg { width: 6.8mm; height: 6.8mm; }
+table.grid.h51 .h51-st.multi .inkan-hint { font-size: 5.5pt; }
+table.grid.h51 .h51-st.multi:last-child { border-bottom: 0; }
+table.grid.h51 tr.h51-who td { height: 13mm; }
+table.grid.h51 tr.h51-dept td { height: 24mm; }
+table.grid.h51 tr.h51-in td { height: 28mm; }
+table.grid.h51 tr.h51-proc td { height: 22mm; }
+table.grid.h51 tr.h51-out td { height: 24mm; }
+/* 承認印の日付（yy/mm/dd、日付を選ぶ） */
+table.grid.h51 .h51-st .date-wrap { height: 4.5mm; flex: none; }
+table.grid.h51 .h51-st .date-wrap .pv { text-align: center; font-size: 7.5pt; padding: 0; }
+table.grid.h51 .h51-st.multi .date-wrap { width: 55%; height: 100%; }
+/* 本-品質-A0051：日常管理以外の日付（実施予定日・承認印の日付）は欄の中央に（ユーザー指定）。画面ではカレンダーの印の分を空けずに中央へ */
+table.grid.h51 tr.h51-date .date-wrap .pv, table.grid.h51 .h51-st:not(.multi) .date-wrap .pv { justify-content: center; text-align: center; }
+@media screen { table.grid.h51 tr.h51-date .date-wrap.jp .pv, table.grid.h51 .h51-st:not(.multi) .date-wrap.jp .pv { inset: 0; padding: 0; } }
+/* クリックで押す三文判風の認印（field の inkan） */
+.inkan-box { display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.inkan-box:hover { background: #f3f6fc; }
+.inkan-box svg { width: 10.5mm; height: 10.5mm; }
+.inkan-hint { font-size: 6.5pt; color: #8a94a6; }
+/* 本-品質-A0052 施工検討会開催通知書：巡回順の表（要出席は □ ⇔ ■、出席・欠席は日付と認印） */
+table.grid.h52 th { font-size: 8.5pt; letter-spacing: .1em; height: 6mm; }
+table.grid.h52 th.h52-role { font-size: 9pt; line-height: 1.3; letter-spacing: .05em; }
+table.grid.h52 td.h52-needc { text-align: center; }
+table.grid.h52 .h52-need { font: inherit; font-family: "MS Gothic", monospace; font-size: 13pt; border: 0; background: none; cursor: pointer; padding: 0; color: #000; -webkit-text-fill-color: #000; }
+table.grid.h52 td.h52-st { padding: 0; height: 21mm; vertical-align: top; position: relative; }
+table.grid.h52 td.h52-st { display: table-cell; }
+table.grid.h52 td.h52-st .date-wrap { height: 4.8mm; }
+table.grid.h52 td.h52-st .date-wrap .pv { justify-content: center; text-align: center; font-size: 8pt; padding: 0; }
+@media screen { table.grid.h52 td.h52-st .date-wrap.jp .pv { inset: 0 4mm 0 0; } }
+table.grid.h52 td.h52-st .inkan-box { height: calc(21mm - 4.8mm); }
+table.grid.h52 .h52-keep { position: absolute; left: 0; right: 0; bottom: 1.2mm; text-align: center; font-size: 8pt; color: #b3bac6; pointer-events: none; }
+/* 出席・欠席の欄：上の罫線が日付の背景に隠れないように1px空ける */
+table.grid.h52 td.h52-st { padding: 1px 1px 0; }
+/* クリックの押印がない役職（紙で回送）は押印の空欄だけ */
+table.grid.h52 td.h52-st .h52-paper { height: calc(21mm - 4.8mm); }
+/* 押印欄の日付：入力欄の最小の高さ（7mm）が枠からはみ出して罫線を隠さないように、枠の高さに合わせる（ユーザー指摘。A0051・A0052） */
+table.grid.h52 td.h52-st .date-wrap input, table.grid.h51 .h51-st .date-wrap input { height: 100%; min-height: 0; padding-top: 0; padding-bottom: 0; }
+table.grid.h51 tr.h51-stamp td { padding: 1px 1px 0; }
+table.grid.h51 .h51-st { height: calc(30mm - 1px); }
+table.grid.h51 .h51-st.multi { height: 7.5mm; }
+/* 本-品質-A0053 施工検討会報告書：検討事項の表 */
+table.grid.h53 th { height: 6mm; font-size: 8.5pt; letter-spacing: .1em; }
+table.grid.h53 td { height: 6.6mm; }
+table.grid.h53 td.h53-fixed { font-weight: bold; text-align: left; padding-left: 2mm; font-size: 9pt; }
+table.grid.h53 td.h53-note { text-align: left; padding-left: 2mm; font-size: 7.5pt; }
+table.grid.h53 td.h53-plan { text-align: left; padding-left: 2mm; font-size: 9pt; }
+table.grid.h53 td.h53-no { text-align: center; font-size: 9pt; }
+/* 回送先の押印欄はヘッダーの右上に4つずつ4段（枠の幅はほかの帳票と同じ。ユーザー指定）。段の間は線を1本に */
+.stamps.h53s { max-width: none; gap: 0; }
+.stamps.h53s .stamp-group + .stamp-group { border-top: 0; }
+/* 検討事項・実施計画：欄の中で折り返し、行の高さを JS で伸ばす（文字の大きさは変えない。本-品質-A0020 と同じ） */
+table.grid.h53 textarea.h53-wrap { min-height: 0; padding: .6mm 1.5mm; line-height: 1.35; resize: none; overflow: hidden; display: block; }
+/* 押印欄の斜線（def.stampSlash）：クリックで枠に左下から右上への斜線（回送不要の部署）。線は要素で描くので印刷にも出る */
+.stamp-box.slashable { position: relative; cursor: pointer; }
+.stamp-box .sb-slash { display: none; position: absolute; inset: 0; pointer-events: none; z-index: 2;
+  background: linear-gradient(to bottom right, transparent calc(50% - .7px), #000 calc(50% - .7px), #000 calc(50% + .7px), transparent calc(50% + .7px));
+  -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.stamp-box.slashed .sb-slash { display: block; }
+@media screen { .stamp-box.slashable:hover { background: #f3f6fc; } }

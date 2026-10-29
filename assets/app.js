@@ -40,8 +40,10 @@
   const fmtNum = (n, dec) => (isNaN(n) ? '' : n.toLocaleString('ja-JP', { maximumFractionDigits: dec == null ? 2 : dec }));
   const fmtDate = (iso, style) => {
     // 未入力なら手書き用の枠を残す
-    if (!iso) return { ym: '　　　年　　月', md: '　　月　　日', short: '　 /　 /' }[style] || '　　　年　　月　　日';
+    if (!iso) return { ym: '　　　年　　月', md: '　　月　　日', short: '　 /　 /', 'm/d': '　 /', 'yy/mm/dd': '　 /　 /' }[style] || '　　　年　　月　　日';
     const [y, m, d] = iso.split('-').map(Number);
+    if (style === 'yy/mm/dd') return `${String(y).slice(-2)}/${String(m).padStart(2, '0')}/${String(d).padStart(2, '0')}`; // 0埋め（本-品質-A0051 の承認印の日付）
+    if (style === 'm/d') return `${m}/${d}`; // 月/日だけ（本-品質-A0020 の手直期限など、元の様式が「/」の欄）
     if (style === 'ym') return `${y}年 ${m}月`;
     if (style === 'md') return `${m}月 ${d}日`;
     if (style === 'short') return `${String(y).slice(-2)}/${m}/${d}`; // 幅の狭い欄（台帳など）
@@ -107,12 +109,33 @@
 
     if (type === 'image') return imageField(f);
 
+    // inkan：クリックで苗字を聞いて三文判風の認印を押す欄（欄ごとに別の人。空欄で取り消し。押せる人の制限はしない）
+    //   値は苗字。前に押した苗字を次の入力の初期値にする（このPCのブラウザに保存）。本-品質-A0051・A0052
+    if (type === 'inkan') {
+      const LAST = STORE_PREFIX + '_inkan';
+      const box = h('div', { class: 'inkan-box', title: 'クリックで押印（苗字を入力）' });
+      const draw = () => { box.innerHTML = values[key] ? DateStamp.inkan({ name: values[key], color: 'red' }) : '<span class="inkan-hint no-print">クリックで押印</span>'; };
+      box.addEventListener('click', () => {
+        let last = '';
+        try { last = localStorage.getItem(LAST) || ''; } catch (e) { /* 既定値のまま */ }
+        const s = prompt('押印する苗字を入力してください（空欄で取り消し）', values[key] || last);
+        if (s === null) return;
+        const name = s.trim().slice(0, 4);
+        setVal(key, name);
+        if (name) { try { localStorage.setItem(LAST, name); } catch (e) { /* noop */ } }
+        draw();
+      });
+      draw();
+      inputs[key] = box;
+      return box;
+    }
+
     // 期間（日付〜日付、kind: 'time' なら時刻〜時刻）を1つの欄に。間に縦罫線を入れない
     // dow: true なら日付の後ろに曜日（例：（木））を自動表示
     if (type === 'daterange') {
       const kind = f.kind || 'date';
       const part = (k) => {
-        const parts = [field({ key: k, type: kind })];
+        const parts = [field({ key: k, type: kind, jp: f.jp, style: f.style })]; // jp・style は日付の見せ方（date と同じ）
         if (f.dow) {
           const w = h('span', { class: 'range-dow' });
           calcs.push(() => { const iso = values[k]; w.textContent = iso ? '（' + '日月火水木金土'[new Date(iso + 'T00:00').getDay()] + '）' : '（　）'; });
@@ -210,7 +233,8 @@
     } else {
       const isNum = type === 'number' || type === 'money';
       el = h('input', {
-        class: 'inp' + (isNum ? ' num' : '') + (f.align === 'center' ? ' center' : ''),
+        // 数値は右寄せ（align: 'left' なら左寄せ。例：「￥」を付けた契約金額）
+        class: 'inp' + (isNum && f.align !== 'left' ? ' num' : '') + (f.align === 'center' ? ' center' : ''),
         type: 'text', value: v, placeholder: f.placeholder || '',
         inputmode: f.inputmode || (isNum ? 'decimal' : (type === 'tel' || type === 'zip' ? 'tel' : null)),
         maxlength: f.maxlength || null,
@@ -298,6 +322,8 @@
   function stampSvg() {
     const c = stampCfg;
     if (!c.enabled || !c.sei) return '';
+    // selfStampStyle: 'inkan'：デート印ではなく三文判風の認印（苗字だけ、朱。本-品質-A0020 の検査者。ユーザー指定）
+    if (def.selfStampStyle === 'inkan') return DateStamp.inkan({ name: c.sei, color: 'red' });
     // 役職なし：苗字を上下に分割／役職あり：上に苗字・下に役職／支店長：上に事業所名（「支店」を除く）
     const names = c.title === '支店長' ? { nameTop: (values.office || c.office || '').replace(/支店$/, ''), nameBottom: '支店長' }
       : c.title ? { nameTop: c.sei, nameBottom: c.title } : { name: c.sei };
@@ -319,7 +345,7 @@
       h('select', { onchange: (e) => set('office', e.target.value) },
         LISTS.offices.filter((o) => o !== '本店').map((o) => h('option', { value: o, selected: o === stampCfg.office }, o))));
     const dlg = h('dialog', { class: 'stamp-dialog' }, h('form', { method: 'dialog' },
-      h('h3', null, '押印設定（本人欄のデート印）'),
+      h('h3', null, def.selfStampStyle === 'inkan' ? '押印設定（本人欄の認印）' : '押印設定（本人欄のデート印）'),
       h('p', { class: 'sd-note' }, '全帳票共通の設定です（このPCのブラウザにだけ保存）。日付は帳票の作成日・発行日、未入力なら今日の日付になります。承認・確認欄には押されません。'),
       h('div', { class: 'sd-body' },
         h('div', { class: 'sd-fields' },
@@ -359,12 +385,27 @@
           const self = def && def.selfStamp === head;
           // 見出しの '|' は改行（'総括安全|衛生管理者' のように長い役職名を2行で）
           const hl = head.split('|');
-          return h('div', { class: 'stamp-box' },
+          const prefix = g.stampKey || (d && d.stampKey) || '';
+          // def.stampSlash：本人欄以外の押印欄は、クリックで枠に斜線（回送不要の部署。もう一度で消す。本-品質-A0053）
+          const slashKey = `${prefix}slash.${head}`;
+          const slashable = def && def.stampSlash && !self;
+          const box = h('div', { class: 'stamp-box' + (slashable ? ' slashable' : '') + (slashable && values[slashKey] ? ' slashed' : ''), title: slashable ? 'クリックで斜線（回送不要）' : null },
+            slashable ? h('span', { class: 'sb-slash' }) : null,
             h('div', { class: 'sb-label' + (hl.length > 1 ? ' two' : head.length >= 6 ? ' tight' : '') }, hl.flatMap((s, i) => (i ? [h('br'), s] : [s]))),
             // dates：見出しの下に日付の欄。空欄なら「/　　/」を印字して手書きできるように（押印部はその分低く、枠の高さは同じ）
-            g.dates ? h('div', { class: 'sb-date' }, field({ key: `${(d && d.stampKey) || ''}sdate.${head}`, align: 'center', placeholder: '/　　/' })) : null,
+            // 日付の項目名は「sdate.見出し」。同じ見出しの欄が2つあるときは groups の stampKey で分ける
+            g.dates ? h('div', { class: 'sb-date' }, field({ key: `${prefix}sdate.${head}`, align: 'center', placeholder: '/　　/' })) : null,
             h('div', self ? { class: 'sb-area self-stamp' + (g.dates ? ' dated' : ''), title: 'クリックで押印設定', onclick: openStampDialog } : { class: 'sb-area' + (g.dates ? ' dated' : '') },
               roles.length ? h('div', { class: 'sb-roles' }, roles.flatMap((r, i) => (i ? [h('br'), r] : [r]))) : null));
+          if (slashable) {
+            box.addEventListener('click', (e) => {
+              if (e.target.closest('input')) return; // 日付の欄の入力では切り替えない
+              const on = !values[slashKey];
+              setVal(slashKey, on ? '1' : '');
+              box.classList.toggle('slashed', on);
+            });
+          }
+          return box;
         }))));
   }
 
@@ -455,7 +496,10 @@
       return h('td', { class: 'stamp-cell', colspan: span, rowspan: rs, style },
         h('div', { class: 'self-stamp', 'data-empty': '印', title: 'クリックで押印設定', onclick: openStampDialog }));
     }
-    if (it.text != null && !it.key) return h('td', { class: it.note ? 'note' : 'txt', colspan: span, rowspan: rs, style: style + (it.align ? `;text-align:${it.align}` : '') }, it.text);
+    // stamps：表の中の押印欄（stamps と同じ groups。欄の右下に置く。本-品質-A0015）
+    if (it.stamps) return h('td', { class: 'stamps-cell', colspan: span, rowspan: rs, style }, stampsEl(it.stamps, null, def));
+    // cls：文字だけの欄の見た目を追加（例：欄の見出し）
+    if (it.text != null && !it.key) return h('td', { class: (it.note ? 'note' : 'txt') + (it.cls ? ' ' + it.cls : ''), colspan: span, rowspan: rs, style: style + (it.align ? `;text-align:${it.align}` : '') }, it.text);
     if (!it.key) return h('td', { colspan: span, rowspan: rs, style });
     const td = h('td', { colspan: span, rowspan: rs, style }, field(it));
     // 表の中の記述欄：罫線は初期値なし（plain: false なら初期値あり）、右上の「罫線」ボタンで切り替え（lineToggle: false で付けない）
@@ -887,7 +931,8 @@
     row: (b) => h('div', { style: `display:flex;gap:${b.gap ?? 4}mm;align-items:${b.align || 'stretch'}` + (b.grow ? ';flex:1' : '') },
       b.items.map((x) => h('div', { style: (x.w ? `width:${x.w}%;flex-shrink:0` : 'flex:1;min-width:0') + ';display:flex;flex-direction:column' }, renderBlock(x)))),
     // col：ブロックを縦に並べる（row の中の1段）。中の grow のブロックが残りの高さを使う
-    col: (b) => h('div', { style: `display:flex;flex-direction:column;gap:${b.gap ?? 3}mm;flex:1` }, b.items.map(renderBlock)),
+    //   fit: true なら伸ばさない（本文の中で、表どうしを隙間なくつなぐとき。本-品質-A0014）
+    col: (b) => h('div', { class: b.fit ? 'col-fit' : null, style: `display:flex;flex-direction:column;gap:${b.gap ?? 3}mm;flex:${b.fit ? 'none' : 1}` }, b.items.map(renderBlock)),
     // rebuild：帳票を作り直す（台帳のページを増やすときなど）。newFile：開いたファイルを忘れる（次の保存は新しいファイル。月報の翌月分など）
     custom: (b) => b.render({ h, field, values, setVal, rebuild: () => rebuild(true), newFile: () => { fileHandle = null; } }),
   };
@@ -945,7 +990,9 @@
   function fileName() {
     const d = new Date();
     const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
-    const name = String(values.subject || values.bukken || '').replace(/[\\/:*?"<>|\s]+/g, '_').slice(0, 40);
+    // fileKeys：ファイル名に使う項目（例：計測機器の管理番号・機器名。省略は件名）
+    const pick = def.fileKeys ? def.fileKeys.map((k) => values[k]).filter(Boolean).join('_') : (values.subject || values.bukken || '');
+    const name = String(pick).replace(/[\\/:*?"<>|\s]+/g, '_').slice(0, 40);
     return `${def.code}_${name ? name + '_' : ''}${ymd}.json`;
   }
   async function saveFile(id) {
