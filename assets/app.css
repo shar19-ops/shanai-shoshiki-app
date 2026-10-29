@@ -847,3 +847,15 @@ table.grid.h52 td.h52-st .date-wrap input, table.grid.h51 .h51-st .date-wrap inp
 table.grid.h51 tr.h51-stamp td { padding: 1px 1px 0; }
 table.grid.h51 .h51-st { height: calc(30mm - 1px); }
 table.grid.h51 .h51-st.multi { height: 7.5mm; }
+/* 本-品質-A0053 施工検討会報告書：検討事項の表、回送先の押印欄は8つずつ2段を全幅に */
+table.grid.h53 th { height: 6mm; font-size: 8.5pt; letter-spacing: .1em; }
+table.grid.h53 td { height: 6.6mm; }
+table.grid.h53 td.h53-fixed { font-weight: bold; text-align: left; padding-left: 2mm; font-size: 9pt; }
+table.grid.h53 td.h53-note { text-align: left; padding-left: 2mm; font-size: 7.5pt; }
+table.grid.h53 td.h53-plan { text-align: left; padding-left: 2mm; font-size: 9pt; }
+table.grid.h53 td.h53-no { text-align: center; font-size: 9pt; }
+.sheet.h53 .inline-stamps > div { flex: 1; }
+.sheet.h53 .inline-stamps .stamps { max-width: none; flex-direction: column; gap: 0; }
+.sheet.h53 .inline-stamps .stamp-group { flex: 1; }
+.sheet.h53 .inline-stamps .stamp-group + .stamp-group { border-top: 0; }
+.sheet.h53 .inline-stamps .stamp-box { flex: 1; width: auto; }
