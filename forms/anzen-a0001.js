@@ -118,7 +118,7 @@
         [{ label: '施工部署', key: 'sekoDept', lw: 1, span: 2 }],
         [{ label: '作業所長名', key: 'shocho', lw: 1, span: 2, unit: '印' }],
         [{ label: '検査部署', key: 'kensaDept', lw: 1, span: 2 }],
-        [{ label: '検査者名', key: 'kensasha', lw: 1, span: 2, unit: '印' }],
+        [{ label: '検査者名', key: 'kensasha', lw: 1, span: 2, unit: '印', unitInkan: true }], // 印は発行者と同じ苗字の認印（修正指示書）
       ] },
     ],
     blocks: [

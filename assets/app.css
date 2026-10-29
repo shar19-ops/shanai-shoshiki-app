@@ -264,6 +264,11 @@ td.ln-cell textarea.inp { padding-right: 11mm; }
 .ln-btn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
 .date-wrap { display: flex; align-items: center; height: 100%; }
 .date-wrap input[type=date] { flex: 1; }
+/* iPad・iPhone の Safari は日付の入力に最小の幅があり、狭い欄では隣の罫線にかぶって線が消えて見える（台帳の発行日・廃止日。修正指示書） */
+@supports (-webkit-touch-callout: none) {
+  .date-wrap { min-width: 0; overflow: hidden; }
+  .date-wrap input[type=date] { -webkit-appearance: none; appearance: none; min-width: 0; width: 100%; }
+}
 .pv { display: none; }
 /* 期間（日付〜日付） */
 .range-wrap { display: flex; align-items: center; height: 100%; }
@@ -436,7 +441,7 @@ table.grid.q-check td.q-goal-h { writing-mode: horizontal-tb; padding: .5mm 0; v
 table.grid.q-check td.q-goal-h .q-month { margin: 0 .3mm; } /* 月と見出しの間に線を入れず一体に見せる */
 table.grid.q-check td.q-goal-h .q-month .inp { padding: 0; font-size: 8pt; text-align: center; }
 table.grid.q-check td.q-goal-h .q-month .inp::placeholder { color: transparent; }
-table.grid.q-check td.q-goal-h .q-vt { writing-mode: vertical-rl; margin: 0 auto; }
+table.grid.q-check td.q-goal-h .q-vt { writing-mode: vertical-rl; margin: 0 auto; height: 7.2em; } /* 高さは7文字分（Safari は高さを決めないと1文字ずつ折り返して横にはみ出す。修正指示書） */
 /* sheetClass: 'stamps-2row' … 押印欄のグループを2つずつ2段に（表題の長い帳票。本-工務-A0037） */
 .sheet.stamps-2row .stamps { max-width: 96mm; }
 /* sheetClass: 'tight-gap' … 欄と欄の間を詰める（項目の多い帳票。本-工務-A0070） */
@@ -642,8 +647,8 @@ table.grid.b3 .b3-rate-v .inp { font-weight: 700; font-size: 11pt; }
 table.grid.b3 .b3-small { font-size: 8pt; margin-left: 2mm; }
 table.grid.b3 .b3-left .inp { font-size: 8pt; color: #b0522a; height: auto; min-height: 0; }
 table.grid.b3 th.b3-eval-h { height: 11mm; }
-table.grid.b3 td.b3-eval { text-align: center; font-size: 11pt; white-space: nowrap; padding: 0; }
-table.grid.b3 .b3-rank { display: inline-block; width: 6.4mm; height: 6.4mm; line-height: 6.1mm; border-radius: 50%; border: 1.5px solid transparent; }
+table.grid.b3 td.b3-eval { text-align: center; font-size: 10pt; white-space: nowrap; padding: 0; letter-spacing: -.05em; } /* iPad の文字でも枠に収まるように少し小さく（修正指示書） */
+table.grid.b3 .b3-rank { display: inline-block; width: 6mm; height: 6mm; line-height: 5.7mm; letter-spacing: 0; border-radius: 50%; border: 1.5px solid transparent; }
 table.grid.b3 .b3-rank.on { border-color: #000; font-weight: 700; }
 table.grid.b3 .b3-dot { margin: 0 .2mm; }
 table.grid.b3 td.b3-criteria { font-size: 8.5pt; padding: 1mm 3mm; line-height: 1.5; }
@@ -670,6 +675,7 @@ table.grid.b4 .b4-inline .checks label { font-size: 7pt; }
 table.grid.b4 .b4-inline .checks .box { width: 2.6mm; height: 2.6mm; }
 table.grid.b4 .b4-kensa .b4-sub { flex: none; padding-left: 2mm; }
 table.grid.b4 .b4-kensa .b4-kv { flex: 1; min-width: 0; }
+table.grid.b4 .b4-inline > .b4-kv { flex: 1; min-width: 0; }
 .b4-terms { columns: 2; column-gap: 7mm; font-size: 7.4pt; line-height: 1.42; text-align: justify; }
 .b4-terms-title { font-weight: 700; font-size: 9pt; margin-bottom: 1mm; }
 .b4-terms p { margin: 0; break-inside: avoid-column; }
@@ -710,7 +716,7 @@ table.grid.s1 td { height: 8.2mm; font-size: 9pt; }
 table.grid.s1 .date-wrap .pv { font-size: 9pt; }
 /* 本-総務-A0012 教育訓練実施記録（受講者40名） */
 table.grid.s12 th { height: 5.5mm; font-size: 8.5pt; }
-table.grid.s12 td { height: 5.6mm; font-size: 9pt; }
+table.grid.s12 td { height: 7.4mm; font-size: 9pt; } /* 30名・手書きしやすい高さ（修正指示書） */
 table.grid.s12 td.s12-no { text-align: center !important; font-size: 8pt; padding: 0; } /* 通し番号は中央 */
 table.grid.s12 .inp { min-height: 0; }
 /* 本-総務-A0013 年度教育訓練計画（A4横、1ページ5項目、スケジュールは月をクリックで■） */
@@ -892,3 +898,25 @@ table.grid.h56 td.h56-in .inkan-box { height: 100%; min-height: 6.6mm; }
 table.grid.h56 td.h56-in .inkan-box svg { width: 6mm; height: 6mm; }
 table.grid.h56 td.h56-in .inkan-hint { font-size: 0; }
 table.grid.h56 td.h56-in .inkan-hint::after { content: '印'; font-size: 7pt; color: #c0c6d0; }
+/* unitInkan：「印」の位置の認印（行の高さを変えずに少しはみ出して押す。本-安全-A0001 の検査者名） */
+.unit.self-inkan { position: relative; cursor: pointer; min-width: 4mm; text-align: center; }
+.unit.self-inkan.on { color: transparent; }
+.unit.self-inkan svg { position: absolute; left: 50%; top: 50%; width: 6.5mm; height: 6.5mm; transform: translate(-50%, -50%); pointer-events: none; }
+/* 本-安全-A0014 運転月報：年月は大きめの太字（修正指示書） */
+.f-meta .m-item.a14-ym, .f-meta .m-item.a14-ym .inp, .f-meta .m-item.a14-ym .pv { font-size: 13pt; font-weight: bold; }
+table.grid td.a14-ym .inp { font-size: 12pt; font-weight: bold; }
+/* 本-安全-A0014 運転月報：年月は大きめの太字（修正指示書） */
+.f-meta .m-item.a14-ym, .f-meta .m-item.a14-ym .inp, .f-meta .m-item.a14-ym .pv { font-size: 13pt; font-weight: bold; }
+table.grid td.a14-ym .inp { font-size: 12pt; font-weight: bold; }
+/* 見出しと「罫線 なし／あり」が狭い欄に収まらないとき（iPad の文字は幅が広い）：欄の幅は変えず、切り替えは見出しの右に詰める（本-工務-A0070 の指示事項。修正指示書） */
+.free { min-width: 0; }
+.free .free-label.has-toggle { gap: 1.5mm; }
+.free .free-label.has-toggle .line-toggle { flex: none; }
+.sheet.k70 .free .free-label.has-toggle { letter-spacing: 0; white-space: nowrap; }
+.sheet.k70 .free .free-label.has-toggle .line-toggle { gap: 1px; }
+.sheet.k70 .free .free-label.has-toggle .line-toggle button { padding-left: 5px; padding-right: 5px; }
+/* 本-工務-A0070：月度は大きめの太字（修正指示書） */
+.sheet.k70 .f-meta .m-item:first-child, .sheet.k70 .f-meta .m-item:first-child .inp, .sheet.k70 .f-meta .m-item:first-child .pv { font-size: 13pt; font-weight: bold; }
+/* 般-50：確認者の日付と押印欄（発行）の間の横罫線をなくす（修正指示書） */
+.k50-tbl td.k50-conf-d { border-bottom-style: hidden; } /* 罫線をつなげた表なので hidden（none だと隣の線が勝つ） */
+.k50-tbl td.k50-conf-s { border-top-style: hidden; }

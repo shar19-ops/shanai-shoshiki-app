@@ -16,7 +16,8 @@ FORM_DEFS['02'] = {
       [{ label: '工事長', key: 'chief', lw: 5, span: 9 }, { label: '作業所長', key: 'manager', lw: 3, span: 7 }, { label: '作業所員', key: 'staff', lw: 3, span: 8 }],
       [{ label: '最寄駅', key: 'station', lw: 5 }],
     ] },
-    { type: 'image', label: '案　内　図', key: 'map', grow: true },
+    // 案内図は本-安全-A0006 の略図の欄と同じ：地図の画像を下絵に敷き、文字・矢印・図形を書き込める（修正指示書。以前貼った画像は下絵として引き継ぐ）
+    { type: 'sketch', label: '案　内　図', key: 'map', grow: true, hideSyms: ['①', '②', '✖', '♀', '▽'] },
     { type: 'notes', items: [
       '※1　全ての欄を漏れなく記入すること。',
       '※2　所在地は住居表示の住所とすること。（ビル名、階数も忘れずに記入すること。）',

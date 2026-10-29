@@ -2,7 +2,8 @@
 // ユーザー指定：一覧に載せるが運転月報アプリとは切り離す（紙で書く・印刷する用の様式）。運転月報アプリの印刷はこの見た目に合わせる
 // ここでは記入ページの2枚（1〜15日＋15日点検、16〜31日＋合計＋末日点検）を作る。表紙と安全運転3訓はユーザー指定で不要
 (function () {
-  const vt = (s) => s.split('').join('\n');
+  // 縦に1文字ずつ並べる。括弧は縦書き用の字形（︵︶）にして横向きに見せる（修正指示書）
+  const vt = (s) => s.replace(/（/g, '︵').replace(/）/g, '︶').split('').join('\n');
   // 走行距離 ＝ 翌日の出庫時メーター − その日の出庫時メーター（元Excelの G列の式と同じ。31日は空欄）
   const meter = (v, d) => {
     const k = d <= 15 ? `a.${d}.meter` : `b.${d - 15}.meter`;
@@ -95,7 +96,7 @@
   // 2枚目の上：1枚目に入れた年月・車両番号・車両管理者をそのまま表示
   const ymText = (v) => (v.ym ? `${v.ym.slice(0, 4)}年 ${Number(v.ym.slice(5, 7))}月` : '');
   const info2 = { type: 'grid', lw: 3, rowH: 7, dense: true, rows: [
-    [{ label: '年　月', key: 'ym2', type: 'calc', align: 'left', calc: (n, v) => ymText(v), span: 7 },
+    [{ label: '年　月', key: 'ym2', type: 'calc', align: 'left', calc: (n, v) => ymText(v), span: 7, cls: 'a14-ym' },
       { label: '車両番号', key: 'carNo2', type: 'calc', align: 'left', calc: (n, v) => v.carNo || '', span: 8 },
       { label: '車両管理者', key: 'kanri2', type: 'calc', align: 'left', calc: (n, v) => v.kanri || '', lw: 4, span: 9 }],
   ] };
@@ -104,7 +105,7 @@
     code: '本-安全-A0014', title: '運転月報',
     seitei: '07/08/06', kaitei: '26/11/17', // フッター：制定日は元の様式のまま、最終改訂日はユーザー指定
     selfStamp: '発行者', // 押印欄の右端（発行者）にデート印
-    meta: [{ label: '年　月', key: 'ym', type: 'ym' }],
+    meta: [{ label: '年　月', key: 'ym', type: 'ym', cls: 'a14-ym' }], // 年月は大きめ（修正指示書）
     stamps: [{ boxes: ['安全運転|管理者', '副安全運転|管理者', '発行者'] }],
     pages: [
       { blocks: [info, days('a', 1, 15), checklist('mid', '15日')] },
