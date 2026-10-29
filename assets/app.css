@@ -854,8 +854,6 @@ table.grid.h53 td.h53-fixed { font-weight: bold; text-align: left; padding-left:
 table.grid.h53 td.h53-note { text-align: left; padding-left: 2mm; font-size: 7.5pt; }
 table.grid.h53 td.h53-plan { text-align: left; padding-left: 2mm; font-size: 9pt; }
 table.grid.h53 td.h53-no { text-align: center; font-size: 9pt; }
-/* 回送先の押印欄はヘッダーの右上に8つずつ2段（枠の幅を14mmに詰める。ユーザー指定） */
+/* 回送先の押印欄はヘッダーの右上に4つずつ4段（枠の幅はほかの帳票と同じ。ユーザー指定）。段の間は線を1本に */
 .stamps.h53s { max-width: none; gap: 0; }
 .stamps.h53s .stamp-group + .stamp-group { border-top: 0; }
-.stamps.h53s .stamp-box { width: 14mm; }
-.stamps.h53s .stamp-box .sb-label { font-size: 6.5pt; letter-spacing: 0; }
