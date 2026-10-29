@@ -1,10 +1,10 @@
 // 本-品質-A0053 施工検討会報告書（品質記録様式。元Excel：本ー品質ーA0053施工検討会報告書.xlsx、A4縦2ページ）
-// ISOの要求事項【8.1】はヘッダーの番号の後ろ。1ページ目：工番・件名・開催日・事業所・部署・作業所長・開催場所・出席者、検討事項と実施計画、本店長指示、回送先の押印欄（元の様式どおり最下段に8つずつ2段）
+// ISOの要求事項【8.1】はヘッダーの番号の後ろ。1ページ目：工番・件名・開催日・事業所・部署・作業所長・開催場所・出席者、検討事項と実施計画、本店長指示、回送先の押印欄（ヘッダーの右上に8つずつ2段。ヘッダーの情報はその横）
 // 2ページ目：検討事項と実施計画の続き、受電・キュービクル搬入などの予定日（1〜7）
 // 本-品質-A0052 施工検討会開催通知書のヘッダーの情報（工番・件名・事業所・部署・作業所長・開催日・開催場所）を取り込める（チェック表のご指示）
 //   このPCのブラウザに残っている A0052 の内容、または A0052 の保存ファイル（JSON）から
 (function () {
-  const FIRST = 16, NEXT = 24; // 検討事項の行数（1ページ目・2ページ目）
+  const FIRST = 17, NEXT = 22; // 検討事項の行数（1ページ目・2ページ目）
   const FIXED = { 2: '施工検討書（本－工務－A0032）（添付資料 参照）', 4: 'その他の施工検討事項' }; // 1ページ目の決まった行（元の様式の太字）
   const IMPORT = ['koban', 'subject', 'jigyo', 'busho', 'shocho', 'kaisaibi', 'basho'];
   const PLAN = ['受電 予定日', 'キュービクル搬入 予定日※', '発電機搬入 予定日※', 'その他重量物搬入　予定日※', '幹線延線　予定日※', '送電 予定日※', '停電工事 予定日※'];
@@ -67,24 +67,34 @@
     fileKeys: ['koban', 'subject'], // ファイル名は「本-品質-A0053_工番_件名_日付.json」
     sheetClass: 'h53',
     meta: [],
-    stamps: [], // 回送先の押印欄は元の様式どおり1ページ目の最下段
+    // 回送先の押印欄は1ページ目のヘッダーの右上（ユーザー指定）。16個を8つずつ2段に、枠の幅を詰めて（14mm）並べる
+    stampClass: 'stack h53s',
     pages: [
-      { subtitle: '（1/2）', blocks: [
-        importer,
-        { type: 'grid', rowH: 6.6, rows: [
-          [{ label: '工　番', key: 'koban', maxlength: 12, lw: 2, span: 7 }, { label: '件　名', key: 'subject', lw: 2, span: 10 }, { label: '開催日', key: 'kaisaibi', type: 'date', jp: true, lw: 2, span: 7 }],
-          [{ label: '事業所', key: 'jigyo', lw: 2, span: 5 }, { label: '部　署', key: 'busho', lw: 2, span: 5 }, { label: '作業所長', key: 'shocho', lw: 3, span: 7 }, { label: '開催場所', key: 'basho', lw: 3, span: 7 }],
-          [{ label: '出席者', key: 'shusseki', type: 'textarea', lines: 2, lw: 2, span: 24 }],
+      { subtitle: '（1/2）',
+        stamps: [
+          { boxes: ['社　長', '本店長', '工事本部長|RE部長', '工事管理|課長', '営業部', '設計|見積部', '設計部', '購買部'], dates: true },
+          { boxes: ['品質|技術部', '安全|品質部', '安全部', '検査|安全部', 'ＩＳＯ部', '安全品質|保証部長\n保　管', '支店長', '工事長|工事部長\n発　行'], dates: true },
+        ],
+        // ヘッダーの情報は押印欄の横（表題の下）に置く（ユーザー指定）
+        headBlocks: [
+          { type: 'grid', cols: 2, colWidths: ['18mm', null], rowH: 5.6, rows: [
+            [{ label: '工　番', key: 'koban', maxlength: 12, lw: 1, span: 2 }],
+            [{ label: '件　名', key: 'subject', lw: 1, span: 2 }],
+            [{ label: '開催日', key: 'kaisaibi', type: 'date', jp: true, lw: 1, span: 2 }],
+            [{ label: '開催場所', key: 'basho', lw: 1, span: 2 }],
+            [{ label: '事業所', key: 'jigyo', lw: 1, span: 2 }],
+            [{ label: '部　署', key: 'busho', lw: 1, span: 2 }],
+            [{ label: '作業所長', key: 'shocho', lw: 1, span: 2 }],
+          ] },
+        ],
+        blocks: [
+          importer,
+          { type: 'grid', rows: [[{ label: '出席者', key: 'shusseki', type: 'textarea', lines: 2, lw: 2, span: 24 }]] },
+          list(1, FIRST),
+          { type: 'grid', rows: [[{ label: '本店長\n指示', key: 'shiji', type: 'textarea', lines: 2, lw: 2, span: 24 }]] },
+          { type: 'notes', items: ['不要回送先は、斜線（／）で抹消すること。'] },
         ] },
-        list(1, FIRST),
-        { type: 'grid', rows: [[{ label: '本店長\n指示', key: 'shiji', type: 'textarea', lines: 2, lw: 2, span: 24 }]] },
-        { type: 'stamps', groups: [
-          { boxes: ['社　長', '本店長', '工事本部長|RE部長', '工事管理課長', '営業部', '設計見積部', '設計部', '購買部'], dates: true },
-          { boxes: ['品質技術部', '安全品質部', '安全部', '検査安全部', 'ＩＳＯ部', '安全品質|保証部長\n保　管', '支店長', '工事長|工事部長\n発　行'], dates: true },
-        ] },
-        { type: 'notes', items: ['不要回送先は、斜線（／）で抹消すること。'] },
-      ] },
-      { subtitle: '（2/2）', blocks: [list(FIRST + 1, FIRST + NEXT, true)] },
+      { subtitle: '（2/2）', stamps: [], blocks: [list(FIRST + 1, FIRST + NEXT, true)] },
     ],
   };
 })();
