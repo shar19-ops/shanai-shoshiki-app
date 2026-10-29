@@ -3,7 +3,7 @@
 //   その横（表題の下）に工番・件名・開催日・開催場所・事業所・部署・作業所長・発注者・契約先・契約金額・粗利率・出席者
 // No・問題点・処置結果・印の表は、長文を折り返して行の高さを伸ばし、あふれた行は次のページへ。最後の行に書いたら、または入りきらなくなったらページを自動で足す。
 //   ページの追加・削除のボタンもある（議題によりページ数が増減＝チェック表のご指示。元は2ページ固定。少なければ1枚）
-//   処置結果の左の細い欄は元の様式どおり見出しなし（書き込める）。印の欄はクリックで三文判風の認印（小さめ）
+//   元の様式の処置結果の左の細い欄はユーザー指定で除く。印の欄はクリックで三文判風の認印（小さめ）
 // 本店長指示と「※安全品質保証部 保管」は1ページ目の表の下。ISOの要求事項【7.1】【8.1】はヘッダーの番号の後ろ
 (function () {
   // 問題点の表の行数（どの行も1行分の高さのとき）。1ページ目（本店長指示の上）・2ページ目以降
@@ -16,7 +16,7 @@
     for (let q = 1; q < p; q++) from += counts[q] ?? cap(q);
     return [from, from + (counts[p] ?? cap(p)) - 1];
   };
-  const hasData = (values, n) => ['no', 'mondai', 'kubun', 'kekka', 'in'].some((k) => String(values[`r${n}.${k}`] ?? '') !== '');
+  const hasData = (values, n) => ['no', 'mondai', 'kekka', 'in'].some((k) => String(values[`r${n}.${k}`] ?? '') !== '');
   // 行の高さを測ってページごとの行数を決め直す（本-品質-A0053 と同じ）。edited：入力して欄を離れたとき
   const relayout = (values, setVal, rebuild, edited) => {
     const trs = [...document.querySelectorAll('table.h56 tr[data-n]')];
@@ -62,14 +62,14 @@
       requestAnimationFrame(grow);
       return ta;
     };
-    const tb = h('tbody', null, h('tr', null, h('th', null, 'No'), h('th', null, '問　題　点'), h('th', { colspan: 2 }, '処　置　結　果'), h('th', null, '印')));
+    const tb = h('tbody', null, h('tr', null, h('th', null, 'No'), h('th', null, '問　題　点'), h('th', null, '処　置　結　果'), h('th', null, '印')));
     for (let n = from; n <= to; n++) {
       tb.append(h('tr', { 'data-n': n }, h('td', null, field({ key: `r${n}.no`, align: 'center' })),
-        h('td', null, wrap(`r${n}.mondai`)), h('td', null, field({ key: `r${n}.kubun`, align: 'center' })),
+        h('td', null, wrap(`r${n}.mondai`)),
         h('td', null, wrap(`r${n}.kekka`)), h('td', { class: 'h56-in' }, field({ key: `r${n}.in`, type: 'inkan' }))));
     }
     const onchange = () => setTimeout(() => relayout(values, setVal, rebuild, true));
-    const table = h('table', { class: 'grid h53 h56', onchange }, h('colgroup', null, ...[9, 84, 9, null, 9].map((w) => h('col', { style: w ? `width:${w}mm` : null }))), tb);
+    const table = h('table', { class: 'grid h53 h56', onchange }, h('colgroup', null, ...[9, 84, null, 9].map((w) => h('col', { style: w ? `width:${w}mm` : null }))), tb);
     if (page !== pages) return table;
     requestAnimationFrame(() => requestAnimationFrame(() => relayout(values, setVal, rebuild)));
     const lastHasData = () => { for (let n = from; n <= to; n++) if (hasData(values, n)) return true; return false; };
