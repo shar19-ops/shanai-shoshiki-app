@@ -79,16 +79,15 @@
         ],
         // ヘッダーの情報は押印欄の横（表題の下）に置く（ユーザー指定）
         headBlocks: [
-          { type: 'grid', cols: 2, colWidths: ['18mm', null], rowH: 5.6, rows: [
-            [{ label: '工　番', key: 'koban', maxlength: 12, lw: 1, span: 2 }],
-            [{ label: '件　名', key: 'subject', lw: 1, span: 2 }],
-            [{ label: '開催日', key: 'kaisaibi', type: 'date', jp: true, lw: 1, span: 2 }],
-            [{ label: '開催場所', key: 'basho', lw: 1, span: 2 }],
-            [{ label: '事業所', key: 'jigyo', lw: 1, span: 2 }],
-            [{ label: '部　署', key: 'busho', lw: 1, span: 2 }],
-            [{ label: '作業所長', key: 'shocho', lw: 1, span: 2 }],
+          // 並びはユーザー指定：開催日・開催場所（横並び）／事業所／工番／件名／部署・作業所長（横並び）／出席者
+          { type: 'grid', cols: 4, colWidths: ['15mm', null, '17mm', null], rowH: 5.6, rows: [
+            [{ label: '開催日', key: 'kaisaibi', type: 'date', jp: true, lw: 1, span: 2 }, { label: '開催場所', key: 'basho', lw: 1, span: 2 }],
+            [{ label: '事業所', key: 'jigyo', lw: 1, span: 4 }],
+            [{ label: '工　番', key: 'koban', maxlength: 12, lw: 1, span: 4 }],
+            [{ label: '件　名', key: 'subject', lw: 1, span: 4 }],
+            [{ label: '部　署', key: 'busho', lw: 1, span: 2 }, { label: '作業所長', key: 'shocho', lw: 1, span: 2 }],
             // 押印欄が4段で高いので、出席者も押印欄の横に置く
-            [{ label: '出席者', key: 'shusseki', type: 'textarea', lines: 6, lw: 1, span: 2 }],
+            [{ label: '出席者', key: 'shusseki', type: 'textarea', lines: 6, lw: 1, span: 4 }],
           ] },
         ],
         blocks: [
