@@ -886,3 +886,9 @@ table.grid.h55k td { height: 5mm; text-align: left; padding: 0 1.5mm; font-size:
 table.grid.h55k td.h55-k1 { border-right: 0; }
 table.grid.h55k td.h55-k2 { border-left: 0; }
 table.grid.h53 td.h55-note { text-align: left; font-size: 7.5pt; line-height: 1.35; padding: .6mm 1.5mm; vertical-align: top; }
+/* 本-品質-A0056 NET検討会報告書：印の欄（クリックで小さめの三文判風の認印） */
+table.grid.h56 td.h56-in { padding: 0; }
+table.grid.h56 td.h56-in .inkan-box { height: 100%; min-height: 6.6mm; }
+table.grid.h56 td.h56-in .inkan-box svg { width: 6mm; height: 6mm; }
+table.grid.h56 td.h56-in .inkan-hint { font-size: 0; }
+table.grid.h56 td.h56-in .inkan-hint::after { content: '印'; font-size: 7pt; color: #c0c6d0; }
