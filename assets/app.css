@@ -866,3 +866,12 @@ table.grid.h53 textarea.h53-wrap { min-height: 0; padding: .6mm 1.5mm; line-heig
   -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 .stamp-box.slashed .sb-slash { display: block; }
 @media screen { .stamp-box.slashable:hover { background: #f3f6fc; } }
+/* 本-品質-A0054 工事反省会開催通知書（巡回順の表は A0052 と共通）：役職名の空欄、主たる審議事項 */
+table.grid.h54 th.h54-free { padding: 0; background: var(--label-bg); }
+table.grid.h54 th.h54-free .inp { height: 100%; font-size: 9pt; }
+table.grid.h54s th { font-size: 8.5pt; letter-spacing: .1em; height: 5.5mm; }
+table.grid.h54s th.h54-sh { line-height: 1.4; }
+table.grid.h54s td { height: 6.4mm; }
+/* A0054 は下に主たる審議事項があるので、巡回順の行を少し低く（21mm → 17.5mm） */
+table.grid.h54 td.h52-st { height: 17.5mm; }
+table.grid.h54 td.h52-st .inkan-box, table.grid.h54 td.h52-st .h52-paper { height: calc(17.5mm - 4.8mm); }
