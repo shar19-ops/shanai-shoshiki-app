@@ -1,4 +1,4 @@
-// 工料発注承認メモ（A4横）
+// 工料発注承認メモ（A4横）と、その縦の版（id '14v'。中身は同じ、内訳明細は左右2段をやめて14行の1つの表）
 (function () {
   // 区分データ（元Excelの「区分データ」シート）
   const KUBUN = [
@@ -14,8 +14,8 @@
   ];
   const kubunName = (code) => (KUBUN.find((k) => k[0] === code) || [])[1] || '';
   const ROWS = 7;
-  const detail = (key, start) => ({
-    type: 'table', key, rows: ROWS, rowNoStart: start, rowH: 7.5,
+  const detail = (key, start, rows = ROWS) => ({
+    type: 'table', key, rows, rowNoStart: start, rowH: 7.5,
     columns: [
       { label: '№', key: 'no', w: 8, rowNo: true },
       // 選んだ後はコード（K50 など）だけを表示。区分名は右の列に自動表示
@@ -27,7 +27,7 @@
   });
   const sumBoth = (k) => (n) => {
     let s = 0;
-    for (let r = 1; r <= ROWS; r++) s += n(`a.${r}.${k}`) + n(`b.${r}.${k}`);
+    for (let r = 1; r <= ROWS * 2; r++) s += n(`a.${r}.${k}`) + (r <= ROWS ? n(`b.${r}.${k}`) : 0); // 縦の版は a の14行
     return s;
   };
   // 消費税 ＝ 電気工事（発注額の合計）× 税率（taxRate、％）
@@ -35,12 +35,19 @@
   // 代表区分：K50 があれば K50、無ければ1行目の区分
   const daihyo = (n, v) => {
     const codes = [];
-    for (let r = 1; r <= ROWS; r++) codes.push(v[`a.${r}.kubun`], v[`b.${r}.kubun`]);
+    for (let r = 1; r <= ROWS * 2; r++) codes.push(v[`a.${r}.kubun`], r <= ROWS ? v[`b.${r}.kubun`] : undefined);
     return codes.includes('K50') ? 'K50' : (v['a.1.kubun'] || '');
   };
 
-  FORM_DEFS['14'] = {
-    code: '般-14', title: '工料発注承認メモ', orientation: 'landscape',
+  const FOOT = [[
+    { label: '合　計', span: 3 },
+    { key: 'sumJ', type: 'calc', calc: sumBoth('jikko') },
+    { key: 'sumH', type: 'calc', calc: sumBoth('hachu') },
+  ]];
+
+  const make = (id, portrait) => {
+  FORM_DEFS[id] = {
+    code: '般-14', title: '工料発注承認メモ', orientation: portrait ? 'portrait' : 'landscape',
     selfStamp: '発行者', // 本人欄（デート印を押す欄）
     meta: [
       { label: '発行日', key: 'date', type: 'date' },
@@ -52,13 +59,24 @@
       { type: 'grid', lw: 3, rows: [
         [{ label: '事業所', key: 'officeCd', type: 'select', options: LISTS.officeCodes, span: 6 }, { label: '工　番', key: 'koban', span: 6 }, { label: '件　名', key: 'subject', span: 12 }],
         [{ label: '発注先CD', key: 'vendorCd', span: 6 }, { label: '発注先名', key: 'vendor', span: 18 }],
-        [{ label: '労災保険', key: 'rosai', type: 'select', options: ['0:発注者加入', '1:受注者加入', '2:なし'], span: 6 },
-          { label: '見積書工期', key: 'kFrom', key2: 'kTo', type: 'daterange', span: 12 },
-          { label: 'インボイス登録番号', key: 'invoice', prefix: 'T', placeholder: '13桁', maxlength: 13, span: 6 }],
-        [{ label: '発注方式', key: 'hoshiki', type: 'select', options: ['A', 'B', 'C', 'D', 'E'], align: 'center', span: 6 },
-          { label: '雄和会費', key: 'yuwa', type: 'select', options: ['0:徴収', '1:免除'], span: 6 },
-          { label: '代表区分 ※1', key: 'daihyo', type: 'calc', align: 'center', calc: daihyo, span: 6 },
-          { label: 'サイト', key: 'site', type: 'select', options: ['60', '30'], unit: '日（通常60日）', span: 6 }],
+        // 縦は幅が狭いので、工期とインボイス登録番号を1行に、残りの4項目を2行に組み替える
+        ...(portrait ? [
+          [{ label: '見積書工期', key: 'kFrom', key2: 'kTo', type: 'daterange', span: 13 },
+            { label: 'インボイス登録番号', key: 'invoice', prefix: 'T', placeholder: '13桁', maxlength: 13, lw: 5, span: 11 }],
+          [{ label: '労災保険', key: 'rosai', type: 'select', options: ['0:発注者加入', '1:受注者加入', '2:なし'], span: 8 },
+            { label: '発注方式', key: 'hoshiki', type: 'select', options: ['A', 'B', 'C', 'D', 'E'], align: 'center', span: 8 },
+            { label: '雄和会費', key: 'yuwa', type: 'select', options: ['0:徴収', '1:免除'], span: 8 }],
+          [{ label: '代表区分 ※1', key: 'daihyo', type: 'calc', align: 'center', calc: daihyo, span: 8 },
+            { label: 'サイト', key: 'site', type: 'select', options: ['60', '30'], unit: '日（通常60日）', span: 16 }],
+        ] : [
+          [{ label: '労災保険', key: 'rosai', type: 'select', options: ['0:発注者加入', '1:受注者加入', '2:なし'], span: 6 },
+            { label: '見積書工期', key: 'kFrom', key2: 'kTo', type: 'daterange', span: 12 },
+            { label: 'インボイス登録番号', key: 'invoice', prefix: 'T', placeholder: '13桁', maxlength: 13, span: 6 }],
+          [{ label: '発注方式', key: 'hoshiki', type: 'select', options: ['A', 'B', 'C', 'D', 'E'], align: 'center', span: 6 },
+            { label: '雄和会費', key: 'yuwa', type: 'select', options: ['0:徴収', '1:免除'], span: 6 },
+            { label: '代表区分 ※1', key: 'daihyo', type: 'calc', align: 'center', calc: daihyo, span: 6 },
+            { label: 'サイト', key: 'site', type: 'select', options: ['60', '30'], unit: '日（通常60日）', span: 6 }],
+        ]),
       ] },
       // 金額の欄は別の表にして入力欄を広くとる（1項目＝ラベル3列＋入力5列）
       { type: 'grid', lw: 3, rows: [
@@ -70,13 +88,11 @@
           { label: '内訳　手形', key: 'tegata', type: 'calc', unit: '円', span: 8, calc: (n, v) => (v.cash ? sumBoth('hachu')(n) - n('cash') : '') },
           { label: '法定福利費', key: 'fukuri', type: 'money', unit: '円', span: 8 }],
       ] },
-      { type: 'row', gap: 3, items: [
+      // 内訳明細：横は7行ずつ左右2段、縦は14行の1つの表（ユーザー指定）
+      // 縦は余白があるので行を少し高く
+      portrait ? { ...detail('a', 1, ROWS * 2), rowH: 8.5, title: '内訳明細', foot: FOOT } : { type: 'row', gap: 3, items: [
         { ...detail('a', 1), title: '内訳明細' },
-        { ...detail('b', 8), title: '　', foot: [[
-          { label: '合　計', span: 3 },
-          { key: 'sumJ', type: 'calc', calc: sumBoth('jikko') },
-          { key: 'sumH', type: 'calc', calc: sumBoth('hachu') },
-        ]] },
+        { ...detail('b', 8), title: '　', foot: FOOT },
       ] },
       { type: 'notes', items: [
         '※1　代表区分は「K50」があるときは「K50」を使用し、なければ内訳明細より1区分選択する。（自動表示）',
@@ -84,4 +100,7 @@
       ] },
     ],
   };
+  };
+  make('14', false);
+  make('14v', true);
 })();
