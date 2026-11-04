@@ -91,7 +91,6 @@
     seitei: '03/04/01', kaitei: '26/11/17', // フッター：制定日は元の様式のまま、最終改訂日はユーザー指定
     paper: 'A3', orientation: 'landscape',
     fileIO: true, // 工事ごとに、工事の進み具合に合わせて書き足すのでファイルに保存
-    fileKeys: ['koban', 'subject'], // ファイル名は「本-品質-A0051_工番_件名_日付.json」
     sheetClass: 'h51',
     meta: [{ label: '作成日', key: 'sakusei', type: 'date', jp: true }],
     stamps: [], // 承認印は表の中（ステップごと）

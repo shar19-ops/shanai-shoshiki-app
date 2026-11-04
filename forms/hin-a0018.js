@@ -10,7 +10,6 @@
     code: '本-品質-A0018', title: '不適合処理報告書',
     seitei: '99/01/04', kaitei: '26/11/17', // フッター：制定日は元の様式のまま、最終改訂日はユーザー指定
     fileIO: true, // 検査者・作業所長・品質保証部の間で書き足していくのでファイルに保存
-    fileKeys: ['koban', 'subject'], // ファイル名は「本-品質-A0018_工番_件名_日付.json」
     selfStamp: '作業所長',
     sheetClass: 'h18',
     meta: [{ label: '作成日', key: 'sakusei', type: 'date', jp: true }],
