@@ -113,8 +113,7 @@
         c.font = font; c.border = box; c.alignment = { vertical: 'top', wrapText: true, horizontal: col === 1 ? 'center' : 'left' };
         if (col >= 3) { c.fill = input; c.protection = { locked: false }; } // 回答・回答者だけ入力できる
       });
-      const len = Math.max(String(values[`r${n}.q`] || '').length, String(values[`r${n}.a`] || '').length);
-      row.height = Math.max(30, Math.ceil(len / 28) * 15 + 6);
+      // 高さは決めない（Excel が文字に合わせて自動で調整する。顧客が書いた回答の長さでも伸びる）
       map.push([r, n]);
     });
     const note = ws.getRow(10 + rows.length);
