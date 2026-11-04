@@ -1020,3 +1020,5 @@ table.grid.s18 td.s18-cn, table.grid.s18 td.s18-in { text-align: center; }
 table.grid.s18 td.s18-it { padding: .3mm 1.5mm; }
 table.grid.s18 td.s18-it.sub { padding-left: 5mm; }
 table.grid.s18 td.s18-mk { text-align: center; font-weight: 700; }
+/* 本-設計-A0010 質疑書・回答書：表の上の Excel 書き出し・取り込み */
+.s10-bar { margin: 0 0 2mm; }
