@@ -920,3 +920,18 @@ table.grid td.a14-ym .inp { font-size: 12pt; font-weight: bold; }
 /* 般-50：確認者の日付と押印欄（発行）の間の横罫線をなくす（修正指示書） */
 .k50-tbl td.k50-conf-d { border-bottom-style: hidden; } /* 罫線をつなげた表なので hidden（none だと隣の線が勝つ） */
 .k50-tbl td.k50-conf-s { border-top-style: hidden; }
+/* 本-設計-A0022 設計図面管理台帳：1件2段を少し低くして1ページ18件 */
+table.grid.k1.s22 td { height: 6mm; }
+/* 本-設計-A0026 設計協力会社評価表（点数のボタンは購買A0003 と同じ b3） */
+table.grid.b3.s26 td { height: 4.6mm; }
+table.grid.b3.s26 th.s26-sub { font-size: 7pt; font-weight: normal; }
+table.grid.b3.s26 td.s26-lv { text-align: center; font-size: 8pt; }
+table.grid.b3.s26 td.b3-name { text-align: center; }
+table.grid.b3.s26 th.s26-full { font-size: 8pt; }
+table.grid.b3.s26 td.s26-total { height: 22mm; }
+table.grid.b3.s26 td.s26-total .inp { font-size: 14pt; font-weight: 700; }
+table.grid.b3.s26 td.s26-memo { padding: 0; vertical-align: top; }
+table.grid.b3.s26 .s26-memo-h { font-size: 8.5pt; padding: .5mm 1.5mm; border-bottom: 1px solid var(--line-weak); background: var(--label-bg); }
+table.grid.b3.s26 td.s26-memo textarea.inp { height: 17mm; font-size: 8.5pt; }
+/* 本-設計-A0023 設計協力会社台帳：1ページ15社なので行を高く（A3の高さを使う） */
+table.grid.b1.s23 td { height: 6.4mm; }
