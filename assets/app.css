@@ -935,3 +935,44 @@ table.grid.b3.s26 .s26-memo-h { font-size: 8.5pt; padding: .5mm 1.5mm; border-bo
 table.grid.b3.s26 td.s26-memo textarea.inp { height: 17mm; font-size: 8.5pt; }
 /* 本-設計-A0023 設計協力会社台帳：1ページ15社なので行を高く（A3の高さを使う） */
 table.grid.b1.s23 td { height: 6.4mm; }
+/* 小さい認印の欄（in-sm：表の中でクリックして苗字の認印。本-設計-A0001・A0019） */
+td.in-sm, div.in-sm { padding: 0; }
+.in-sm .inkan-box { height: 100%; min-height: 6.6mm; }
+.in-sm .inkan-box svg { width: 6mm; height: 6mm; }
+.in-sm .inkan-hint { font-size: 0; }
+.in-sm .inkan-hint::after { content: '印'; font-size: 7pt; color: #c0c6d0; }
+/* 本-設計-A0001 有資格者台帳：認定日は日付（左）と認印（右） */
+table.grid.s01 td { height: 7.4mm; }
+table.grid.s01 td.s01-nt { padding: 0; }
+table.grid.s01 .s01-nt-in { display: flex; height: 100%; }
+table.grid.s01 .s01-nt-d { flex: 1; min-width: 0; }
+table.grid.s01 .s01-nt-in .in-sm { width: 8mm; flex: none; border-left: 1px dashed var(--line-weak); }
+table.grid.s01 .date-wrap .pv { font-size: 9pt; text-align: center; }
+/* 本-設計-A0021 設計変更連絡書（表は本-品質-A0053 の h53 と同じ） */
+/* 本-設計-A0019 設計検証書：表紙 */
+.s19-cover { display: flex; flex-direction: column; align-items: center; }
+.s19-koji { display: flex; align-items: flex-end; gap: 3mm; width: 150mm; margin-top: 22mm; font-size: 16pt; }
+.s19-koji-in { flex: 1; border-bottom: 1px solid var(--line); }
+.s19-koji-in .inp { font-size: 15pt; height: 11mm; }
+.s19-title { margin: 22mm 0 16mm; font-size: 26pt; font-weight: 700; letter-spacing: .2em; }
+.s19-no, .s19-date { display: flex; align-items: center; gap: 4mm; font-size: 12pt; margin-bottom: 14mm; }
+.s19-no-in, .s19-date-in { width: 62mm; border-bottom: 1px solid var(--line); }
+.s19-no-in .inp, .s19-date-in .inp, .s19-date-in .pv { font-size: 12pt; height: 8mm; }
+.s19-date { margin-top: 18mm; }
+.s19-co { margin-top: 16mm; font-size: 15pt; letter-spacing: .1em; }
+/* 本-設計-A0019：2枚目 */
+table.grid.s19 td { height: 8mm; font-size: 9.5pt; }
+table.grid.s19 th.s19-lh { text-align: left; padding-left: 2mm; }
+table.grid.s19 td.s19-dot { text-align: center; }
+table.grid.s19 td.s19-txt { padding: 0 2mm; }
+table.grid.s19 td.s19-betsu { padding: .5mm 2mm; }
+table.grid.s19 .s19-b-row { display: flex; align-items: center; gap: 3mm; min-height: 6.5mm; }
+table.grid.s19 .s19-b-lbl { width: 34mm; flex: none; }
+table.grid.s19 .s19-b-how { width: 12mm; flex: none; padding-left: 34mm; box-sizing: content-box; }
+table.grid.s19 .s19-b-in { flex: 1; border-bottom: 1px dotted var(--line-weak); }
+table.grid.s19 td.s19-ink .inkan-box svg { width: 8mm; height: 8mm; }
+table.grid.s19-nai { margin-top: 4mm; }
+table.grid.s19-nai td.s19-nai-ta { height: 120mm; padding: 0; vertical-align: top; }
+table.grid.s19-nai td.s19-nai-ta textarea.inp { height: 100%; }
+table.grid.s19-nai td.s19-shonin { height: 20mm; }
+table.grid.s19-nai td.s19-rest { height: auto; }

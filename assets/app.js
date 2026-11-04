@@ -929,7 +929,7 @@
     notes: (b) => h('ul', { class: 'notes' }, b.items.map((t) => h('li', null, t))),
     addressee: (b) => h('div', { class: 'addressee', style: b.style || '' }, b.lines.map((l) => h('div', null, l))),
     spacer: () => h('div', { class: 'spacer' }),
-    stamps: (b) => h('div', { class: 'inline-stamps', style: b.align === 'right' ? 'justify-content:flex-end' : '' },
+    stamps: (b) => h('div', { class: 'inline-stamps', style: b.align === 'right' ? 'justify-content:flex-end' : b.align === 'center' ? 'justify-content:center' : '' }, // center：表紙の押印欄（本-設計-A0019）
       h('div', null, b.title ? h('div', { class: 'is-title' }, b.title) : null, stampsEl(b.groups))),
     // row の grow：残りの高さいっぱいに伸ばす（A3横で左右2段に組むときなど）
     row: (b) => h('div', { style: `display:flex;gap:${b.gap ?? 4}mm;align-items:${b.align || 'stretch'}` + (b.grow ? ';flex:1' : '') },
