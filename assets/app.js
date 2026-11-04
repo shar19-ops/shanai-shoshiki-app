@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const APP_VERSION = 'v2026.10.15';
+  const APP_VERSION = 'v2026.11.04';
   const STORE_PREFIX = 'shoshiki:';
   window.FORM_DEFS = window.FORM_DEFS || {};
   // 複数の帳票で使う選択肢（元Excelの入力規則から）
