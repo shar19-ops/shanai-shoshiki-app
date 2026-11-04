@@ -3,9 +3,9 @@
 //   発行日=date／社員ＣＤ=empCode／氏名=name／利用区間1=route1（乗車駅）／利用区間2=route2（降車駅）／経由=via
 //   期間(ヵ月)=months（1・3・6の数値）／開始日=start／終了日=end（自動）／金額=amount／工番=koban／件名=subject／備考=note
 // 路線が複数のときは「＋ 路線を追加」で利用区間〜開始日の組を足す（ユーザー指定）。1路線目は上のキーのまま、2路線目からは 'r2.' などを付ける
-//   3路線までA4の1枚、4路線目からは2枚目（最大6路線）。入力検印の押印欄はなし（ユーザー指定）
+//   4路線までA4の1枚、5路線目からは2枚目（最大8路線）。備考は3行分の高さ。入力検印の押印欄はなし（ユーザー指定）
 (function () {
-  const PER_FIRST = 3, MAX = 6;
+  const PER_FIRST = 4, MAX = 8;
   const routeCount = (v) => Math.min(MAX, Math.max(1, Number(v.routeCount) || 1));
   const rk = (n, key) => (n === 1 ? key : `r${n}.${key}`);
   // 終了日＝台帳と同じ EDATE(開始日, 期間) − 1日（月末はその月の末日にそろえる）
@@ -41,7 +41,7 @@
     return h('div', { class: 'k1-pages no-print' },
       total < MAX ? h('button', { type: 'button', onclick: () => { setVal('routeCount', String(total + 1)); rebuild(); } }, '＋ 路線を追加') : null,
       total > 1 ? h('button', { type: 'button', onclick: del }, `路線${total}を削除`) : null,
-      h('span', { class: 'k1-hint' }, `路線が複数あるときに足してください（3路線までは1枚、4路線目からは2枚目。最大${MAX}路線）。`));
+      h('span', { class: 'k1-hint' }, `路線が複数あるときに足してください（${PER_FIRST}路線までは1枚、${PER_FIRST + 1}路線目からは2枚目。最大${MAX}路線）。`));
   } };
 
   const head = { type: 'grid', lw: 4, rowH: 10, rows: [
@@ -71,8 +71,9 @@
           head,
           { type: 'col', gap: 1.5, fit: true, items: nums(1, Math.min(total, PER_FIRST)).map((n) => route(n, many)) },
           ...(total <= PER_FIRST ? [routeButtons] : []),
-          { type: 'free', label: '備　考', key: 'note', lines: 4, grow: true },
+          { type: 'free', label: '備　考', key: 'note', lines: 3 }, // 備考は3行分（広くしない。ユーザー指定）
           { type: 'notes', items: ['※ 終了日は、期間と開始日から自動で表示されます。'] },
+          { type: 'spacer' },
         ],
       };
       if (total <= PER_FIRST) return [first];
