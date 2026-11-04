@@ -12,7 +12,6 @@
     code: '本-品質-A0015', title: '是正処置報告書',
     seitei: '99/01/04', kaitei: '26/11/17', // フッター：制定日は元の様式のまま、最終改訂日はユーザー指定
     fileIO: true, // 部署と安全品質保証部の間で書き足していくのでファイルに保存
-    fileKeys: ['no', 'atesaki'], // ファイル名は「本-品質-A0015_No_部署_日付.json」
     meta: [{ label: '作成日', key: 'sakusei', type: 'date', jp: true }, { label: 'No.', key: 'no', w: 25, right: true }],
     stamps: [], // 押印欄は各欄の右下（元の様式どおり）
     blocks: [

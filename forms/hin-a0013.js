@@ -40,7 +40,7 @@
     code: '本-品質-A0013', title: '計測機器使用前点検表',
     seitei: '99/01/04', kaitei: '26/11/17', // フッター：制定日は元の様式のまま、最終改訂日はユーザー指定
     fileIO: true,
-    fileKeys: ['kanri', 'kiki'], // ファイル名は「本-品質-A0013_管理番号_機器名_日付.json」
+    fileKeys: ['kanri', 'kiki'], fileNameStyle: 'keys', // ファイル名は「本-品質-A0013_管理番号_機器名_yymmdd.json」（機器ごと。ユーザー指定）
     meta: [],
     stamps: [], // 元の様式に押印欄なし
     pages: (v) => Array.from({ length: pageCount(v) }, (_, i) => ({

@@ -993,13 +993,18 @@
   const JSON_TYPES = [{ description: 'JSONファイル', accept: { 'application/json': ['.json'] } }];
   function fileName() {
     const d = new Date();
-    const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
-    // fileKeys：ファイル名に使う項目（例：計測機器の管理番号・機器名。省略は件名）
-    const pick = def.fileKeys ? def.fileKeys.map((k) => values[k]).filter(Boolean).join('_') : (values.subject || values.bukken || '');
-    const name = String(pick).replace(/[\\/:*?"<>|\s]+/g, '_').slice(0, 40);
+    const p2 = (x) => String(x).padStart(2, '0');
+    const yymmdd = `${p2(d.getFullYear() % 100)}${p2(d.getMonth() + 1)}${p2(d.getDate())}`;
+    const safe = (x) => String(x).replace(/[\\/:*?"<>|\s]+/g, '_').slice(0, 40);
+    const title = String(def.title).replace(/\s+/g, '').replace(/[\\/:*?"<>|]+/g, '_').slice(0, 40); // 表題の空白は詰める（日　報 → 日報）
+    // fileKeys：ファイル名に使う項目（fileNameStyle を指定した帳票だけ）
+    const name = safe(def.fileKeys ? def.fileKeys.map((k) => values[k]).filter(Boolean).join('_') : '');
     // fileNameStyle: 'title'：「帳票名_工番.json」（日付なし。同じ台帳を上書きしていく。本-工務-A0001。修正指示書）
-    if (def.fileNameStyle === 'title') return `${def.title}${name ? '_' + name : ''}.json`;
-    return `${def.code}_${name ? name + '_' : ''}${ymd}.json`;
+    if (def.fileNameStyle === 'title') return `${title}${name ? '_' + name : ''}.json`;
+    // fileNameStyle: 'keys'：「番号_管理番号_機器名_日付.json」（機器ごとに保存。本-品質-A0013。ユーザー指定）
+    if (def.fileNameStyle === 'keys') return `${def.code}_${name ? name + '_' : ''}${yymmdd}.json`;
+    // ふつうは「帳票名_yymmdd.json」（2026-11 ユーザー指定）
+    return `${title}_${yymmdd}.json`;
   }
   async function saveFile(id) {
     const text = JSON.stringify({ form: id, code: def.code, title: def.title, savedAt: new Date().toISOString(), values }, null, 2);
@@ -1099,9 +1104,9 @@
         try { localStorage.removeItem(storeKey); } catch (e) { /* noop */ }
         location.reload();
       } }, 'クリア'),
-      // fileIO：入力内容をJSONファイルに保存・読み込み（つぎ足しながら使う帳票。例：本-営業-A0003）
-      def.fileIO ? h('button', { onclick: () => openFile(id), title: '保存したJSONファイルを読み込む' }, 'ファイルを開く') : null,
-      def.fileIO ? h('button', { onclick: () => saveFile(id), title: '入力内容をJSONファイルに保存（開いたファイルには上書き）' }, 'ファイルに保存') : null,
+      // 入力内容をJSONファイルに保存・読み込み（全帳票。2026-11 ユーザー指定。fileIO: false で付けない）
+      def.fileIO !== false ? h('button', { onclick: () => openFile(id), title: '保存したJSONファイルを読み込む' }, 'ファイルを開く') : null,
+      def.fileIO !== false ? h('button', { onclick: () => saveFile(id), title: '入力内容をJSONファイルに保存（開いたファイルには上書き）' }, 'ファイルに保存') : null,
       def.selfStamp ? h('button', { onclick: openStampDialog }, '押印設定') : null,
       // printNote：印刷の前に注意を出す（両面印刷など。A3の帳票は用紙の注意を自動で出す。修正指示書）
       h('button', { class: 'primary', onclick: () => {

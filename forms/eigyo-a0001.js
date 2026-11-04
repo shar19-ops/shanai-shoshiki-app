@@ -33,7 +33,6 @@
     seitei: '99/01/06', kaitei: '26/11/17', // フッター：制定日は元の様式のまま、最終改訂日はユーザー指定
     selfStamp: '作成者',
     fileIO: true, // 物件ごとに発行をつぎ足すのでファイルに保存（修正指示書）
-    fileKeys: ['bukken', 'subject'], // ファイル名は「本-営業-A0001_物件コード_件名_日付.json」
     meta: [{ label: '区　分', key: 'kubun', type: 'radio', options: ['設計', '積算'], nowrap: true, cls: 'noline lg' }],
     stamps: [{ boxes: ['承認者', '作成者'] }],
     pages: (v) => Array.from({ length: pageCount(v) }, (_, i) => i + 1).map((n) => ({
