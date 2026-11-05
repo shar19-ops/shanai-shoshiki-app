@@ -48,6 +48,15 @@ body {
 .toolbar button:hover { background: rgba(255,255,255,.15); }
 .toolbar button.primary:hover { background: #e8ecf7; }
 .toolbar .saved { font-size: 9pt; opacity: .8; min-width: 7em; }
+.toolbar .tb-zoom { display: inline-flex; align-items: center; gap: 2px; }
+.toolbar .tb-zoom button { padding: 6px 10px; }
+.toolbar .tb-zoom button.tb-zoom-pct { min-width: 4.2em; padding: 6px 4px; border-color: transparent; text-align: center; }
+
+/* ---------- 用紙の拡大・縮小（ツールバーは拡大せず、横にスクロールしても画面の上に残す） ---------- */
+.zoom-app { width: max-content; min-width: 100%; }
+.zoom-app > .toolbar { left: 0; width: var(--tb-w, 100%); }
+.zoom-stage { margin: 0 auto; }
+.zoom-box { display: flow-root; width: max-content; transform-origin: 0 0; }
 
 /* ---------- 用紙 ---------- */
 .sheet {
@@ -379,6 +388,8 @@ table.grid td textarea.inp { height: 100%; }
 @media print {
   body { background: #fff; }
   .toolbar, .no-print { display: none !important; }
+  /* 拡大率に関係なく等倍で印刷する */
+  .zoom-app, .zoom-stage, .zoom-box { display: block; width: auto !important; min-width: 0; height: auto !important; margin: 0; transform: none !important; }
   .sheet { margin: 0; box-shadow: none; page-break-after: always; break-after: page; }
   .sheet:last-child { page-break-after: auto; break-after: auto; }
   .inp, textarea.inp, .checks .box { background-color: transparent !important; box-shadow: none !important; }

@@ -433,6 +433,61 @@
         }))));
   }
 
+  // ---------- 用紙の拡大・縮小（2026-11 ユーザー指定：拡大してもツールバーは大きくしない） ----------
+  // transform で見た目だけ拡大する。レイアウトは常に100%で計算されるので、折り返し・行の高さ・ページ分け・印刷は拡大率で変わらない
+  const ZOOM_KEY = 'shoshiki-zoom', ZOOM_MIN = 0.5, ZOOM_MAX = 2, ZOOM_STEP = 0.1;
+  let zoom = 1, zoomStage = null, zoomBox = null, zoomLabel = null;
+  // 要素の100%のときの高さ（getBoundingClientRect は拡大後の値を返すので割り戻す。帳票の行の高さを測るときに使う）
+  const layoutH = (el) => el.getBoundingClientRect().height / zoom;
+  function fitZoomStage() {
+    if (!zoomStage) return;
+    zoomStage.style.width = `${zoomBox.offsetWidth * zoom}px`;
+    zoomStage.style.height = `${zoomBox.offsetHeight * zoom}px`;
+  }
+  // at：拡大の中心（画面上の座標）。その位置に見えている内容がずれないようにスクロールする
+  function setZoom(next, at) {
+    const z = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, Math.round(next * 100) / 100));
+    if (zoomStage && z !== zoom) {
+      const cx = at ? at.x : document.documentElement.clientWidth / 2, cy = at ? at.y : document.documentElement.clientHeight / 2;
+      const r = zoomBox.getBoundingClientRect(), px = (cx - r.left) / zoom, py = (cy - r.top) / zoom;
+      zoom = z;
+      zoomBox.style.transform = z === 1 ? '' : `scale(${z})`;
+      fitZoomStage();
+      const r2 = zoomBox.getBoundingClientRect();
+      window.scrollBy(r2.left + px * z - cx, r2.top + py * z - cy);
+    } else zoom = z;
+    if (zoomLabel) zoomLabel.textContent = `${Math.round(zoom * 100)}%`;
+    try { localStorage.setItem(ZOOM_KEY, String(zoom)); } catch (e) { /* noop */ }
+  }
+  const stepZoom = (dir, at) => setZoom((Math.round(zoom / ZOOM_STEP) + dir) * ZOOM_STEP, at);
+  // Ctrl＋ホイール（ノートPCのピンチも同じ）・Ctrl＋キー・iPad のピンチを、画面全体の拡大の代わりに用紙の拡大にする
+  function bindZoomInputs() {
+    let acc = 0;
+    window.addEventListener('wheel', (e) => {
+      if (!e.ctrlKey) return;
+      e.preventDefault();
+      acc += e.deltaY;
+      if (Math.abs(acc) < 50) return;
+      stepZoom(acc < 0 ? 1 : -1, { x: e.clientX, y: e.clientY });
+      acc = 0;
+    }, { passive: false });
+    window.addEventListener('keydown', (e) => {
+      if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+      if (e.key === '+' || e.key === ';' || e.key === '=') { e.preventDefault(); stepZoom(1); }
+      else if (e.key === '-') { e.preventDefault(); stepZoom(-1); }
+      else if (e.key === '0') { e.preventDefault(); setZoom(1); }
+    });
+    let pinchFrom = 1, pinchNext = null;
+    const gesture = (fn) => (e) => { e.preventDefault(); fn(e); };
+    document.addEventListener('gesturestart', gesture(() => { pinchFrom = zoom; }), { passive: false });
+    document.addEventListener('gesturechange', gesture((e) => {
+      const first = pinchNext === null;
+      pinchNext = { z: Math.round(pinchFrom * e.scale * 20) / 20, at: { x: e.clientX, y: e.clientY } };
+      if (first) requestAnimationFrame(() => { setZoom(pinchNext.z, pinchNext.at); pinchNext = null; });
+    }), { passive: false });
+    document.addEventListener('gestureend', gesture(() => {}), { passive: false });
+  }
+
   // タイトルが押印欄とぶつかるときは、1行に収まるまで文字を縮める
   function fitTitles() {
     // 押印欄が2段に折り返したときは、いちばん広い段の幅まで縮めてタイトル側に場所を譲る
@@ -444,7 +499,7 @@
         rows[k] = rows[k] || { l: r.left, r: r.right };
         rows[k].l = Math.min(rows[k].l, r.left); rows[k].r = Math.max(rows[k].r, r.right);
       });
-      const widths = Object.values(rows).map((x) => x.r - x.l);
+      const widths = Object.values(rows).map((x) => (x.r - x.l) / zoom); // 100%のときの幅で指定する
       if (widths.length > 1) st.style.width = Math.ceil(Math.max(...widths)) + 'px';
     });
     document.querySelectorAll('.f-title').forEach((el) => {
@@ -701,7 +756,7 @@
       const fit = () => {
         const sheet = imgArea.closest('.sheet');
         if (!sheet) return;
-        const limit = () => sheet.scrollHeight > sheet.getBoundingClientRect().height + 1 || sheet.scrollHeight > parseFloat(getComputedStyle(sheet).minHeight) + 1;
+        const limit = () => sheet.scrollHeight > layoutH(sheet) + 1 || sheet.scrollHeight > parseFloat(getComputedStyle(sheet).minHeight) + 1;
         let mm = 75;
         imgArea.style.setProperty('--img-h', mm + 'mm');
         while (limit() && mm > 20) { mm -= 5; imgArea.style.setProperty('--img-h', mm + 'mm'); }
@@ -756,7 +811,7 @@
     const measure = () => {
       const r = area.getBoundingClientRect();
       if (!r.width || !r.height) return;
-      W = r.width * 25.4 / 96; H = r.height * 25.4 / 96;
+      W = r.width / zoom * 25.4 / 96; H = r.height / zoom * 25.4 / 96;
       svg.setAttribute('viewBox', `0 0 ${W.toFixed(2)} ${H.toFixed(2)}`);
     };
     const toMM = (e) => { const r = area.getBoundingClientRect(); return { x: (e.clientX - r.left) * W / r.width, y: (e.clientY - r.top) * W / r.width }; };
@@ -1093,7 +1148,7 @@
     calcs.length = 0;
     Object.keys(inputs).forEach((k) => delete inputs[k]);
     const pages = pageList();
-    pages.forEach((p) => root.append(sheetEl(def, p)));
+    pages.forEach((p) => zoomBox.append(sheetEl(def, p)));
     if (def.selfStamp) calcs.push(renderSelfStamps);
     recalc();
     if (def.setup) def.setup({ inputs, values, setVal });
@@ -1119,6 +1174,10 @@
     root.append(h('div', { class: 'toolbar' },
       h('div', { class: 'tb-title' }, h('a', { href: './', class: 'tb-home', title: '帳票一覧へ' }, h('span', { class: 'app-name' }, h('span', { class: 'y' }, 'Y'), '-Format'), h('span', { class: 'sep' }, '＞')), ` ${def.code}　${def.title}`),
       h('span', { class: 'saved' }),
+      h('span', { class: 'tb-zoom' },
+        h('button', { type: 'button', title: '用紙を縮小（Ctrl＋「－」）', 'aria-label': '縮小', onclick: () => stepZoom(-1) }, '－'),
+        zoomLabel = h('button', { type: 'button', class: 'tb-zoom-pct', title: 'クリックで100%に戻す（Ctrl＋0）', onclick: () => setZoom(1) }, '100%'),
+        h('button', { type: 'button', title: '用紙を拡大（Ctrl＋「＋」）', 'aria-label': '拡大', onclick: () => stepZoom(1) }, '＋')),
       h('button', { onclick: () => {
         if (!confirm('入力内容をすべて消去します。よろしいですか？')) return;
         try { localStorage.removeItem(storeKey); } catch (e) { /* noop */ }
@@ -1134,15 +1193,29 @@
         if (note && !confirm(note + '\n\nこのまま印刷画面を開きますか？')) return;
         window.print();
       } }, '印刷')));
+    // 用紙はこの中に入れる（zoomBox を拡大し、zoomStage がその分の場所を取る）
+    root.classList.add('zoom-app');
+    zoomBox = h('div', { class: 'zoom-box' });
+    zoomStage = h('div', { class: 'zoom-stage' }, zoomBox);
+    root.append(zoomStage);
+    const syncBarWidth = () => root.style.setProperty('--tb-w', `${document.documentElement.clientWidth}px`);
+    new ResizeObserver(() => requestAnimationFrame(fitZoomStage)).observe(zoomBox);
+    new ResizeObserver(() => requestAnimationFrame(syncBarWidth)).observe(document.documentElement);
+    syncBarWidth();
+    bindZoomInputs();
     const pages = pageList();
-    pages.forEach((p) => root.append(sheetEl(def, p)));
+    pages.forEach((p) => zoomBox.append(sheetEl(def, p)));
     if (def.selfStamp) calcs.push(renderSelfStamps); // 日付の入力に追従
     recalc();
     // 帳票ごとの追加の動き（例：般-22 物件略称の漢字→カタカナ自動入力）
     if (def.setup) def.setup({ inputs, values, setVal });
     fitTitles();
     if (document.fonts) document.fonts.ready.then(fitTitles);
+    let saved = 1;
+    try { saved = Number(localStorage.getItem(ZOOM_KEY)) || 1; } catch (e) { /* noop */ }
+    setZoom(saved);
+    window.scrollTo(0, 0);
   }
 
-  window.ShoshikiApp = { boot, version: APP_VERSION, toNum, fmtNum };
+  window.ShoshikiApp = { boot, version: APP_VERSION, toNum, fmtNum, layoutH };
 })();
