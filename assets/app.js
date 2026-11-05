@@ -254,8 +254,8 @@
     if (f.prefix || f.unit) {
       return h('div', { class: 'cell-wrap' },
         f.prefix ? h('span', { class: 'unit' }, f.prefix) : null, ...parts,
-        // unitInkan：「印」の位置に本人欄と同じ苗字の三文判風の認印（押印設定の苗字。本-安全-A0001 の検査者＝発行者。修正指示書）
-        f.unit ? (f.unitInkan ? h('span', { class: 'unit self-inkan', title: 'クリックで押印設定', onclick: openStampDialog }, f.unit) : h('span', { class: 'unit' }, f.unit)) : null);
+        // unitInkan：「印」の位置に本人欄と同じ苗字の三文判風の認印（本人欄の印と一緒に押される。本-安全-A0001 の検査者＝発行者。修正指示書）
+        f.unit ? (f.unitInkan ? h('span', { class: 'unit self-inkan', title: 'クリックで押印', onclick: clickSelfStamp }, f.unit) : h('span', { class: 'unit' }, f.unit)) : null);
     }
     return parts.length > 1 ? h('div', { style: 'height:100%' }, ...parts) : el;
   }
@@ -315,32 +315,52 @@
     try { localStorage.setItem(STAMP_KEY, JSON.stringify(stampCfg)); } catch (e) { /* noop */ }
     renderSelfStamps();
   }
-  // 日付は帳票の作成日・発行日（def.stampDate、既定 'date'）。未入力なら今日。
-  function stampDate() {
+  // 押した印は values._selfStamp に残す（ファイルに保存されるので、誰が開いても同じ印が出る。2026-11 ユーザー指定）
+  //   { sei, title, color, office, date }。date は押した日（帳票の日付の欄があるときはそちらを使う）
+  const pressedStamp = () => { const v = values._selfStamp; return v && v.sei ? v : null; };
+  // 日付は帳票の作成日・発行日（def.stampDate、既定 'date'）。未入力なら押した日、押す前（設定の見本）は今日。
+  const isoParts = (iso) => { const [y, m, d] = iso.split('-').map(Number); return { year: y, month: m, day: d }; };
+  function stampDate(c) {
     const iso = values[def.stampDate || 'date'];
-    if (/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) { const [y, m, d] = iso.split('-').map(Number); return { year: y, month: m, day: d }; }
+    if (/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) return isoParts(iso);
+    if (c && /^\d{4}-\d{2}-\d{2}$/.test(c.date || '')) return isoParts(c.date);
     return new Date();
   }
-  function stampSvg() {
-    const c = stampCfg;
-    if (!c.enabled || !c.sei) return '';
+  function stampSvg(c = stampCfg) {
+    if (!c.sei || c.enabled === false) return '';
     // selfStampStyle: 'inkan'：デート印ではなく三文判風の認印（苗字だけ、朱。本-品質-A0020 の検査者。ユーザー指定）
     if (def.selfStampStyle === 'inkan') return DateStamp.inkan({ name: c.sei, color: 'red' });
     // 役職なし：苗字を上下に分割／役職あり：上に苗字・下に役職／支店長：上に事業所名（「支店」を除く）
     const names = c.title === '支店長' ? { nameTop: (values.office || c.office || '').replace(/支店$/, ''), nameBottom: '支店長' }
       : c.title ? { nameTop: c.sei, nameBottom: c.title } : { name: c.sei };
-    return DateStamp.svg({ ...names, date: stampDate(), color: c.color });
+    return DateStamp.svg({ ...names, date: stampDate(c), color: c.color });
   }
   function renderSelfStamps() {
-    const svg = stampSvg();
+    const p = pressedStamp();
+    const svg = p ? stampSvg(p) : '';
     document.querySelectorAll('.self-stamp').forEach((el) => {
-      el.innerHTML = svg || (el.dataset.empty === '印' ? '<span class="stamp-mark">印</span>' : '<span class="self-hint no-print">クリックで<br>押印設定</span>');
+      el.innerHTML = svg || (el.dataset.empty === '印' ? '<span class="stamp-mark">印</span>' : '<span class="self-hint no-print">クリックで<br>押印</span>');
     });
-    const c = stampCfg, inkan = c.enabled && c.sei ? DateStamp.inkan({ name: c.sei, color: 'red' }) : '';
+    const inkan = p ? DateStamp.inkan({ name: p.sei, color: 'red' }) : '';
     document.querySelectorAll('.self-inkan').forEach((el) => { el.innerHTML = '印' + inkan; el.classList.toggle('on', !!inkan); });
   }
+  // 本人欄のクリック：押してあれば取り消しの確認、まだなら押す（苗字が未設定なら先に押印設定を開き、閉じたら押す）
+  function clickSelfStamp() {
+    const p = pressedStamp();
+    if (p) {
+      if (confirm(`「${p.sei}」の印を取り消しますか？`)) setVal('_selfStamp', '');
+      return;
+    }
+    const press = () => {
+      const c = stampCfg;
+      if (!c.sei || !c.enabled) return;
+      const d = new Date(), p2 = (x) => String(x).padStart(2, '0');
+      setVal('_selfStamp', { sei: c.sei, title: c.title, color: c.color, office: c.office, date: `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}` });
+    };
+    if (stampCfg.enabled && stampCfg.sei) press(); else openStampDialog(press);
+  }
 
-  function openStampDialog() {
+  function openStampDialog(after) {
     const prev = h('div', { class: 'sd-prev' });
     const upd = () => { prev.innerHTML = stampSvg() || '<span class="sd-empty">苗字を入れると<br>表示されます</span>'; };
     const set = (k, v) => { stampCfg[k] = v; saveStampCfg(); upd(); };
@@ -350,10 +370,10 @@
         LISTS.offices.filter((o) => o !== '本店').map((o) => h('option', { value: o, selected: o === stampCfg.office }, o))));
     const dlg = h('dialog', { class: 'stamp-dialog' }, h('form', { method: 'dialog' },
       h('h3', null, def.selfStampStyle === 'inkan' ? '押印設定（本人欄の認印）' : '押印設定（本人欄のデート印）'),
-      h('p', { class: 'sd-note' }, '全帳票共通の設定です（このPCのブラウザにだけ保存）。日付は帳票の作成日・発行日、未入力なら今日の日付になります。承認・確認欄には押されません。'),
+      h('p', { class: 'sd-note' }, '全帳票共通の設定です（このPCのブラウザにだけ保存）。本人欄をクリックすると押され、押した印はファイルに保存されます（もう一度クリックで取り消し）。日付は帳票の作成日・発行日、未入力なら押した日になります。承認・確認欄には押されません。'),
       h('div', { class: 'sd-body' },
         h('div', { class: 'sd-fields' },
-          h('label', null, h('input', { type: 'checkbox', checked: stampCfg.enabled, onchange: (e) => set('enabled', e.target.checked) }), 'デート印を表示する'),
+          h('label', null, h('input', { type: 'checkbox', checked: stampCfg.enabled, onchange: (e) => set('enabled', e.target.checked) }), 'デート印を使う'),
           h('label', null, '苗字', h('input', { type: 'text', value: stampCfg.sei, maxlength: 4, placeholder: '例：佐藤', oninput: (e) => set('sei', e.target.value.trim()) })),
           h('label', null, '役職', h('select', { onchange: (e) => {
             const t = e.target.value;
@@ -367,7 +387,7 @@
           h('div', { class: 'sd-colors' }, '色', h('label', null, colors[0], '黒'), h('label', null, colors[1], '朱（赤）'))),
         prev),
       h('div', { class: 'sd-btns' }, h('button', { value: 'close', class: 'primary' }, '閉じる'))));
-    dlg.addEventListener('close', () => dlg.remove());
+    dlg.addEventListener('close', () => { dlg.remove(); if (typeof after === 'function') after(); });
     document.body.append(dlg);
     dlg.showModal();
     upd();
@@ -399,7 +419,7 @@
             // dates：見出しの下に日付の欄。空欄なら「/　　/」を印字して手書きできるように（押印部はその分低く、枠の高さは同じ）
             // 日付の項目名は「sdate.見出し」。同じ見出しの欄が2つあるときは groups の stampKey で分ける
             g.dates ? h('div', { class: 'sb-date' }, field({ key: `${prefix}sdate.${head}`, align: 'center', placeholder: '/　　/' })) : null,
-            h('div', self ? { class: 'sb-area self-stamp' + (g.dates ? ' dated' : ''), title: 'クリックで押印設定', onclick: openStampDialog } : { class: 'sb-area' + (g.dates ? ' dated' : '') },
+            h('div', self ? { class: 'sb-area self-stamp' + (g.dates ? ' dated' : ''), title: 'クリックで押印', onclick: clickSelfStamp } : { class: 'sb-area' + (g.dates ? ' dated' : '') },
               roles.length ? h('div', { class: 'sb-roles' }, roles.flatMap((r, i) => (i ? [h('br'), r] : [r]))) : null));
           if (slashable) {
             box.addEventListener('click', (e) => {
@@ -498,7 +518,7 @@
   function valueCell(it, span, rs, style) {
     if (it.stampCell) {
       return h('td', { class: 'stamp-cell', colspan: span, rowspan: rs, style },
-        h('div', { class: 'self-stamp', 'data-empty': '印', title: 'クリックで押印設定', onclick: openStampDialog }));
+        h('div', { class: 'self-stamp', 'data-empty': '印', title: 'クリックで押印', onclick: clickSelfStamp }));
     }
     // stamps：表の中の押印欄（stamps と同じ groups。欄の右下に置く。本-品質-A0015）
     if (it.stamps) return h('td', { class: 'stamps-cell', colspan: span, rowspan: rs, style }, stampsEl(it.stamps, null, def));
@@ -1107,7 +1127,7 @@
       // 入力内容をJSONファイルに保存・読み込み（全帳票。2026-11 ユーザー指定。fileIO: false で付けない）
       def.fileIO !== false ? h('button', { onclick: () => openFile(id), title: '保存したJSONファイルを読み込む' }, 'ファイルを開く') : null,
       def.fileIO !== false ? h('button', { onclick: () => saveFile(id), title: '入力内容をJSONファイルに保存（開いたファイルには上書き）' }, 'ファイルに保存') : null,
-      def.selfStamp ? h('button', { onclick: openStampDialog }, '押印設定') : null,
+      def.selfStamp ? h('button', { onclick: () => openStampDialog() }, '押印設定') : null,
       // printNote：印刷の前に注意を出す（両面印刷など。A3の帳票は用紙の注意を自動で出す。修正指示書）
       h('button', { class: 'primary', onclick: () => {
         const note = def.printNote || (paper === 'A3' ? '用紙サイズは「A3」を選んで印刷してください。（A4のままだと縮小されたり、はみ出したりします）' : '');
