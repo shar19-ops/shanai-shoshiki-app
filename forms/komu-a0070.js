@@ -15,6 +15,7 @@
       if (!confirm('翌月分を作ります。\n・今月の自己評価を「前月」の欄へ移し、今月の評価を空にします\n・現場の状況、現状の問題点、指示事項を空にします\n・月度を1か月進めます\n（工番・件名などはそのまま。保存は新しいファイルになります）')) return;
       EVAL.forEach((_, i) => { setVal(`prev${i + 1}`, values[`eval${i + 1}`] || ''); setVal(`eval${i + 1}`, ''); });
       MONTHLY.forEach((k) => setVal(k, ''));
+      setVal('_selfStamp', ''); // 翌月分は押し直す
       if (/^\d{4}-\d{2}$/.test(values.ym || '')) {
         const [y, m] = values.ym.split('-').map(Number);
         const d = new Date(y, m, 1); // 翌月
