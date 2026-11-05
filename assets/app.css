@@ -1049,3 +1049,9 @@ table.grid.s35 td.s35-sign { padding: 0 2mm; vertical-align: middle; }
 .s35-line > div { flex: 1; min-width: 0; }
 .s35-res { margin-bottom: 1.5mm; }
 .s35-res .checks { justify-content: center; gap: 0 8mm; }
+/* 本-品質-A0006 内部監査チェックリスト：1段の高さは元の様式に合わせる（1ページ20行） */
+table.grid.h06 td { height: 10.6mm; font-size: 9pt; padding: 0; }
+table.grid.h06 th { height: 7mm; font-size: 9pt; }
+table.grid.h06 td.h06-no { text-align: center; }
+table.grid.h06 textarea.h53-wrap { display: block; width: 100%; min-height: 10.6mm; font-size: 9pt; line-height: 1.3; padding: .8mm 1.2mm; resize: none; overflow: hidden; }
+table.grid.h06 select.inp { height: 100%; min-height: 10.6mm; }
