@@ -25,7 +25,7 @@
     const trs = [...document.querySelectorAll('table.s27 tr[data-n]')];
     if (!trs.length) return;
     const hs = {};
-    trs.forEach((tr) => { hs[tr.dataset.n] = tr.getBoundingClientRect().height; });
+    trs.forEach((tr) => { hs[tr.dataset.n] = ShoshikiApp.layoutH(tr); });
     const base = Math.min(...Object.values(hs));
     const pages = pageCount(values);
     const next = {};

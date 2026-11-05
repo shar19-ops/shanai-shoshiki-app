@@ -25,7 +25,7 @@
     const trs = [...document.querySelectorAll('table.h55l tr[data-n]')];
     if (!trs.length) return;
     const hs = {};
-    trs.forEach((tr) => { hs[tr.dataset.n] = tr.getBoundingClientRect().height; });
+    trs.forEach((tr) => { hs[tr.dataset.n] = ShoshikiApp.layoutH(tr); });
     const base = Math.min(...Object.values(hs));
     const pages = pageCount(values);
     const next = {};
@@ -125,10 +125,10 @@
       const trs = [...table.querySelectorAll('tbody tr')].slice(1);
       // 行ごとの空のときの高さ（入力欄を縮めて測る）
       tas.forEach((ta) => { ta.style.height = '0'; });
-      const base = trs.map((tr) => tr.getBoundingClientRect().height);
+      const base = trs.map((tr) => ShoshikiApp.layoutH(tr));
       for (const pt of SIZES) {
         tas.forEach((ta) => { ta.style.fontSize = pt + 'pt'; ta.style.height = '0'; ta.style.height = ta.scrollHeight + 'px'; });
-        const extra = trs.reduce((s, tr, i) => s + Math.max(0, tr.getBoundingClientRect().height - base[i]), 0);
+        const extra = trs.reduce((s, tr, i) => s + Math.max(0, ShoshikiApp.layoutH(tr) - base[i]), 0);
         if (extra <= mm(SLACK)) return;
       }
     };

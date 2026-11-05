@@ -16,7 +16,7 @@
     setup: ({ inputs }) => AREAS.forEach((key) => {
       const el = inputs[key];
       if (!el) return;
-      const min = el.getBoundingClientRect().height;
+      const min = ShoshikiApp.layoutH(el);
       const grow = () => { el.style.height = '0'; el.style.height = `${Math.max(min, el.scrollHeight)}px`; };
       el.addEventListener('input', grow);
       grow();

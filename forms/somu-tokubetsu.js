@@ -152,7 +152,7 @@
       setup: ({ inputs }) => {
         const ta = inputs.riyu;
         if (!ta) return;
-        const min = ta.getBoundingClientRect().height;
+        const min = ShoshikiApp.layoutH(ta);
         const grow = () => { ta.style.height = '0'; ta.style.height = `${Math.max(min, ta.scrollHeight)}px`; };
         ta.addEventListener('input', grow);
         grow();
