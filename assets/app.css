@@ -1055,3 +1055,11 @@ table.grid.h06 th { height: 7mm; font-size: 9pt; }
 table.grid.h06 td.h06-no { text-align: center; }
 table.grid.h06 textarea.h53-wrap { display: block; width: 100%; min-height: 10.6mm; font-size: 9pt; line-height: 1.3; padding: .8mm 1.2mm; resize: none; overflow: hidden; }
 table.grid.h06 select.inp { height: 100%; min-height: 10.6mm; }
+/* 本-品質-A0008 是正処置要求書・報告書（欄の作りは A0015 と同じ h15） */
+.h08-to { justify-content: space-between; }
+.h08-right { display: flex; flex-direction: column; align-items: flex-end; gap: 1mm; }
+.h08-made { display: flex; align-items: center; gap: 2mm; font-size: 10pt; }
+.h08-from { font-size: 10.5pt; white-space: nowrap; }
+.h08-lead { display: flex; align-items: center; gap: 1mm; font-size: 10pt; white-space: nowrap; }
+.h08-date { width: 42mm; border-bottom: 1px solid var(--line); }
+.sheet.h08 td.stamps-cell .sb-area.dated { height: 13.2mm; } /* 押印欄を少し低く（欄が多いので1枚に収める） */
