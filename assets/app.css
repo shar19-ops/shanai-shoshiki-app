@@ -1028,3 +1028,14 @@ table.grid.k1.h09 td { height: 4.7mm; font-size: 8pt; }
 table.grid.k1.h09 td.h09-lbl { text-align: center; font-size: 7.5pt; line-height: 1.15; padding: 0 .3mm; background: var(--label-bg); }
 table.grid.k1.h09 .inp { min-height: 0; height: 100%; font-size: 8pt; padding: 0 .8mm; }
 table.grid.k1.h09 .date-wrap .pv { font-size: 8pt; text-align: center; }
+/* 本-総務-A0004 新規文書登録依頼：文書番号設定基準（参考） */
+.s04-ref { font-size: 8.5pt; margin-bottom: 1mm; }
+table.grid.s04 th { font-size: 8.5pt; height: 5.5mm; }
+table.grid.s04 td.s04-rule { padding: 1.5mm 2mm; height: auto; text-align: center; }
+.s04-no { display: inline-flex; align-items: flex-start; gap: 1mm; font-size: 10pt; }
+.s04-part { display: inline-flex; flex-direction: column; align-items: center; }
+.s04-pt { border-bottom: 1px solid var(--line); padding: 0 .5mm; }
+.s04-pn { font-size: 8.5pt; }
+.s04-note { font-size: 8.5pt; margin-top: .5mm; }
+table.grid.s04 td.s04-list { font-size: 8.5pt; line-height: 1.45; padding: .8mm 1.5mm; height: auto; vertical-align: top; }
+table.grid.s04 td.s04-list.center { text-align: center; }
