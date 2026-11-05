@@ -1039,3 +1039,13 @@ table.grid.s04 td.s04-rule { padding: 1.5mm 2mm; height: auto; text-align: cente
 .s04-note { font-size: 8.5pt; margin-top: .5mm; }
 table.grid.s04 td.s04-list { font-size: 8.5pt; line-height: 1.45; padding: .8mm 1.5mm; height: auto; vertical-align: top; }
 table.grid.s04 td.s04-list.center { text-align: center; }
+/* 本-総務-A0035・A0036 特別条項適用申請書 */
+.s35-bar { margin: 0 0 2mm; }
+table.grid.s35 th { font-size: 10pt; line-height: 1.3; }
+table.grid.s35 td { height: 17mm; }
+table.grid.s35 tr.s35-tall td { height: 22mm; }
+table.grid.s35 td.s35-sign { padding: 0 2mm; vertical-align: middle; }
+.s35-line { display: flex; align-items: center; gap: 1mm; font-size: 10pt; }
+.s35-line > div { flex: 1; min-width: 0; }
+.s35-res { margin-bottom: 1.5mm; }
+.s35-res .checks { justify-content: center; gap: 0 8mm; }
