@@ -719,6 +719,145 @@
     return btn;
   }
 
+  // ---------- 文字の装飾ができる記述欄（free ブロックの rich: true。2026-11 ユーザー指定：般-06 の内容） ----------
+  // values[key] に文字だけ（これまでと同じ）、values[key + '__html'] に装飾つきのHTMLを保存する
+  // 開いたファイルの内容をそのまま画面に入れないよう、決まったタグと色だけを新しく組み立てる（それ以外は捨てる）
+  const RICH_COLORS = { '0,0,0': 'rgb(0,0,0)', '192,0,0': 'rgb(192,0,0)', '0,51,204': 'rgb(0,51,204)' };
+  const RICH_MARK = '255,255,0';
+  const rgbKey = (s) => (String(s || '').match(/\d+/g) || []).slice(0, 3).join(',');
+  function richClean(html) {
+    const src = new DOMParser().parseFromString(String(html ?? ''), 'text/html').body;
+    const out = document.createElement('div');
+    const walk = (from, to) => from.childNodes.forEach((n) => {
+      if (n.nodeType === 3) { to.append(n.data); return; }
+      if (n.nodeType !== 1) return;
+      const tag = n.tagName;
+      if (tag === 'BR') { to.append(document.createElement('br')); return; }
+      if (!['DIV', 'P', 'SPAN', 'B', 'STRONG', 'U'].includes(tag)) return; // 他のタグは中身ごと捨てる
+      let cur = to;
+      const wrap = (el) => { cur.append(el); cur = el; return el; };
+      const st = n.style;
+      if (tag === 'DIV' || tag === 'P') wrap(document.createElement('div'));
+      if (tag === 'B' || tag === 'STRONG' || st.fontWeight === 'bold' || Number(st.fontWeight) >= 600) wrap(document.createElement('b'));
+      if (tag === 'U' || /underline/.test(`${st.textDecorationLine} ${st.textDecoration}`)) wrap(document.createElement('u'));
+      const color = RICH_COLORS[rgbKey(st.color)];
+      if (color) wrap(document.createElement('span')).style.color = color;
+      if (rgbKey(st.backgroundColor) === RICH_MARK) wrap(document.createElement('span')).style.backgroundColor = 'rgb(255,255,0)';
+      walk(n, cur);
+    });
+    walk(src, out);
+    return out;
+  }
+  // 文字だけを取り出す（innerText は空行の改行が1つ多くなるので使わない）
+  function richText(el) {
+    const lines = [];
+    let cur = '';
+    const walk = (node) => node.childNodes.forEach((n) => {
+      if (n.nodeType === 3) cur += n.data;
+      else if (n.tagName === 'BR') { lines.push(cur); cur = ''; }
+      else if (n.tagName === 'DIV') {
+        if (cur) { lines.push(cur); cur = ''; }
+        walk(n);
+        if (cur) { lines.push(cur); cur = ''; }
+      } else if (n.nodeType === 1) walk(n);
+    });
+    walk(el);
+    if (cur) lines.push(cur);
+    return lines.join('\n').replace(/\n+$/, '');
+  }
+  function richField(b) {
+    const htmlKey = b.key + '__html';
+    const el = h('div', { class: 'inp lt rich-body', contenteditable: 'true', role: 'textbox', 'aria-multiline': 'true', 'aria-label': b.label || '' });
+    el.style.setProperty('--rich-min', `calc(${b.lines || 6} * 7mm + 2mm)`);
+    if (values[htmlKey]) el.append(...richClean(values[htmlKey]).childNodes);
+    else if (values[b.key]) String(values[b.key]).split('\n').forEach((line) => { const d = document.createElement('div'); if (line) d.textContent = line; else d.append(document.createElement('br')); el.append(d); });
+    const sync = () => {
+      const text = richText(el);
+      setVal(b.key, text);
+      setVal(htmlKey, text.trim() ? richClean(el.innerHTML).innerHTML : '');
+    };
+    el.addEventListener('input', sync);
+    // 太字・下線以外の装飾（Ctrl+I や iPad の書式メニューの斜体など）は入れない
+    el.addEventListener('beforeinput', (e) => { if (/^format/.test(e.inputType) && !['formatBold', 'formatUnderline'].includes(e.inputType)) e.preventDefault(); });
+    el.addEventListener('drop', (e) => e.preventDefault());
+    // 文字の貼り付けは書式を捨てて文字だけ（画像は freeBlock の貼り付けが受け取る）
+    el.addEventListener('paste', (e) => {
+      const items = [...(e.clipboardData?.items || [])];
+      if (b.images && items.some((x) => x.type.startsWith('image/'))) return;
+      e.preventDefault();
+      document.execCommand('insertText', false, e.clipboardData?.getData('text/plain') || '');
+    });
+    // ボタンを押しても選んだ文字を覚えておく（iPad はボタンに触れると選択が外れることがある）
+    let range = null;
+    const onSel = () => {
+      if (!el.isConnected) { document.removeEventListener('selectionchange', onSel); return; }
+      const s = getSelection();
+      if (s.rangeCount && el.contains(s.getRangeAt(0).commonAncestorContainer)) range = s.getRangeAt(0).cloneRange();
+    };
+    document.addEventListener('selectionchange', onSel);
+    const restore = () => {
+      el.focus();
+      if (range) { const s = getSelection(); s.removeAllRanges(); s.addRange(range); }
+    };
+    const run = (cmd) => {
+      restore();
+      document.execCommand('styleWithCSS', false, true);
+      document.execCommand(cmd);
+      sync();
+    };
+    // 文字の色・マーカー：選んだ文字を行ごと・部分ごとに span で囲む
+    //   （execCommand の foreColor は、入力した文字に対して Safari 系で効かないことがあった。2026-11）
+    const paint = (prop, val) => {
+      restore();
+      const s = getSelection();
+      if (!s.rangeCount || s.isCollapsed) return;
+      const r = s.getRangeAt(0);
+      const parts = [];
+      const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      for (let n = w.nextNode(); n; n = w.nextNode()) {
+        if (!r.intersectsNode(n)) continue;
+        const start = n === r.startContainer ? r.startOffset : 0, end = n === r.endContainer ? r.endOffset : n.length;
+        if (start < end) parts.push({ n, start, end });
+      }
+      const spans = parts.map(({ n, start, end }) => {
+        if (end < n.length) n.splitText(end);
+        const mid = start > 0 ? n.splitText(start) : n;
+        const up = mid.parentNode;
+        // すでに同じ文字だけを囲んでいる span は作り直さない（色を変えるたびに入れ子が増えないように）
+        if (up.tagName === 'SPAN' && up.childNodes.length === 1) { up.style[prop] = val; return up; }
+        const sp = document.createElement('span');
+        sp.style[prop] = val;
+        mid.replaceWith(sp);
+        sp.append(mid);
+        return sp;
+      });
+      if (spans.length) {
+        const nr = document.createRange();
+        nr.setStartBefore(spans[0]);
+        nr.setEndAfter(spans[spans.length - 1]);
+        s.removeAllRanges();
+        s.addRange(nr);
+        range = nr.cloneRange();
+      }
+      sync();
+    };
+    const btn = (label, title, cls, fn) => {
+      const x = h('button', { type: 'button', class: cls, title }, label);
+      x.addEventListener('mousedown', (e) => e.preventDefault());
+      x.addEventListener('click', fn);
+      return x;
+    };
+    el.richTools = h('span', { class: 'rich-tools no-print' },
+      btn('太字', '選んだ文字を太字にする（もう一度押すと戻す）', 'rt-b', () => run('bold')),
+      btn('下線', '選んだ文字に下線を引く（もう一度押すと戻す）', 'rt-u', () => run('underline')),
+      btn('黒', '選んだ文字を黒にする', 'rt-k', () => paint('color', 'rgb(0,0,0)')),
+      btn('赤', '選んだ文字を赤にする', 'rt-r', () => paint('color', 'rgb(192,0,0)')),
+      btn('青', '選んだ文字を青にする', 'rt-l', () => paint('color', 'rgb(0,51,204)')),
+      btn('マーカー', '選んだ文字に黄色のマーカーを引く', 'rt-m', () => paint('backgroundColor', 'rgb(255,255,0)')),
+      btn('解除', '選んだ文字の装飾を消す', 'rt-x', () => run('removeFormat')));
+    return el;
+  }
+
   function freeBlock(b) {
     // 罫線は初期値なし（b.plain === false なら初期値あり）。見出しの右に「罫線 なし／あり」の切り替え（lineToggle: false で付けない）
     // 高さは lines 行分、grow なら残りいっぱい
@@ -727,9 +866,11 @@
     const def = b.plain ?? true;
     const canToggle = b.lineToggle !== false;
     const isPlain = () => (canToggle ? linePlain(b.key, def) : def);
-    const el = field({ key: b.key, type: 'textarea', lines, placeholder: b.placeholder });
-    el.classList.add('lt');
-    el.style.height = b.grow ? '' : `calc(${lines} * 7mm + 2mm)`;
+    const el = b.rich ? richField(b) : field({ key: b.key, type: 'textarea', lines, placeholder: b.placeholder });
+    if (!b.rich) {
+      el.classList.add('lt');
+      el.style.height = b.grow ? '' : `calc(${lines} * 7mm + 2mm)`;
+    }
     let toggle = null;
     if (canToggle) {
       const btn = (label, plain) => h('button', { type: 'button', 'data-plain': plain ? '1' : '0', onclick: () => { setVal(pk, plain ? '1' : '0'); paint(); } }, label);
@@ -777,11 +918,12 @@
         e.preventDefault();
         its.forEach((x) => add(x.getAsFile()));
       });
+      if (b.rich) el.addEventListener('input', fit); // 文章が伸びる欄なので、打つたびに画像の大きさを調整する
       draw();
     }
     const head = b.label || toggle || imgTools;
     const box = h('div', { class: 'free' + (b.images ? ' has-imgs' : ''), style: b.grow ? 'flex:1' : '' },
-      head ? h('div', { class: 'free-label' + (toggle || imgTools ? ' has-toggle' : '') }, b.label || '', imgTools, toggle) : null,
+      head ? h('div', { class: 'free-label' + (toggle || imgTools ? ' has-toggle' : '') }, b.label || '', el.richTools || null, imgTools, toggle) : null,
       el, imgArea);
     if (imgArea) box.classList.toggle('has-img-items', imgArea.childElementCount > 0);
     return wrapTitle(b, box);

@@ -25,7 +25,8 @@ FORM_DEFS['06'] = {
       [{ label: '事　項', key: 'subject', type: 'textarea', lines: 2, lw: 1, span: 2 }],
     ] },
     // 内容：画像も貼れる（Ctrl+V または「画像を追加」。文章の下に並べて印刷にも出す）
-    { type: 'free', label: '内　容', key: 'body', lines: 18, grow: true, images: true },
+    // rich：太字・下線・文字の色・マーカーを付けられる
+    { type: 'free', label: '内　容', key: 'body', lines: 18, grow: true, images: true, rich: true },
     { type: 'free', label: '回　答', key: 'answer', lines: 6 },
   ],
 };

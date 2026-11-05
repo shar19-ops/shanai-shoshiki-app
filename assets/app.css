@@ -323,6 +323,25 @@ table.grid .date-wrap .pv { text-align: right; font-size: 9.5pt; }
 .free.has-img-items textarea { flex: 1 1 0; min-height: 21mm; }
 .free-img button { position: absolute; top: 2px; right: 2px; width: 22px; height: 22px; border-radius: 50%; border: 0; background: rgba(0,0,0,.6); color: #fff; font-size: 13px; line-height: 22px; padding: 0; cursor: pointer; }
 .free textarea { flex: 1; }
+/* 文字の装飾ができる記述欄（rich）：見た目は記述欄と同じ。長文は欄が伸びる */
+.inp.rich-body {
+  display: block; flex: 1 1 auto; height: auto; min-height: var(--rich-min, 7mm); padding: 1mm 2mm;
+  line-height: 7mm; white-space: pre-wrap; overflow-wrap: anywhere; cursor: text;
+  background-image: var(--rule-line); background-color: var(--input-bg);
+  background-position: 0 1mm; background-size: 100% 7mm;
+}
+.inp.rich-body.plain { background-image: none; }
+.free.has-img-items .inp.rich-body { min-height: 21mm; }
+.free .rich-tools { margin-left: 3mm; display: inline-flex; align-items: center; gap: 2px; }
+.free .rich-tools button { font: inherit; font-size: 8pt; letter-spacing: 0; padding: 1px 8px; border: 1px solid #b8bfcc; border-radius: 4px; background: #fff; color: #333; cursor: pointer; }
+.free .rich-tools button:hover { border-color: var(--accent); }
+.free .rich-tools .rt-b { font-weight: bold; }
+.free .rich-tools .rt-u { text-decoration: underline; }
+.free .rich-tools .rt-k { margin-left: 4px; color: #000; font-weight: bold; }
+.free .rich-tools .rt-r { color: #c00000; font-weight: bold; }
+.free .rich-tools .rt-l { color: #0033cc; font-weight: bold; }
+.free .rich-tools .rt-m { margin-left: 4px; background: #ffff00; }
+.free .rich-tools .rt-x { margin-left: 4px; }
 
 /* 画像欄 */
 .img-field {
@@ -395,6 +414,8 @@ table.grid td textarea.inp { height: 100%; }
   .inp, textarea.inp, .checks .box { background-color: transparent !important; box-shadow: none !important; }
   textarea.inp { background-image: var(--rule-line); background-size: 100% 7mm; }
   textarea.inp.plain { background-image: none; }
+  .inp.rich-body { background-image: var(--rule-line); background-size: 100% 7mm; }
+  .inp.rich-body.plain { background-image: none; }
   select.inp { color: var(--ink); }
   .img-field { background: transparent; }
   .inp::placeholder { color: transparent; }
