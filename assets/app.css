@@ -742,7 +742,7 @@ table.grid.b4-vendor td.b4-vname { border-right: none; } /* 殿の前の罫線�
 .b4-pages button { font: inherit; font-size: 8pt; padding: 2px 6px; border: 1px solid var(--accent); border-radius: 4px; background: #fff; color: var(--accent); cursor: pointer; }
 .b4-pages button:hover { background: #eef2fb; }
 .sheet:has(table.b4-right) .notes { font-size: 7.5pt; line-height: 1.38; } /* 本-購買-A0004 右の表の下の注意書き */
-/* 本-購買-A0004-1 の縦・β版：左右2段のまま幅を詰め、縦の余裕で文字と行を大きくする */
+/* 本-購買-A0004-1・2 の縦・β版：左右2段のまま幅を詰め、縦の余裕で文字と行を大きくする */
 .b4-tate table.grid.b4-vendor { width: calc((210mm - 24mm - 4mm) / 2); }
 .b4-tate .b4-head { flex-wrap: wrap; gap: 1.5mm 4mm; }
 .b4-tate table.grid.b4 th { font-size: 8pt; height: 4.8mm; }
