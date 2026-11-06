@@ -14,6 +14,7 @@ FORM_DEFS['55'] = {
       [{ label: '現場住所', key: 'siteAddr' }],
       [{ label: '事務所住所', key: 'officeAddr' }],
       [{ label: '担当者', key: 'tanto', span: 10 }, { label: '連絡先', key: 'tel', type: 'tel', span: 14 }],
+      [{ label: 'メールアドレス', key: 'mail', inputmode: 'email' }], // 担当者のメールアドレス
       [{ label: '工　期', key: 'kFrom', key2: 'kTo', type: 'daterange' }], // 「〜」の両側に罫線なし
     ] },
     // 備考：罫線なしが初期値。画面の「罫線 なし／あり」であとから罫線ありにもできる。下の検印欄まで伸ばす
