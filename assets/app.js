@@ -1314,7 +1314,7 @@
     document.head.append(st);
 
     root.append(h('div', { class: 'toolbar' },
-      h('div', { class: 'tb-title' }, h('a', { href: './', class: 'tb-home', title: '帳票一覧へ' }, h('span', { class: 'app-name' }, h('span', { class: 'y' }, 'Y'), '-Format'), h('span', { class: 'sep' }, '＞')), ` ${def.code}　${def.title}`),
+      h('div', { class: 'tb-title' }, h('a', { href: './', class: 'tb-home', title: '帳票一覧へ' }, h('span', { class: 'app-name' }, h('span', { class: 'y' }, 'Y'), '-Format'), h('span', { class: 'sep' }, '＞')), ` ${def.code}　${def.title}${def.tbNote || ''}`),
       h('span', { class: 'saved' }),
       h('span', { class: 'tb-zoom' },
         h('button', { type: 'button', title: '用紙を縮小（Ctrl＋「－」）', 'aria-label': '縮小', onclick: () => stepZoom(-1) }, '－'),

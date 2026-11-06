@@ -1,6 +1,7 @@
 // 本-購買-A0004-1・2 見積依頼書／注文書付属書（労務・材料労務／物品納品）の共通定義（品質記録様式。元Word：本-購買-A0004-1・2….doc）
 // forms/kobai-a0004-1.js などが FORM_NEEDS でこのファイルを読み込む
-// 両面印刷（A0004-1はA4縦、A0004-2はA4横。ユーザー指定）：表面は項目の表を左右2段、裏面は約款（見積依頼書付属書類／物品売買契約約款）
+// A4横の両面印刷（ユーザー指定）：表面は項目の表を左右2段、裏面は約款（見積依頼書付属書類／物品売買契約約款）
+// A0004-1 には A4縦のβ版もある（forms/kobai-a0004-1-tate.js。表の左右2段はそのまま。横版は残す。ユーザー指定）
 // 業者名は左の表の上。同じ現場で多数の業者に出すので、業者ごとに表裏の1組を増やせて、JSONファイルに保存・読み込み（ユーザー指定）
 // 各項目の○／✕欄はクリックで「空欄 → ○ → ✕ → 空欄」。元の様式で○・✕が入っていた項目は、最初からその印
 // 注文書付属書・見積依頼書の発行の欄（元は表の右下）は、押印欄として右上に置く（ユーザー指定）
@@ -27,15 +28,15 @@
     ['養　生', ['取付中の養生', '取付完了後の養生']],
     ['片　付', ['建設廃棄物の場外搬出･処分に係る費用', '梱包材･発生材の場内指定場所への集積', { t: '作業終了後の片付･清掃', d: '○' }]],
   ];
-  const RIGHT = (kind) => [
+  const RIGHT = (kind, tate) => [
     ['機　器', [{ t: '協力会社先での検証', f: 'kensa', key: 'kensa' }]],
     ['図面･書類', ['工種別施工計画書（施工要領書）･施工図･製作図', '竣工（完成）図書一式']],
     ['見　本', [{ f: 'text', key: 'mihon' }]],
     ['検査･確認', ['諸官庁･施主･設計監理者の諸検査の立会い', '使用機器の性能試験･検査（成績書提出）']],
     ['安全衛生', ['保安･警備費（入退場管理を含む）', '現場安全衛生管理用施設の確保及び維持管理', '仮設道路･通路の確保及び維持管理', '労災保険料、第三者傷害賠償保険料',
       '安全パトロール', '揚重の合図･玉掛け', '再下請負通知書･作業員名簿等の提出']],
-    ['支払条件', [{ t: kind === 1
-      ? '労務業者\n　10日締め　月末支払　現金100％\n主要資器材・資材業者\n　25日締め　翌月末支払　手形60日' // A0004-1は縦で幅が狭いので折り返す位置を決める
+    ['支払条件', [{ t: tate
+      ? '労務業者\n　10日締め　月末支払　現金100％\n主要資器材・資材業者\n　25日締め　翌月末支払　手形60日' // 縦は幅が狭いので折り返す位置を決める
       : '労務業者　　　　　　　10日締め　月末支払　　現金100％\n主要資器材・資材業者　25日締め　翌月末支払　手形60日', d: '○' },
       { t: '振込手数料、駐車場代、安全帽代、工具類貸出費の他、発注者が立替えた費用は、支払時に支払代金より差引いたします。', d: '○' }]],
     ['その他', ['現場事務所、作業用詰所、倉庫等の仮設建物', '電灯電力設備、給排水･トイレ設備、仮設動力設備', '同上用用水光熱費', '工事用電力･用水費', '近隣対策費', '式典費',
@@ -115,7 +116,7 @@
   };
 
   // 表（左右どちらか1段分）
-  const table = (groups, tail, kind, vn) => ({ type: 'custom', render: ({ h, field, values, setVal }) => {
+  const table = (groups, tail, kind, vn, tate) => ({ type: 'custom', render: ({ h, field, values, setVal }) => {
     // ○／✕の欄：クリックで切り替え。値が未設定なら元の様式の印（d）
     const mark = (k0, d) => {
       const key = pk(vn, k0);
@@ -161,7 +162,7 @@
         ...tail.map((it, i) => h('tr', null, h('td', { class: 'b4-m' }, mark(`m.tail${i}`, it.d)), body(it))));
     }
     return h('table', { class: 'grid b4' + (tail ? ' b4-right' : '') },
-      h('colgroup', null, h('col', { style: `width:${kind === 1 ? 16 : 23}mm` }), h('col', { style: 'width:5.5mm' }), h('col')), tb); // A0004-1は縦なので項目名の列を狭く
+      h('colgroup', null, h('col', { style: `width:${tate ? 16 : 23}mm` }), h('col', { style: 'width:5.5mm' }), h('col')), tb); // 縦は項目名の列を狭く
   } });
 
   const terms = (kind) => ({ type: 'custom', render: ({ h }) => h('div', { class: 'b4-terms' },
@@ -192,12 +193,13 @@
         total > 1 ? h('button', { type: 'button', onclick: del }, `${total}社目を削除`) : null) : null);
   } });
 
-  const make = (no, kind) => {
-    FORM_DEFS[`kobai-a0004-${no}`] = {
+  const make = (no, kind, tate) => {
+    FORM_DEFS[`kobai-a0004-${no}${tate ? '-tate' : ''}`] = {
       code: `本-購買-A0004-${no}`, title: `見積依頼書／注文書付属書（${kind === 1 ? '労務・材料労務' : '物品納品'}）`,
       seitei: '99/01/04', kaitei: '26/11/17', // フッター：制定日は元の様式のまま、最終改訂日はユーザー指定
-      orientation: kind === 1 ? 'portrait' : 'landscape', // A0004-1はA4縦（ユーザー指定）。A0004-2はA4横のまま
-      sheetClass: kind === 1 ? 'b4-sheet b4-tate' : 'b4-sheet',
+      orientation: tate ? 'portrait' : 'landscape',
+      sheetClass: tate ? 'b4-sheet b4-tate' : 'b4-sheet',
+      tbNote: tate ? '【縦・β版】' : '', // 画面の上部だけに出す（印刷には出ない）
       // 元は表の右下の「注文書付属書／見積依頼書 ／／ 発行」の欄 → 押印欄として右上（ユーザー指定）
       // 押印欄の上部に日付（空欄なら「/　　/」で手書き。ユーザー指定）
       stamps: [{ boxes: ['注文書付属書\n発行', '見積依頼書\n発行'], dates: true }],
@@ -209,7 +211,7 @@
       pages: (v) => Array.from({ length: pageCount(v) }, (_, i) => i + 1).flatMap((vn) => [
         { subtitle: pageCount(v) > 1 ? `（表面 ${vn}/${pageCount(v)}）` : '（表面）', stampKey: pk(vn, ''), headBlocks: [vendorHead(vn)], blocks: [
           // 注意書きは右の表の下（元の様式と同じ）。凡例の下に1.〜3.を縦に並べる（ユーザー指定）
-          { type: 'row', gap: 4, items: [table(LEFT(kind), null, kind, vn), { type: 'col', gap: 1.5, items: [table(RIGHT(kind), TAIL(kind), kind, vn), { type: 'notes', items: [
+          { type: 'row', gap: 4, items: [table(LEFT(kind), null, kind, vn, tate), { type: 'col', gap: 1.5, items: [table(RIGHT(kind, tate), TAIL(kind), kind, vn, tate), { type: 'notes', items: [
             '○：見積･契約に含む･条件内、✕：見積･契約に含まない･条件外（○✕の欄はクリックで ○ → ✕ → 空欄）',
             '1.　見積依頼時に、工事内容に含める場合は○、含めない場合は✕を記入して協力会社に交付する。',
             '2.　協力会社は、見積書提出時に本書を添付して提出する。',
@@ -224,4 +226,5 @@
 
   make(1, 1);
   make(2, 2);
+  make(1, 1, true); // A0004-1 の縦・β版
 })();
