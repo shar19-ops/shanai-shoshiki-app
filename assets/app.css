@@ -742,6 +742,24 @@ table.grid.b4-vendor td.b4-vname { border-right: none; } /* 殿の前の罫線�
 .b4-pages button { font: inherit; font-size: 8pt; padding: 2px 6px; border: 1px solid var(--accent); border-radius: 4px; background: #fff; color: var(--accent); cursor: pointer; }
 .b4-pages button:hover { background: #eef2fb; }
 .sheet:has(table.b4-right) .notes { font-size: 7.5pt; line-height: 1.38; } /* 本-購買-A0004 右の表の下の注意書き */
+/* 本-購買-A0004-1 はA4縦：左右2段のまま幅を詰め、縦の余裕で文字と行を大きくする */
+.b4-tate table.grid.b4-vendor { width: calc((210mm - 24mm - 4mm) / 2); }
+.b4-tate .b4-head { flex-wrap: wrap; gap: 1.5mm 4mm; }
+.b4-tate table.grid.b4 th { font-size: 8pt; height: 4.8mm; }
+.b4-tate table.grid.b4 th.b4-mh { font-size: 5.8pt; }
+.b4-tate table.grid.b4 td { font-size: 8pt; height: 5.3mm; line-height: 1.15; }
+.b4-tate table.grid.b4 .inp { font-size: 8pt; height: 4.6mm; line-height: 4.6mm; }
+.b4-tate table.grid.b4 .date-wrap, .b4-tate table.grid.b4 .range-wrap { height: 4.6mm; }
+.b4-tate table.grid.b4 .date-wrap .pv { font-size: 8pt; line-height: 4.5mm; }
+.b4-tate table.grid.b4 .b4-inline { flex-wrap: wrap; }
+.b4-tate table.grid.b4 .b4-inline .checks label { font-size: 8pt; }
+.b4-tate table.grid.b4 .b4-lines .b4-inline { display: block; }
+.b4-tate table.grid.b4 .b4-lt { display: block; width: auto; }
+.b4-tate table.grid.b4 .b4-kensa .b4-sub { width: 24mm; }
+.b4-tate table.grid.b4 .b4-kensa .b4-kv { flex: 1 1 calc(100% - 26mm); }
+.b4-tate .b4-terms { font-size: 8.2pt; line-height: 1.43; }
+.b4-tate .b4-terms-title { font-size: 10pt; }
+.sheet.b4-tate:has(table.b4-right) .notes { font-size: 8pt; }
 /* 本-総務-A0001〜A0003 文書の台帳（A4横、1ページ16件） */
 table.grid.s1 th { height: 7mm; font-size: 9pt; letter-spacing: .1em; }
 table.grid.s1 td { height: 8.2mm; font-size: 9pt; }
