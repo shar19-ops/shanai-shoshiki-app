@@ -1,6 +1,6 @@
 // 業態調査依頼書
 FORM_DEFS['30'] = {
-  code: '般-30', title: '業態調査依頼書',
+  code: '総-02', title: '業態調査依頼書',
   selfStamp: '発行', // 本人欄（デート印を押す欄）
   meta: [{ label: '作成日', key: 'date', type: 'date' }],
   // 総務部の押印欄は帳票の下（bottomStamps）

@@ -57,7 +57,7 @@
   ] };
 
   FORM_DEFS['53'] = {
-    code: '般-53', title: '通勤用定期券購入申請書',
+    code: '共-01', title: '通勤用定期券購入申請書',
     selfStamp: '申請者', // 本人欄（デート印を押す欄）
     meta: [{ label: '申請日', key: 'date', type: 'date' }],
     stamps: [{ boxes: ['承認', '確認', '確認', '申請者'] }],

@@ -1,6 +1,6 @@
 const LABEL_W = '31mm'; // 宛先・発行部署・事項の見出し列の幅（そろえる）
 FORM_DEFS['06'] = {
-  code: '般-06', title: '業務連絡書',
+  code: '経-01', title: '業務連絡書',
   selfStamp: '発行', stampDate: 'issued', // 本人欄（デート印）と、その日付に使う項目
   meta: [
     { label: '発行日', key: 'issued', type: 'date' },

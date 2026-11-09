@@ -47,7 +47,7 @@
 
   const make = (id, portrait) => {
   FORM_DEFS[id] = {
-    code: '般-14', title: '工料発注承認メモ', orientation: portrait ? 'portrait' : 'landscape',
+    code: '購-05', title: '工料発注承認メモ', orientation: portrait ? 'portrait' : 'landscape',
     tbNote: portrait ? '【縦・β版】' : '', // 画面の上部だけに出す（印刷には出ない）
     selfStamp: '発行者', // 本人欄（デート印を押す欄）
     meta: [
