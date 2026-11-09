@@ -11,7 +11,7 @@
   const YN = ['●', '〇'];
 
   FORM_DEFS['24'] = {
-    code: '般-24', title: '契約条件確認事項', subtitle: '（経費）',
+    code: '営-05', title: '契約条件確認事項', subtitle: '（経費）',
     meta: [{ label: '作成日', key: 'date', type: 'date' }],
     blocks: [
       { type: 'grid', rows: [

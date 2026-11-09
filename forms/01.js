@@ -7,7 +7,7 @@
     const d = new Date(v.week + 'T00:00'); d.setDate(d.getDate() + r - 1); return d;
   };
   FORM_DEFS['01'] = {
-    code: '般-01', title: '営業活動報告書', subtitle: '（行先・経費）',
+    code: '営-01', title: '営業活動報告書', subtitle: '（行先・経費）',
     selfStamp: '発行', // 本人欄（デート印を押す欄）
     meta: [
       { label: '週の開始日（月）', key: 'week', type: 'date' },

@@ -14,7 +14,7 @@
   ];
 
   FORM_DEFS['23'] = {
-    code: '般-23', title: '工事概要書',
+    code: '営-04', title: '工事概要書',
     meta: [{ label: '作成日', key: 'date', type: 'date' }],
     blocks: [
       { type: 'grid', dense: true, rows: [

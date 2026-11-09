@@ -2,7 +2,7 @@
 (function () {
   const M = { type: 'number', unit: '百万円' };
   FORM_DEFS['31'] = {
-    code: '般-31', title: '与信限度額設定申告書',
+    code: '総-03', title: '与信限度額設定申告書',
     selfStamp: '発行', // 本人欄（デート印を押す欄）
     meta: [{ label: '作成日', key: 'date', type: 'date' }],
     stamps: [

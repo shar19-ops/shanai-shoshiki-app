@@ -1,6 +1,6 @@
 // 外注品発注承認書（A4横）
 FORM_DEFS['47'] = {
-  code: '般-47', title: '外注品発注承認書', orientation: 'landscape',
+  code: '購-08', title: '外注品発注承認書', orientation: 'landscape',
   selfStamp: '作成', // 本人欄（デート印を押す欄）
   meta: [
     { label: '発行日', key: 'date', type: 'date' },

@@ -11,7 +11,7 @@
     { label: '所　属', key: 'dept', span: 16, lw: 3 },
   ];
   FORM_DEFS['05'] = {
-    code: '般-05', title: '届　書',
+    code: '総-01', title: '届　書',
     selfStamp: '印', // 本人欄は氏名横の「印」欄（stampCell）
     meta: [{ label: '提出日', key: 'date', type: 'date' }],
     bottomStamps: ['登録済検印'], // 下部（フッターの上）に置く押印欄
