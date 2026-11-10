@@ -8,11 +8,11 @@ FORM_DEFS['02'] = {
     { type: 'grid', rows: [
       [{ label: '工　番', key: 'koban', span: 9 }, { label: '件　名', key: 'subject', span: 15 }],
       [{ label: '現場所在地', key: 'siteAddr', lw: 5 }],
+      [{ label: '当社現場\n事務所', span: 5, rs: 2 }, { label: '所在地', key: 'oAddr', lw: 3, span: 19 }], // 当社現場事務所を建築現場事務所の上に（2026-11-10 ユーザー指定）
+      [{ label: 'TEL', key: 'oTel', lw: 3, span: 10, type: 'tel' }, { label: 'FAX', key: 'oFax', lw: 3, span: 9, type: 'tel' }],
       [{ label: '建築現場\n事務所', span: 5, rs: 3 }, { label: '会社名', key: 'bCompany', lw: 3, span: 19 }],
       [{ label: '所在地', key: 'bAddr', lw: 3, span: 19 }],
       [{ label: 'TEL', key: 'bTel', lw: 3, span: 10, type: 'tel' }, { label: 'FAX', key: 'bFax', lw: 3, span: 9, type: 'tel' }],
-      [{ label: '当社現場\n事務所', span: 5, rs: 2 }, { label: '所在地', key: 'oAddr', lw: 3, span: 19 }],
-      [{ label: 'TEL', key: 'oTel', lw: 3, span: 10, type: 'tel' }, { label: 'FAX', key: 'oFax', lw: 3, span: 9, type: 'tel' }],
       [{ label: '工事長', key: 'chief', lw: 5, span: 9 }, { label: '作業所長', key: 'manager', lw: 3, span: 7 }, { label: '作業所員', key: 'staff', lw: 3, span: 8 }],
       [{ label: '最寄駅', key: 'station', lw: 5 }],
     ] },
