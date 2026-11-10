@@ -160,7 +160,8 @@
   // 契約時確認・工事名称（A0004 の業者名と同じ位置：左の表の上）
   const tateHead = { type: 'custom', render: ({ h, field }) => h('div', { class: 'b4-head' },
     h('table', { class: 'grid b4-vendor k50v-top' }, h('tbody', null,
-      h('tr', null, h('th', null, '契約時確認'), h('td', null, field({ key: 'keiyaku1', align: 'center' })), h('td', null, field({ key: 'keiyaku2', align: 'center' }))),
+      // 契約時確認は 確認先・担当者 を書く欄。空欄のときだけ薄いグレーで案内（画面だけ。印刷には出ない。2026-11-10 ユーザー指定）
+      h('tr', null, h('th', null, '契約時確認'), h('td', null, field({ key: 'keiyaku1', align: 'center', placeholder: '確認先' })), h('td', null, field({ key: 'keiyaku2', align: 'center', placeholder: '担当者' }))),
       h('tr', null, h('th', null, '工事名称'), h('td', { colspan: 2 }, field({ key: 'koji' })))))) };
 
   FORM_DEFS['50v'] = {
