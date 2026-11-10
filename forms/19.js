@@ -1,5 +1,5 @@
 FORM_DEFS['19'] = {
-  code: '般-19', title: '稟議書', subtitle: '（大）',
+  code: '般-19', hokan: '総務部', title: '稟議書', subtitle: '（大）',
   meta: [
     { label: '起案年月日', key: 'date', type: 'date' },
   ],

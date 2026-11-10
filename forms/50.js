@@ -103,7 +103,7 @@
   }
 
   FORM_DEFS['50'] = {
-    code: '購-09', title: '工期設定チェックリスト',
+    code: '購-09', hokan: '経理部', title: '工期設定チェックリスト',
     orientation: 'landscape',
     bare: true, // 共通の表題・押印欄は使わず、元のExcelのままの見た目
     footerRight: '購-09　　25/07/25　制定', // 番号は 2026-11-09 に 般-50 から変更（ユーザー指定）
