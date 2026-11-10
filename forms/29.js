@@ -2,7 +2,7 @@
 // 金額キーの消費税額（税率は taxRate、％）
 const tax = (key) => (n) => Math.floor(n(key) * n('taxRate') / 100);
 FORM_DEFS['29'] = {
-  code: '経-05', title: '請求書作成依頼書',
+  code: '経-05', hokan: '経理部', title: '請求書作成依頼書',
   selfStamp: '依頼者', // 本人欄（デート印を押す欄）
   meta: [
     { label: '請求月', key: 'month', type: 'ym' },

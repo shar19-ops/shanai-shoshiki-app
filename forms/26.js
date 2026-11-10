@@ -1,6 +1,6 @@
 // 工期・施工部署・工事担当者変更届
 FORM_DEFS['26'] = {
-  code: '経-02', title: '工期・施工部署・工事担当者変更届',
+  code: '経-02', hokan: '工事管理部', title: '工期・施工部署・工事担当者変更届',
   selfStamp: '発行', // 本人欄（デート印を押す欄）
   meta: [{ label: '作成日', key: 'date', type: 'date' }],
   bottomStamps: ['登録済検印'], // 下部（フッターの上）に置く押印欄

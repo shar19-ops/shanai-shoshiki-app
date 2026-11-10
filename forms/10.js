@@ -32,7 +32,7 @@
   };
 
   FORM_DEFS['10'] = {
-    code: '工-01', title: '作業月報',
+    code: '工-01', hokan: '非管理', title: '作業月報',
     meta: [
       { label: '対象月', key: 'month', type: 'ym' },
       { label: '提出日', key: 'date', type: 'date' },

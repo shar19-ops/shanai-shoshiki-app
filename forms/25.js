@@ -1,6 +1,6 @@
 // 設計料手続き管理リスト（A4横）
 FORM_DEFS['25'] = {
-  code: '設-02', title: '設計料手続き管理リスト', orientation: 'landscape',
+  code: '設-02', hokan: '営業部', title: '設計料手続き管理リスト', orientation: 'landscape',
   meta: [{ label: '作成日', key: 'date', type: 'date' }],
   blocks: [
     {

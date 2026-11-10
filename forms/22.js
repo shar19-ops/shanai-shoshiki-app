@@ -103,7 +103,7 @@
   }
 
   FORM_DEFS['22'] = {
-    code: '営-03', title: '受注報告登録メモ',
+    code: '営-03', hokan: '工事管理部', title: '受注報告登録メモ',
     selfStamp: '発行者',
     meta: [{ label: '発行日', key: 'date', type: 'date' }],
     stamps: [{ boxes: ['確認', '確認', '発行者'] }],

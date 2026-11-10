@@ -1,5 +1,5 @@
 FORM_DEFS['52'] = {
-  code: '経-06', title: '代行支払い承諾書',
+  code: '経-06', hokan: '経理部', title: '代行支払い承諾書',
   meta: [{ label: '日付', key: 'date', type: 'date' }],
   blocks: [
     { type: 'row', align: 'flex-end', items: [

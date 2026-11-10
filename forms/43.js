@@ -2,7 +2,7 @@
 (function () {
   const MONTHS = ['4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月', '1月', '2月', '3月'];
   FORM_DEFS['43'] = {
-    code: '管-03', title: 'スパイダープラス閲覧・編集依頼書',
+    code: '管-03', hokan: '工事管理部', title: 'スパイダープラス閲覧・編集依頼書',
     meta: [{ label: '依頼日', key: 'date', type: 'date' }],
     // 承認ルートと関係ない欄は表の下（bottomStamps）
     bottomStamps: ['追加者'],

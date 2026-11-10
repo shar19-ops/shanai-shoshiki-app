@@ -1164,6 +1164,8 @@
   }
 
   // ---------- 用紙 ----------
+  // 保管部署（一般書式。帳票一覧Excelの「保管部署」。2026-11-10 ユーザー指定）：フッター右の番号・帳票名の後ろに
+  const hokanText = (pd) => (pd.hokan ? `　　保管部署：${pd.hokan}` : '');
   function sheetEl(d, page) {
     const paper = page.paper || d.paper || 'A4';
     const orient = page.orientation || d.orientation || 'portrait';
@@ -1185,7 +1187,7 @@
         h('div', { class: 'sheet-body' }, blocks.map(renderBlock)),
         h('div', { class: 'f-footer bare' },
           h('img', { class: 'mark-only', src: 'assets/logo-mark.jpg', alt: '' }),
-          h('div', { class: 'f-ver' }, pd.footerRight || '')));
+          h('div', { class: 'f-ver' }, (pd.footerRight || '') + hokanText(pd))));
     }
     // sheetClass：帳票ごとの見た目の調整（例：'tight-checks' 選択肢の多い帳票で文字と間隔を詰める）
     // 帳票と違う向き・用紙のページ（本-購買-A0002 の2ページ目はA4縦）は、名前付きの @page でその用紙に印刷する
@@ -1200,7 +1202,7 @@
           // ロゴタイプはホームページと同じローマ字表記（書体は近いもの：Montserrat ExtraBold）
           h('span', { class: 'word', title: '株式会社 雄電社' }, 'YUDENSHA')),
         // 品質記録様式：制定日（元の様式のまま固定）と最終改訂日（ユーザーが都度指定）を番号の後ろに
-        h('div', { class: 'f-ver' }, `${pd.code}　${pd.title}` + (pd.seitei ? `　　${pd.seitei}制定　　${pd.kaitei || pd.seitei}最終改訂` : ''))));
+        h('div', { class: 'f-ver' }, `${pd.code}　${pd.title}` + (pd.seitei ? `　　${pd.seitei}制定　　${pd.kaitei || pd.seitei}最終改訂` : '') + hokanText(pd))));
   }
 
   // ---------- JSONファイルへの保存・読み込み（def.fileIO） ----------

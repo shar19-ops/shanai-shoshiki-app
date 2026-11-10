@@ -1,5 +1,5 @@
 FORM_DEFS['04'] = {
-  code: '購-01', title: '物品購入要求書',
+  code: '購-01', hokan: '非管理', title: '物品購入要求書',
   selfStamp: '要求者', // 本人欄（デート印を押す欄）
   meta: [
     { label: '作成日', key: 'date', type: 'date' },
