@@ -1,13 +1,17 @@
 // 工期設定チェックリスト（ユーザー指定：ほかの帳票に寄せず、元のExcelのままの見た目で）
 // 元Excel：般ー50.工期設定ﾁｪｯｸﾘｽﾄ.xlsx（A4横・1ページ）。列幅・行の高さ・罫線・網かけを元に合わせる
-// A4縦のβ版（id 50v、2026-11-10 ユーザー指定）：左右の表を上下に並べ、横幅いっぱいに広げて行の高さを詰める。定義は横と共通（make(id, portrait)）
+// A4縦のβ版（id 50v、2026-11-10 ユーザー指定）は社内書式のひな型に寄せる：本-購買-A0004-1 の縦・β版と同じ作り
+//   （統一ヘッダー・押印欄は右上・左右2段の表・確認欄はクリックで切り替え）。項目と保存キーは横と同じ
 (function () {
   const MARKS = ['〇', '△', '×', '－']; // 確認欄の選択肢（元Excelの入力規則）
   // 元Excelの列幅（pt）。左表 C〜H、右表 J〜O、間の I は余白
   const LEFT = [88.5, 28.5, 94.5, 94.5, 94.5, 94.5];
   const RIGHT = [88.5, 28.5, 94.5, 94.5, 106.5, 82.5];
   const GAP = 10.5;
-  const sum = (a) => a.reduce((x, y) => x + y);
+  const TOTAL = LEFT.reduce((a, b) => a + b) + GAP + RIGHT.reduce((a, b) => a + b);
+  const W = 281; // 用紙の横幅に収める幅（mm）
+  const mm = (pt) => (pt * W / TOTAL).toFixed(2) + 'mm';
+  const ROW = mm(19.5); // 行の高さ（元は 19.5pt）
 
   // 左表：項目 → 確認＋文章（1〜2行）。split: true は2行の間に線を引く（行政への申請）
   const LEFT_ITEMS = [
@@ -26,12 +30,12 @@
     ['設計変更', [['設計変更発生時における、積算、施工図変更の期間'], ['']]],
     ['後片付け', [['完了検査、竣工検査・引き渡し前の後片付けや清掃、', '竣工後の初期点検に要する時間']]],
   ];
+  const LEGEND = ['〇：条件を明示し、工期に反映済　　△：条件を一部明示し、工期に反映済', '×：条件が明示できず、工期に未反映　　－：該当工事で対象外'];
+  const NOTE = '※見積依頼書/注文書付属書 （労務・材料労務）発行時に、本書を添付する。';
+  const CAP1 = '1⃣　工期全般にわたって考慮すべき事項の例';
+  const CAP2 = '2⃣　工程別に考慮すべき事項の例';
 
-  // portrait：A4縦（上下に並べる）。横は左右の表と間の余白を 281mm に、縦は片側の表を 194mm に広げる
-  const render = (portrait) => ({ h, field }) => {
-    const scale = portrait ? 194 / sum(LEFT) : 281 / (sum(LEFT) + GAP + sum(RIGHT)); // mm / pt
-    const mm = (pt) => (pt * scale).toFixed(2) + 'mm';
-    const ROW = portrait ? '4.25mm' : mm(19.5); // 行の高さ（元は 19.5pt。縦は1枚に収まる高さ）
+  function render({ h, field }) {
     const colg = (ws) => h('colgroup', null, ws.map((w) => h('col', { style: `width:${mm(w)}` })));
     const td = (attrs, ...kids) => h('td', { ...attrs, style: `height:${ROW};` + (attrs.style || '') }, ...kids);
     const lines = (t) => String(t).split('\n').flatMap((s, i) => (i ? [h('br'), s] : [s]));
@@ -83,40 +87,97 @@
       }
     };
 
-    const head = h('div', { class: 'k50-head' },
-      h('div', { class: 'k50-title' }, '工期設定チェックリスト'),
-      h('div', { class: 'k50-law' }, '建設業法：第１９条の５'));
-    const top = h('table', { class: 'k50-tbl k50-top' }, colg(RIGHT), h('tbody', null,
-      h('tr', null, td({ class: 'k50-th', colspan: 2 }, '契約時確認'), td({ class: 'k50-in', colspan: 2 }, field({ key: 'keiyaku1', align: 'center' })), td({ class: 'k50-in', colspan: 2 }, field({ key: 'keiyaku2', align: 'center' }))),
-      h('tr', null, td({ class: 'k50-th', colspan: 2 }, '工事名称'), td({ class: 'k50-in k50-white', colspan: 4 }, field({ key: 'koji' })))));
-    const cap1 = h('table', { class: 'k50-tbl k50-cap' }, colg(LEFT), h('tbody', null, h('tr', null, td({ colspan: 6 }, '1⃣　工期全般にわたって考慮すべき事項の例'))));
-    const legend = h('div', { class: 'k50-legend' },
-      h('div', null, h('span', { class: 'k50-legend-h' }, '【確認凡例】'), '〇：条件を明示し、工期に反映済　　△：条件を一部明示し、工期に反映済'),
-      h('div', null, h('span', { class: 'k50-legend-h' }, ''), '×：条件が明示できず、工期に未反映　　－：該当工事で対象外'));
-    const cap2 = h('table', { class: 'k50-tbl k50-cap' }, colg(RIGHT), h('tbody', null, h('tr', null, td({ colspan: 6 }, '2⃣　工程別に考慮すべき事項の例'))));
-    const note = h('div', { class: 'k50-note' }, '※見積依頼書/注文書付属書 （労務・材料労務）発行時に、本書を添付する。');
-    const style = `--k50-gap:${mm(GAP)};--k50-row:${ROW}`;
+    const left = h('div', { class: 'k50-side' },
+      h('div', { class: 'k50-head' },
+        h('div', { class: 'k50-title' }, '工期設定チェックリスト'),
+        h('div', { class: 'k50-law' }, '建設業法：第１９条の５')),
+      h('table', { class: 'k50-tbl k50-cap' }, colg(LEFT), h('tbody', null, h('tr', null, td({ colspan: 6 }, CAP1)))),
+      itemsTable(LEFT, LEFT_ITEMS, 'L'),
+      h('div', { class: 'k50-legend' },
+        h('div', null, h('span', { class: 'k50-legend-h' }, '【確認凡例】'), LEGEND[0]),
+        h('div', null, h('span', { class: 'k50-legend-h' }, ''), LEGEND[1])));
 
-    // 縦：表題 → 契約時確認・工事名称 → 1⃣ → 2⃣（その他・確認者）→ 確認凡例・注意書き
-    if (portrait) {
-      return h('div', { class: 'k50 k50-tate', style },
-        head, top, cap1, itemsTable(LEFT, LEFT_ITEMS, 'L'), cap2, itemsTable(RIGHT, RIGHT_ITEMS, 'R', others), legend, note);
-    }
-    const left = h('div', { class: 'k50-side' }, head, cap1, itemsTable(LEFT, LEFT_ITEMS, 'L'), legend);
-    const right = h('div', { class: 'k50-side' }, top, cap2, itemsTable(RIGHT, RIGHT_ITEMS, 'R', others), note);
-    return h('div', { class: 'k50', style }, left, right);
+    const right = h('div', { class: 'k50-side' },
+      h('table', { class: 'k50-tbl k50-top' }, colg(RIGHT), h('tbody', null,
+        h('tr', null, td({ class: 'k50-th', colspan: 2 }, '契約時確認'), td({ class: 'k50-in', colspan: 2 }, field({ key: 'keiyaku1', align: 'center' })), td({ class: 'k50-in', colspan: 2 }, field({ key: 'keiyaku2', align: 'center' }))),
+        h('tr', null, td({ class: 'k50-th', colspan: 2 }, '工事名称'), td({ class: 'k50-in k50-white', colspan: 4 }, field({ key: 'koji' }))))),
+      h('table', { class: 'k50-tbl k50-cap' }, colg(RIGHT), h('tbody', null, h('tr', null, td({ colspan: 6 }, CAP2)))),
+      itemsTable(RIGHT, RIGHT_ITEMS, 'R', others),
+      h('div', { class: 'k50-note' }, NOTE));
+
+    return h('div', { class: 'k50', style: `--k50-gap:${mm(GAP)};--k50-row:${ROW}` }, left, right);
+  }
+
+  FORM_DEFS['50'] = {
+    code: '購-09', hokan: '経理部', title: '工期設定チェックリスト',
+    orientation: 'landscape',
+    bare: true, // 共通の表題・押印欄は使わず、元のExcelのままの見た目
+    footerRight: '購-09　　25/07/25　制定', // 番号は 2026-11-09 に 般-50 から変更（ユーザー指定）
+    blocks: [{ type: 'custom', render }],
   };
 
-  const make = (id, portrait) => {
-    FORM_DEFS[id] = {
-      code: '購-09', hokan: '経理部', title: '工期設定チェックリスト',
-      orientation: portrait ? 'portrait' : 'landscape',
-      tbNote: portrait ? '【縦・β版】' : '', // 画面の上部だけに出す（印刷には出ない）
-      bare: true, // 共通の表題・押印欄は使わず、元のExcelのままの見た目
-      footerRight: '購-09　　25/07/25　制定', // 番号は 2026-11-09 に 般-50 から変更（ユーザー指定）
-      blocks: [{ type: 'custom', render: render(portrait) }],
+  // ---------- A4縦・β版（本-購買-A0004-1 の縦・β版の作りに寄せる） ----------
+  // 表のクラス（grid b4 ほか）と CSS は A0004 の縦（b4-tate）と同じものを使う
+  const NEXT = { '': '〇', '〇': '△', '△': '×', '×': '－', '－': '' };
+  // 文章は欄の幅で自然に折り返す（元の2行の区切りは横の列幅に合わせたもの）。別の文が続くものだけ改行を残す
+  const BREAK = new Set(['時間外労働規制の遵守、週休二日の確保']);
+  const tateTable = (items, prefix, caption, withOthers) => ({ type: 'custom', render: ({ h, field, values, setVal }) => {
+    // 確認欄はクリックで 〇 → △ → × → － → 空欄（A0004 の ○✕ と同じ操作）。保存キーは横と同じ（L1…・R1…・O1…）
+    const mark = (key) => {
+      const b = h('button', { type: 'button', class: 'b4-mark', title: 'クリックで 〇 → △ → × → － → 空欄' }, values[key] || '');
+      b.addEventListener('click', () => { const next = NEXT[values[key] || ''] ?? ''; setVal(key, next); b.textContent = next; });
+      return b;
     };
+    const lines = (s) => String(s).split('\n').flatMap((x, i) => (i ? [h('br'), x] : [x]));
+    const tb = h('tbody', null,
+      h('tr', null, h('th', { class: 'k50v-cap', colspan: 3 }, caption)),
+      h('tr', null, h('th', null, '項　目'), h('th', { class: 'b4-mh' }, '確認'), h('th', null, '工期設定に関わる要因・条件')));
+    let n = 0;
+    items.forEach(([label, list]) => {
+      list.forEach((it, i) => {
+        n++;
+        const t = Array.isArray(it) ? it : it.lines;
+        const text = t.length > 1 && BREAK.has(t[0]) ? t.join('\n') : t.join('');
+        tb.append(h('tr', { class: i === 0 ? 'b4-grp' : null },
+          i === 0 ? h('th', { class: 'b4-lbl', rowspan: list.length }, ...lines(label)) : null,
+          h('td', { class: 'b4-m' }, mark(`${prefix}${n}`)),
+          h('td', { class: 'b4-txt' }, ...lines(text))));
+      });
+    });
+    // その他：確認欄と自由入力の5行（横の確認者の欄は押印欄として右上へ）
+    if (withOthers) {
+      for (let i = 1; i <= 5; i++) {
+        tb.append(h('tr', { class: i === 1 ? 'b4-grp' : null },
+          i === 1 ? h('th', { class: 'b4-lbl', rowspan: 5 }, 'その他') : null,
+          h('td', { class: 'b4-m' }, mark(`O${i}`)),
+          h('td', { class: 'b4-in' }, field({ key: `Otext${i}` }))));
+      }
+    }
+    return h('table', { class: 'grid b4' + (withOthers ? ' b4-right' : '') },
+      h('colgroup', null, h('col', { style: 'width:19mm' }), h('col', { style: 'width:6mm' }), h('col')), tb);
+  } });
+
+  // 契約時確認・工事名称（A0004 の業者名と同じ位置：左の表の上）
+  const tateHead = { type: 'custom', render: ({ h, field }) => h('div', { class: 'b4-head' },
+    h('table', { class: 'grid b4-vendor k50v-top' }, h('tbody', null,
+      h('tr', null, h('th', null, '契約時確認'), h('td', null, field({ key: 'keiyaku1', align: 'center' })), h('td', null, field({ key: 'keiyaku2', align: 'center' }))),
+      h('tr', null, h('th', null, '工事名称'), h('td', { colspan: 2 }, field({ key: 'koji' })))))) };
+
+  FORM_DEFS['50v'] = {
+    code: '購-09', hokan: '経理部', title: '工期設定チェックリスト',
+    iso: '建設業法：第１９条の５', // 元の様式の表示。A0004 の【8.4.3】と同じくヘッダーの番号の後ろに
+    orientation: 'portrait',
+    sheetClass: 'b4-sheet b4-tate k50v',
+    tbNote: '【縦・β版】', // 画面の上部だけに出す（印刷には出ない）
+    // 横の「確認者／日付／発行」は押印欄として右上に（日付つき。認印を手で押す）
+    stamps: [{ boxes: ['確認者\n発行'], dates: true }],
+    meta: [],
+    headBlocks: [tateHead],
+    blocks: [
+      { type: 'row', gap: 4, items: [tateTable(LEFT_ITEMS, 'L', CAP1, false), { type: 'col', gap: 1.5, items: [tateTable(RIGHT_ITEMS, 'R', CAP2, true), { type: 'notes', items: [
+        '【確認凡例】（確認欄はクリックで 〇 → △ → × → － → 空欄）',
+        '〇：条件を明示し、工期に反映済', '△：条件を一部明示し、工期に反映済', '×：条件が明示できず、工期に未反映', '－：該当工事で対象外', NOTE,
+      ] }] }] },
+    ],
   };
-  make('50', false);
-  make('50v', true);
 })();

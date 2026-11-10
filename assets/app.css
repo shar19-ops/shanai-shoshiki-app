@@ -427,8 +427,6 @@ table.grid td textarea.inp { height: 100%; }
 /* ---------- 般-50 工期設定チェックリスト（元のExcelのままの見た目） ---------- */
 .k50 { display: flex; gap: var(--k50-gap); font-family: "MS PGothic", "ＭＳ Ｐゴシック", sans-serif; font-size: 8.8pt; color: #000; }
 .k50-side { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-.k50.k50-tate { flex-direction: column; gap: 0; } /* 購-09 の縦・β版：左右の表を上下に（横の左右の間隔は使わない） */
-.k50-tate .k50-head { height: calc(var(--k50-row) * 2.7); } /* 縦は行が低いので、表題と「建設業法」が表に重ならない高さに */
 .k50-head { height: calc(var(--k50-row) * 2); display: flex; flex-direction: column; justify-content: center; }
 .k50-title { text-align: center; font-size: 15.9pt; line-height: 1.2; }
 .k50-law { text-align: right; font-weight: bold; font-size: 8.8pt; padding-right: 22mm; }
@@ -746,6 +744,11 @@ table.grid.b4-vendor td.b4-vname { border-right: none; } /* 殿の前の罫線�
 .sheet:has(table.b4-right) .notes { font-size: 7.5pt; line-height: 1.38; } /* 本-購買-A0004 右の表の下の注意書き */
 /* 本-購買-A0004-1・2 の縦・β版：左右2段のまま幅を詰め、縦の余裕で文字と行を大きくする */
 .b4-tate table.grid.b4-vendor { width: calc((210mm - 24mm - 4mm) / 2); }
+/* 購-09 工期設定チェックリストの縦・β版（A0004 の縦と同じ表）：表の見出し（1⃣・2⃣）と、契約時確認・工事名称 */
+table.grid.b4 th.k50v-cap { font-weight: 700; text-align: left; padding-left: 1.5mm; background: #fff; }
+table.grid.b4-vendor.k50v-top th { width: 23mm; }
+table.grid.b4-vendor.k50v-top td { font-size: 9pt; }
+.sheet.k50v table.grid.b4 td { height: 9.4mm; } /* 行数が少ないので、用紙の高さに合わせて行を高く */
 .b4-tate .b4-head { flex-wrap: wrap; gap: 1.5mm 4mm; }
 .b4-tate table.grid.b4 th { font-size: 8pt; height: 4.8mm; }
 .b4-tate table.grid.b4 th.b4-mh { font-size: 5.8pt; }
