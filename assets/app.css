@@ -744,6 +744,12 @@ table.grid.b4-vendor td.b4-vname { border-right: none; } /* 殿の前の罫線�
 .sheet:has(table.b4-right) .notes { font-size: 7.5pt; line-height: 1.38; } /* 本-購買-A0004 右の表の下の注意書き */
 /* 本-購買-A0004-1・2 の縦・β版：左右2段のまま幅を詰め、縦の余裕で文字と行を大きくする */
 .b4-tate table.grid.b4-vendor { width: calc((210mm - 24mm - 4mm) / 2); }
+/* 購-09 工期設定チェックリストの縦・β版（A0004 の縦と同じ表）：表の見出し（1⃣・2⃣）と、契約時確認・工事名称 */
+table.grid.b4 th.k50v-cap { font-weight: 700; text-align: left; padding-left: 1.5mm; background: #fff; }
+table.grid.b4-vendor.k50v-top th { width: 23mm; }
+table.grid.b4-vendor.k50v-top td { font-size: 9pt; }
+@media screen { table.grid.b4-vendor.k50v-top .inp::placeholder { color: #b5b5b5; opacity: 1; } } /* 確認先・担当者の案内は薄いグレー（印刷では出ない） */
+.sheet.k50v table.grid.b4 td { height: 9.4mm; } /* 行数が少ないので、用紙の高さに合わせて行を高く */
 .b4-tate .b4-head { flex-wrap: wrap; gap: 1.5mm 4mm; }
 .b4-tate table.grid.b4 th { font-size: 8pt; height: 4.8mm; }
 .b4-tate table.grid.b4 th.b4-mh { font-size: 5.8pt; }
