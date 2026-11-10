@@ -427,6 +427,8 @@ table.grid td textarea.inp { height: 100%; }
 /* ---------- 般-50 工期設定チェックリスト（元のExcelのままの見た目） ---------- */
 .k50 { display: flex; gap: var(--k50-gap); font-family: "MS PGothic", "ＭＳ Ｐゴシック", sans-serif; font-size: 8.8pt; color: #000; }
 .k50-side { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.k50.k50-tate { flex-direction: column; gap: 0; } /* 購-09 の縦・β版：左右の表を上下に（横の左右の間隔は使わない） */
+.k50-tate .k50-head { height: calc(var(--k50-row) * 2.7); } /* 縦は行が低いので、表題と「建設業法」が表に重ならない高さに */
 .k50-head { height: calc(var(--k50-row) * 2); display: flex; flex-direction: column; justify-content: center; }
 .k50-title { text-align: center; font-size: 15.9pt; line-height: 1.2; }
 .k50-law { text-align: right; font-weight: bold; font-size: 8.8pt; padding-right: 22mm; }

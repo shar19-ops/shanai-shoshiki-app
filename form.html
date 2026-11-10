@@ -12,17 +12,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap">
 <!-- ?v= は版番号。更新したら上げる（ブラウザ・iPad のホーム画面が古いファイルを使い続けないように） -->
-<link rel="stylesheet" href="assets/app.css?v=2026111005">
+<link rel="stylesheet" href="assets/app.css?v=2026111006">
 </head>
 <body>
 <div id="app"></div>
-<script src="assets/app.js?v=2026111005"></script>
-<script src="assets/codes.js?v=2026111005"></script>
-<script src="assets/date-stamp.js?v=2026111005"></script>
+<script src="assets/app.js?v=2026111006"></script>
+<script src="assets/codes.js?v=2026111006"></script>
+<script src="assets/date-stamp.js?v=2026111006"></script>
 <script>
   // ?id=04 → forms/04.js を読み込んでから描画
   (function () {
-    var V = '2026111005'; // 版番号（上の ?v= と同じ）
+    var V = '2026111006'; // 版番号（上の ?v= と同じ）
     var id = new URLSearchParams(location.search).get('id') || '';
     if (!/^[0-9A-Za-z_-]+$/.test(id)) { document.getElementById('app').textContent = '帳票IDが不正です'; return; }
     var s = document.createElement('script');
