@@ -90,6 +90,13 @@
     var KKEY = 'shoshiki:_kind';
     var kind = '一般';
     try { kind = localStorage.getItem(KKEY) || '一般'; } catch (e) {}
+    // ?kind=伝票 のようにURLで種類を指定して開ける（伝票アプリの配布用PDFのQR・ボタンから伝票タブを直接開く。2026-11-11）
+    var qkind = null;
+    try { qkind = new URLSearchParams(location.search).get('kind'); } catch (e) {}
+    if (qkind && KINDS.some(function (k) { return k[0] === qkind; })) {
+      kind = qkind;
+      try { localStorage.setItem(KKEY, kind); } catch (e) {}
+    }
     if (!KINDS.some(function (k) { return k[0] === kind; })) kind = '一般';
     var SUB = { '一般': '社内書式アプリ　一般社内書類', '品質': '社内書式アプリ　品質記録様式', '伝票': '社内書式アプリ　伝票' };
     var NO_CATS = { '伝票': true }; // 職種の絞り込みをしない種類（伝票は別アプリへのリンク）
