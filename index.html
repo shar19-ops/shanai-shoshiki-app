@@ -12,7 +12,7 @@
 <meta name="theme-color" content="#1f3f8f">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap">
-<link rel="stylesheet" href="assets/app.css?v=2026111006"> <!-- 版番号は form.html と同じ -->
+<link rel="stylesheet" href="assets/app.css?v=2026111101"> <!-- 版番号は form.html と同じ -->
 <style>
   .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
   .intro { background: #fff; border-radius: 6px; padding: 12px 16px; font-size: 10pt; line-height: 1.7; margin-bottom: 14px; }
@@ -54,6 +54,13 @@
   .card .beta-mark, .intro .beta-legend { font-weight: 800; color: #fff; background: #7b3fb5; border-radius: 99px; letter-spacing: .05em; white-space: nowrap; }
   .card .beta-mark { margin-left: auto; flex: none; font-size: 9pt; padding: 2px 9px; }
   .intro .beta-legend { display: inline-block; font-size: 8pt; padding: 1px 8px; vertical-align: 1px; margin-right: 2px; }
+  /* 伝票タブ：別アプリへのリンク。カード全体でアプリを開き、右の「使い方」は別リンク（2026-11-11） */
+  .card.slip { position: relative; }
+  .card.slip:hover { border-color: var(--accent); box-shadow: 0 1px 4px rgba(31,63,143,.25); }
+  .card.slip a.t { color: inherit; text-decoration: none; }
+  .card.slip a.t::after { content: ''; position: absolute; inset: 0; } /* カード全体をクリックできるように */
+  .card.slip .guide { position: relative; z-index: 1; margin-left: auto; flex: none; font-size: 9pt; color: var(--accent); background: #e6ecf7; border-radius: 99px; padding: 2px 10px; text-decoration: none; white-space: nowrap; }
+  .card.slip .guide:hover { background: var(--accent); color: #fff; }
 </style>
 </head>
 <body>
@@ -70,7 +77,7 @@
   <input class="search" type="search" placeholder="帳票名・番号で絞り込み" id="q">
   <div class="list" id="list"></div>
 </div>
-<script src="forms/catalog.js?v=2026111006"></script>
+<script src="forms/catalog.js?v=2026111101"></script>
 <script>
   (function () {
     var list = document.getElementById('list');
@@ -84,7 +91,10 @@
     var kind = '一般';
     try { kind = localStorage.getItem(KKEY) || '一般'; } catch (e) {}
     if (!KINDS.some(function (k) { return k[0] === kind; })) kind = '一般';
-    var SUB = { '一般': '社内書式アプリ　一般社内書類', '品質': '社内書式アプリ　品質記録様式' };
+    var SUB = { '一般': '社内書式アプリ　一般社内書類', '品質': '社内書式アプリ　品質記録様式', '伝票': '社内書式アプリ　伝票' };
+    var NO_CATS = { '伝票': true }; // 職種の絞り込みをしない種類（伝票は別アプリへのリンク）
+    var hintEl = document.querySelector('.cats-hint');
+    var HINT = hintEl.textContent;
     function renderKinds() {
       kindsEl.innerHTML = '';
       KINDS.forEach(function (k) {
@@ -106,8 +116,11 @@
     // 選んでいる種類の職種ボタン（共通の職種＋種類ごとの追加分）
     function catsOf() { return CATS.concat((window.KIND_CATS || {})[kind] || []); }
     function renderCats() {
-      if (cur && catsOf().indexOf(cur) < 0) cur = ''; // ほかの種類にしかない職種を選んでいたら「すべて」に戻す
       catsEl.innerHTML = '';
+      catsEl.style.display = NO_CATS[kind] ? 'none' : '';
+      hintEl.textContent = NO_CATS[kind] ? '伝票は別のアプリが新しいタブで開きます。「使い方」から操作の説明を見られます。' : HINT;
+      if (NO_CATS[kind]) return; // 選んでいた職種（cur）は覚えたまま。ほかのタブに戻ると元どおり
+      if (cur && catsOf().indexOf(cur) < 0) cur = ''; // ほかの種類にしかない職種を選んでいたら「すべて」に戻す
       [''].concat(catsOf()).forEach(function (name) {
         var b = document.createElement('button');
         b.type = 'button';
@@ -126,8 +139,9 @@
       CATALOG.forEach(function (c) {
         if ((c.kind || '一般') !== kind) return;
         if (c.hidden) return; // 一覧から外した帳票（定義は残す。catalog.js の hidden）
-        if (!inCat(c)) return;
+        if (!NO_CATS[kind] && !inCat(c)) return;
         if (q && (c.no + c.title + (c.old || '')).indexOf(q) < 0) return; // old：旧番号（般-14 など）でも見つかる
+        if (c.url) { list.appendChild(slipCard(c)); return; } // 伝票：別アプリへのリンク
         var el = document.createElement('a');
         el.className = 'card' + (c.kind === '品質' ? ' q' : '') + (c.isBeta ? ' beta' : '');
         el.href = 'form.html?id=' + c.id;
@@ -146,6 +160,25 @@
         list.appendChild(em);
       }
       fitNames();
+    }
+    // 伝票アプリのカード（catalog.js の url・guide・color）。アプリも使い方も新しいタブで開く
+    function slipCard(c) {
+      var el = document.createElement('div');
+      el.className = 'card slip';
+      el.innerHTML = '<span class="no"></span><a class="t" target="_blank" rel="noopener"></a>';
+      var no = el.querySelector('.no');
+      no.textContent = c.no;
+      if (c.color) no.style.background = c.color;
+      var t = el.querySelector('.t');
+      t.textContent = c.title;
+      t.href = c.url;
+      if (c.guide) {
+        var g = document.createElement('a');
+        g.className = 'guide'; g.target = '_blank'; g.rel = 'noopener';
+        g.href = c.guide; g.textContent = '📖 使い方';
+        el.appendChild(g);
+      }
+      return el;
     }
     // 帳票名がカードに入りきらない時は、1行に収まるまで文字を小さくする（下限 8pt）
     function fitNames() {
