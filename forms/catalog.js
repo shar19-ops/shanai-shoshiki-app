@@ -131,6 +131,8 @@ window.CATALOG = [
   { id: 'sekkei-a0027', no: '本-設計-A0027', title: '議事録', kind: '品質', cat: ['設計見積部'] }, // A4縦（ページ増減）。顧客用のExcelを書き出し、加筆・修正されたExcelを取り込める
   { id: 'sekkei-a0030', no: '本-設計-A0030', title: '設計物件プロセス管理表', kind: '品質', cat: ['設計見積部'] }, // A3横（ページ追加）。予定日・実施日は日付・済・―
   // ---- 伝票（別アプリへのリンク。2026-11-11〜） ----
+  // group: 一覧の下に折りたたみ欄でまとめる（特定の担当者だけが使うもの）。同じ group は1つの欄に入る（index.html）。
+  //   定期券の3件は定期券の起票担当者だけが使うので「定期券起票者専用」に分けた（2026-11-11 ユーザー指定。見えなくするだけで、利用制限ではない）
   { id: 'slip-furikae', no: '振替', title: '振替伝票', kind: '伝票', cat: '共通', color: '#1a7a4a',
     url: 'https://shar19-ops.github.io/transfer-slip-app/%E6%8C%AF%E6%9B%BF%E4%BC%9D%E7%A5%A8.html',
     guide: 'https://shar19-ops.github.io/transfer-slip-app/%E4%BC%9D%E7%A5%A8%E3%83%9E%E3%83%8B%E3%83%A5%E3%82%A2%E3%83%AB.html' },
@@ -140,16 +142,16 @@ window.CATALOG = [
   { id: 'slip-shiharai-misei', no: '支払', title: '支払伝票（未成工事用）', kind: '伝票', cat: '共通', color: '#1a4a7a',
     url: 'https://shar19-ops.github.io/payment-slip-app/%E6%94%AF%E6%89%95%E4%BC%9D%E7%A5%A8%E3%80%90%E6%9C%AA%E6%88%90%E5%B7%A5%E4%BA%8B%E7%94%A8%E3%80%91.html',
     guide: 'https://shar19-ops.github.io/transfer-slip-app/%E4%BC%9D%E7%A5%A8%E3%83%9E%E3%83%8B%E3%83%A5%E3%82%A2%E3%83%AB.html' },
-  { id: 'slip-teiki-ippan', no: '定期', title: '定期券の支払伝票（一般管理費）', old: '支払伝票', kind: '伝票', cat: '共通', color: '#1a4a7a',
+  { id: 'slip-teiki-ippan', no: '定期', title: '定期券の支払伝票（一般管理費）', old: '支払伝票', kind: '伝票', cat: '共通', group: '定期券起票者専用', color: '#1a4a7a',
     url: 'https://shar19-ops.github.io/teiki-slip-ippan-app/%E6%94%AF%E6%89%95%E4%BC%9D%E7%A5%A8%E3%80%90%E4%B8%80%E8%88%AC%E7%AE%A1%E7%90%86%E8%B2%BB%E3%83%BB%E5%AE%9A%E6%9C%9F%E5%88%B8%E3%80%91.html',
     guide: 'guides/一般管理費支払伝票（定期券）アプリのご案内.pdf' },
-  { id: 'slip-teiki-misei', no: '定期', title: '定期券の支払伝票（未成工事用）', old: '支払伝票', kind: '伝票', cat: '共通', color: '#1a4a7a',
+  { id: 'slip-teiki-misei', no: '定期', title: '定期券の支払伝票（未成工事用）', old: '支払伝票', kind: '伝票', cat: '共通', group: '定期券起票者専用', color: '#1a4a7a',
     url: 'https://shar19-ops.github.io/teiki-slip-app/%E6%94%AF%E6%89%95%E4%BC%9D%E7%A5%A8%E3%80%90%E5%AE%9A%E6%9C%9F%E5%88%B8%E3%80%91.html',
     guide: 'guides/未成工事支払伝票（定期券）アプリのご案内.pdf' },
   { id: 'slip-nyukin', no: '入金', title: '入金伝票', kind: '伝票', cat: '共通', color: '#9c2335',
     url: 'https://shar19-ops.github.io/deposit-slip-app/%E5%85%A5%E9%87%91%E4%BC%9D%E7%A5%A8.html',
     guide: 'guides/入金伝票アプリのご案内.pdf' },
-  { id: 'slip-teiki-nyukin', no: '定期', title: '定期券の入金伝票（払戻）', old: '入金伝票', kind: '伝票', cat: '共通', color: '#9c2335',
+  { id: 'slip-teiki-nyukin', no: '定期', title: '定期券の入金伝票（払戻）', old: '入金伝票', kind: '伝票', cat: '共通', group: '定期券起票者専用', color: '#9c2335',
     url: 'https://shar19-ops.github.io/teiki-deposit-slip-app/%E5%85%A5%E9%87%91%E4%BC%9D%E7%A5%A8%E3%80%90%E5%AE%9A%E6%9C%9F%E5%88%B8%E3%80%91.html',
     guide: 'guides/入金伝票（定期券）アプリのご案内.pdf' }, // 2026-11-11 追加
   { id: 'slip-ryohi', no: '出張', title: '出張旅費伝票', kind: '伝票', cat: '共通', color: '#005544',

@@ -12,7 +12,7 @@
 <meta name="theme-color" content="#1f3f8f">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap">
-<link rel="stylesheet" href="assets/app.css?v=2026111103"> <!-- 版番号は form.html と同じ -->
+<link rel="stylesheet" href="assets/app.css?v=2026111104"> <!-- 版番号は form.html と同じ -->
 <style>
   .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
   .intro { background: #fff; border-radius: 6px; padding: 12px 16px; font-size: 10pt; line-height: 1.7; margin-bottom: 14px; }
@@ -61,6 +61,15 @@
   .card.slip a.t::after { content: ''; position: absolute; inset: 0; } /* カード全体をクリックできるように */
   .card.slip .guide { position: relative; z-index: 1; margin-left: auto; flex: none; font-size: 9pt; color: var(--accent); background: #e6ecf7; border-radius: 99px; padding: 2px 10px; text-decoration: none; white-space: nowrap; }
   .card.slip .guide:hover { background: var(--accent); color: #fff; }
+  /* 折りたたみ欄（catalog.js の group。例：定期券起票者専用）。一覧の下に区切って置き、初めは閉じておく（2026-11-11） */
+  .grp { grid-column: 1 / -1; margin-top: 10px; border-top: 1px dashed #b8bfcc; padding-top: 10px; }
+  .grp-head { font: inherit; font-size: 10pt; font-weight: 700; color: #4a5a7a; background: #eef1f6; border: 1px solid #c9d0dc; border-radius: 6px; padding: 6px 14px; cursor: pointer; }
+  .grp-head:hover { border-color: var(--accent); color: var(--accent); }
+  .grp-head .arw { display: inline-block; width: 1em; margin-right: 6px; font-size: 9pt; transition: transform .15s; }
+  .grp.open .grp-head .arw { transform: rotate(90deg); }
+  .grp-head .ct { font-weight: 400; margin-left: 2px; }
+  .grp-body { display: none; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 8px; margin-top: 8px; }
+  .grp.open .grp-body { display: grid; }
 </style>
 </head>
 <body>
@@ -77,7 +86,7 @@
   <input class="search" type="search" placeholder="帳票名・番号で絞り込み" id="q">
   <div class="list" id="list"></div>
 </div>
-<script src="forms/catalog.js?v=2026111103"></script>
+<script src="forms/catalog.js?v=2026111104"></script>
 <script>
   (function () {
     var list = document.getElementById('list');
@@ -141,14 +150,64 @@
         catsEl.appendChild(b);
       });
     }
+    // 折りたたみ欄（catalog.js の group）。開け閉めはこのブラウザで覚える。初めは閉じている
+    var GKEY = 'shoshiki:_grp:';
+    function grpOpen(name) { try { return localStorage.getItem(GKEY + name) === '1'; } catch (e) { return false; } }
+    function groupBox(name, cards) {
+      var box = document.createElement('div');
+      box.className = 'grp';
+      var head = document.createElement('button');
+      head.type = 'button';
+      head.className = 'grp-head';
+      var body = document.createElement('div');
+      body.className = 'grp-body';
+      cards.forEach(function (el) { body.appendChild(el); });
+      var forced = !!q; // 絞り込み中は、当てはまった帳票が見えるように開いておく
+      function show(open) {
+        box.classList.toggle('open', open);
+        head.innerHTML = '<span class="arw"></span><span class="nm"></span><span class="ct"></span>';
+        head.querySelector('.arw').textContent = '▶'; // 開いたら CSS で下向きに回す
+        head.querySelector('.nm').textContent = name;
+        head.querySelector('.ct').textContent = '（' + cards.length + '件）';
+        head.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+      show(forced || grpOpen(name));
+      head.onclick = function () {
+        var open = !box.classList.contains('open');
+        try { localStorage.setItem(GKEY + name, open ? '1' : '0'); } catch (e) {}
+        show(open);
+        if (open) fitNames();
+      };
+      box.appendChild(head);
+      box.appendChild(body);
+      return box;
+    }
     function render() {
       list.innerHTML = '';
+      var groups = {}, gorder = [];
       CATALOG.forEach(function (c) {
         if ((c.kind || '一般') !== kind) return;
         if (c.hidden) return; // 一覧から外した帳票（定義は残す。catalog.js の hidden）
         if (!NO_CATS[kind] && !inCat(c)) return;
         if (q && (c.no + c.title + (c.old || '')).indexOf(q) < 0) return; // old：旧番号（般-14 など）でも見つかる
-        if (c.url) { list.appendChild(slipCard(c)); return; } // 伝票：別アプリへのリンク
+        var el = c.url ? slipCard(c) : formCard(c); // 伝票：別アプリへのリンク
+        if (c.group) { // 担当者だけが使うもの：一覧の下の折りたたみ欄にまとめる
+          if (!groups[c.group]) { groups[c.group] = []; gorder.push(c.group); }
+          groups[c.group].push(el);
+          return;
+        }
+        list.appendChild(el);
+      });
+      gorder.forEach(function (g) { list.appendChild(groupBox(g, groups[g])); });
+      if (!list.children.length) {
+        var em = document.createElement('div');
+        em.className = 'empty';
+        em.textContent = '該当する帳票はまだありません。';
+        list.appendChild(em);
+      }
+      fitNames();
+    }
+    function formCard(c) {
         var el = document.createElement('a');
         el.className = 'card' + (c.kind === '品質' ? ' q' : '') + (c.isBeta ? ' beta' : '');
         el.href = 'form.html?id=' + c.id;
@@ -158,15 +217,7 @@
         if (cur && c.cat === '共通') { var cm = document.createElement('span'); cm.className = 'common'; cm.textContent = '共通'; el.querySelector('.t').after(cm); }
         if (c.isNew) { var nw = document.createElement('span'); nw.className = 'new'; nw.textContent = 'NEW'; el.appendChild(nw); }
         if (c.isBeta) { var bt = document.createElement('span'); bt.className = 'beta-mark'; bt.textContent = 'β版'; el.appendChild(bt); }
-        list.appendChild(el);
-      });
-      if (!list.children.length) {
-        var em = document.createElement('div');
-        em.className = 'empty';
-        em.textContent = '該当する帳票はまだありません。';
-        list.appendChild(em);
-      }
-      fitNames();
+        return el;
     }
     // 伝票アプリのカード（catalog.js の url・guide・color）。アプリも使い方も新しいタブで開く
     function slipCard(c) {
