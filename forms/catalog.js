@@ -149,6 +149,9 @@ window.CATALOG = [
   { id: 'slip-nyukin', no: '入金', title: '入金伝票', kind: '伝票', cat: '共通', color: '#9c2335',
     url: 'https://shar19-ops.github.io/deposit-slip-app/%E5%85%A5%E9%87%91%E4%BC%9D%E7%A5%A8.html',
     guide: 'guides/入金伝票アプリのご案内.pdf' },
+  { id: 'slip-teiki-nyukin', no: '定期', title: '定期券の入金伝票（払戻）', old: '入金伝票', kind: '伝票', cat: '共通', color: '#9c2335',
+    url: 'https://shar19-ops.github.io/teiki-deposit-slip-app/%E5%85%A5%E9%87%91%E4%BC%9D%E7%A5%A8%E3%80%90%E5%AE%9A%E6%9C%9F%E5%88%B8%E3%80%91.html',
+    guide: 'guides/入金伝票（定期券）アプリのご案内.pdf' }, // 2026-11-11 追加
   { id: 'slip-ryohi', no: '出張', title: '出張旅費伝票', kind: '伝票', cat: '共通', color: '#005544',
     url: 'https://shar19-ops.github.io/travel-slip-app/%E5%87%BA%E5%BC%B5%E6%97%85%E8%B2%BB%E4%BC%9D%E7%A5%A8.html',
     guide: 'guides/出張旅費伝票アプリのご案内.pdf' }, // 2026-11-11 追加
