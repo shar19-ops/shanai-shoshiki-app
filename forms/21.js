@@ -11,7 +11,7 @@
   const zumen = (label, key) => row(label, key, { type: 'select', options: ARI }, { key: key + 'Date', type: 'date', style: 'md', span: 7 });
 
   FORM_DEFS['21'] = {
-    code: '見-02', hokan: '営業部', title: '積算依頼物件　確認事項',
+    code: '営-07', hokan: '営業部', title: '積算依頼物件　確認事項',
     selfStamp: '営業担当', // 本人欄（デート印を押す欄）
     meta: [{ label: '作成日', key: 'date', type: 'date' }],
     stamps: [{ boxes: ['見積部確認', '営業担当'] }],

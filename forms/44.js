@@ -1,6 +1,6 @@
 // スパイダープラス電気パック使用申込書
 FORM_DEFS['44'] = {
-  code: '管-04', hokan: '工事管理部', title: 'スパイダープラス電気パック使用申込書',
+  code: '工-08', hokan: '工事管理部', title: 'スパイダープラス電気パック使用申込書',
   meta: [{ label: '作成日', key: 'date', type: 'date' }],
   // 承認ルートと関係ない欄は表の下（bottomStamps）
   bottomStamps: ['借与者', '受取人'],

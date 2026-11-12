@@ -1,7 +1,7 @@
 // 作図依頼書（共用・住戸）
 // 2026-11-10：事業所・CAD欄を追加、注意書きを修正（JSONファイルをBOXの【現場→CAD】に格納 → CAD部の作図予定表アプリが取り込む）
 FORM_DEFS['39'] = {
-  code: 'C-01', hokan: 'CAD部', title: '作図依頼書',
+  code: '工-10', hokan: 'CAD部', title: '作図依頼書',
   selfStamp: '依頼者', // 本人欄（デート印を押す欄）
   meta: [
     { label: '区分', key: 'kubun', type: 'checks', options: ['共用', '住戸'], w: 34 },

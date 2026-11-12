@@ -8,7 +8,7 @@
   ];
 
   FORM_DEFS['48'] = {
-    code: '営-06', hokan: '営業部', title: '入札結果報告書',
+    code: '営-04', hokan: '営業部', title: '入札結果報告書',
     selfStamp: '発行者', // 本人欄（デート印を押す欄）
     meta: [{ label: '報告日', key: 'date', type: 'date' }],
     bottomStamps: ['登録済検印'], // 下部（フッターの上）に置く押印欄

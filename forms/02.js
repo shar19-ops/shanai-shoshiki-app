@@ -1,5 +1,5 @@
 FORM_DEFS['02'] = {
-  code: '営-02', hokan: '工事管理部', title: '現場案内図・連絡先',
+  code: '工-03', hokan: '工事管理部', title: '現場案内図・連絡先',
   meta: [
     { label: '作成日', key: 'date', type: 'date' },
     { label: '作成者', key: 'author', w: 40 },
