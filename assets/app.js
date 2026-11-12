@@ -11,8 +11,10 @@
   // 複数の帳票で使う選択肢（元Excelの入力規則から）
   window.LISTS = {
     offices: ['本店', '東関東支店', '横浜支店', '大阪支店', '名古屋支店', '仙台支店', '北関東支店'],
-    // 事業所コード（般-15 の一覧より）
-    officeCodes: [['010', '010 本店'], ['020', '020 東関東支店'], ['030', '030 横浜支店'], ['040', '040 大阪支店'], ['050', '050 名古屋支店'], ['060', '060 仙台支店'], ['090', '090 北関東支店']],
+    // 事業所コード（2026-11-12 基幹系の変更に合わせて差し替え。ユーザー指定）
+    officeCodes: [['100', '100 本店'], ['200', '200 横浜支店'], ['300', '300 東関東支店'], ['400', '400 北関東支店'], ['500', '500 大阪支店'], ['600', '600 仙台支店'], ['700', '700 名古屋支店']],
+    // 前の事業所コード → 新しいコード（保存済みの下書き・JSONを開いたときに置き換える。事業所名で対応）
+    officeCodesOld: { '010': '100', '030': '200', '020': '300', '090': '400', '040': '500', '060': '600', '050': '700' },
     depts: ['営業部', '工事部', 'RE部', '経理部', '見積部', '設計部', 'CAD部', '情報S部', '安全品質保証部', '購買部', '総務部'],
   };
 
@@ -84,8 +86,10 @@
   // f: {key, type, options, placeholder, unit, align, lines, ...}
   function field(f) {
     const key = f.key;
-    const v = values[key] ?? f.default ?? '';
     if (values[key] == null && f.default != null) values[key] = f.default;
+    // 事業所コードの欄：前のコード（010 など）で保存された下書き・JSONは新しいコードに置き換える（2026-11-12）
+    if (f.options === LISTS.officeCodes && LISTS.officeCodesOld[values[key]]) values[key] = LISTS.officeCodesOld[values[key]];
+    const v = values[key] ?? f.default ?? '';
     const type = f.type || 'text';
     let el;
 
