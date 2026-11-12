@@ -15,8 +15,13 @@
   ];
   const sel = (no, label, key, options, o = {}) => it(no, label, key, { type: 'select', options, span: 8, ...o });
   const three = (label, key, o = {}) => ({ label, key, type: 'number', span: 8, ...o });
-  const busho = ['01040：営業本部', '01021：第1工事本部', '01022：第2工事本部', '01023：ＲＥ部', '02000：東関東支店',
-    '03000：横浜支店', '04000：大阪支店', '05000：名古屋支店', '06000：仙台支店', '09000：北関東支店'];
+  // 部署コード（31. 受注担当部署・33. 施工担当部署）。2026-11-12 基幹系の変更で3桁に（ユーザー指定。155 工事管理部は念のため追加）
+  const busho = ['140：営業本部', '121：第一工事本部', '122：第二工事本部', '125：ＲＥ部', '155：工事管理部',
+    '200：横浜支店', '300：東関東支店', '400：北関東支店', '500：大阪支店', '600：仙台支店', '700：名古屋支店'];
+  // 前の部署コード（5桁）で保存された下書き・JSONは、開いたときに新しいコードに置き換える
+  const bushoOld = { '01040：営業本部': '140：営業本部', '01021：第1工事本部': '121：第一工事本部', '01022：第2工事本部': '122：第二工事本部',
+    '01023：ＲＥ部': '125：ＲＥ部', '03000：横浜支店': '200：横浜支店', '02000：東関東支店': '300：東関東支店', '09000：北関東支店': '400：北関東支店',
+    '04000：大阪支店': '500：大阪支店', '06000：仙台支店': '600：仙台支店', '05000：名古屋支店': '700：名古屋支店' };
   // 38. 小工事実行予算の列（見出し, keyの末尾）
   const COLS = [['材料費\n（F50）', 'Zai'], ['外注費\n（Z50）', 'Gai'], ['工料\n（K50）', 'Kou'], ['経費\n（O00）', 'Kei2']];
   const pct = (a, b) => (a ? Math.floor(((a - b) / a) * 1000) / 10 : null); // 粗利率（小数点第2位切捨て）
@@ -143,8 +148,8 @@
         [it('29', '建物用途', 'youto', { type: 'select', options: C.youto }), { label: 'その他', key: 'youtoEtc', span: 12, placeholder: '「99：その他」の場合' }],
         [three('　　住戸戸数', 'ko', { unit: '戸' }), three('室数', 'shitsu', { unit: '室' }), three('病床数', 'byosho', { unit: '床' })],
         '■ 担当者・部署',
-        [...code('30', '営業担当者', 'eigyo', { span: 4, name: '氏名' }), it('31', '受注担当部署', 'juchuBu', { type: 'select', options: busho })],
-        [...code('32', '工事担当者', 'koji', { span: 4, name: '氏名' }), it('33', '施工担当部署', 'sekoBu', { type: 'select', options: busho })],
+        [...code('30', '営業担当者', 'eigyo', { span: 4, name: '氏名' }), it('31', '受注担当部署', 'juchuBu', { type: 'select', options: busho, migrate: bushoOld })],
+        [...code('32', '工事担当者', 'koji', { span: 4, name: '氏名' }), it('33', '施工担当部署', 'sekoBu', { type: 'select', options: busho, migrate: bushoOld })],
         [it('34', '支払条件', 'shiharai', { type: 'select', options: ['0：通常（出来高払）', '1：特殊'] }), { span: 12 }],
         [three('　　出来高締', 'dekidaka', { unit: '日' }), three('請求締', 'seikyu', { unit: '日' }), three('支払日', 'shiharaiBi', { unit: '日' })],
         [three('　　前渡金', 'maetoki', { unit: '％' }), three('中間払', 'chukan', { unit: '回' }), three('竣工後', 'shunko', { unit: '％' })],

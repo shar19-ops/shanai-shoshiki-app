@@ -89,6 +89,8 @@
     if (values[key] == null && f.default != null) values[key] = f.default;
     // 事業所コードの欄：前のコード（010 など）で保存された下書き・JSONは新しいコードに置き換える（2026-11-12）
     if (f.options === LISTS.officeCodes && LISTS.officeCodesOld[values[key]]) values[key] = LISTS.officeCodesOld[values[key]];
+    // migrate：{ 前の値: 新しい値 }。選択肢を差し替えた欄で、前の値の下書き・JSONを置き換える（工-04 の部署コード。2026-11-12）
+    if (f.migrate && f.migrate[values[key]]) values[key] = f.migrate[values[key]];
     const v = values[key] ?? f.default ?? '';
     const type = f.type || 'text';
     let el;
