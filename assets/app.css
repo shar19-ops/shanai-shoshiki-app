@@ -1119,3 +1119,30 @@ table.grid.h06 select.inp { height: 100%; min-height: 10.6mm; }
 .h08-lead { display: flex; align-items: center; gap: 1mm; font-size: 10pt; white-space: nowrap; }
 .h08-date { width: 42mm; border-bottom: 1px solid var(--line); }
 .sheet.h08 td.stamps-cell .sb-area.dated { height: 13.2mm; } /* 押印欄を少し低く（欄が多いので1枚に収める） */
+
+/* 本-設計-A0020 妥当性確認報告書（2026-11-12） */
+table.grid.s20 th { height: 6.5mm; font-size: 9.5pt; }
+table.grid.s20 .s20-ph { display: flex; align-items: center; justify-content: center; gap: 2mm; white-space: nowrap; }
+table.grid.s20 .s20-md { display: inline-flex; align-items: center; font-weight: normal; }
+table.grid.s20 .s20-md .inp { width: 6.5mm; padding: 0; text-align: center; }
+table.grid.s20 td.s20-item { vertical-align: top; padding: 0; }
+table.grid.s20 .s20-item-in { display: flex; align-items: center; gap: 1mm; padding: .6mm 1mm; font-size: 9.5pt; }
+table.grid.s20 .s20-name { flex: 1; }
+.s20-box { font: inherit; font-size: 11pt; line-height: 1; width: 5.5mm; height: 5.5mm; padding: 0; border: none; background: transparent; cursor: pointer; flex: none; }
+@media screen { .s20-box { background: var(--input-bg); } }
+table.grid.s20 td.s20-ta { height: 11.6mm; padding: 0; vertical-align: top; background-image: linear-gradient(to bottom, transparent calc(50% - .5px), var(--line-weak) calc(50% - .5px), var(--line-weak) calc(50% + .5px), transparent calc(50% + .5px)); }
+@media screen { table.grid.s20 td.s20-ta { background-color: var(--input-bg); } }
+table.grid.s20 td.s20-ta textarea.inp { width: 100%; height: 11.6mm; font-size: 9pt; line-height: 5.8mm; padding: 0 1.2mm; background-color: transparent; resize: none; overflow: hidden; }
+
+/* 本-設計-A0025 図面リスト（2026-11-12） */
+.s25-no { text-align: right; font-size: 10pt; margin: -1mm 0 1mm; }
+table.grid.s25-head th { font-size: 9pt; font-weight: normal; height: 7mm; }
+table.grid.s25-head .s25-copy { padding: 0 1.5mm; font-size: 10pt; }
+table.grid.s25-head .s25-copy.c { text-align: center; }
+table.grid.s25 { margin-top: 1.5mm; }
+table.grid.s25 th { height: 7.5mm; font-size: 9pt; }
+table.grid.s25 th.s25-kaku { font-size: 7.5pt; line-height: 1.15; }
+table.grid.s25 td { height: 7.0mm; font-size: 9.5pt; }
+table.grid.s25 td.s25-mark { padding: 0; }
+table.grid.s25 td .inp { height: 6.9mm; min-height: 0; padding-top: 0; padding-bottom: 0; }
+.s25-note { font-size: 7.5pt; margin-top: 1mm; }
