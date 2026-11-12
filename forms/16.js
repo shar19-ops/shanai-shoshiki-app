@@ -11,7 +11,7 @@
   const KIJUN = ['00：通常', '01：建設省', '02：文部省', '03：住都公団', '04：東京都', '99：その他'];
 
   FORM_DEFS['16'] = {
-    code: '設-01', hokan: '非管理', title: '設計依頼登録メモ',
+    code: '営-08', hokan: '非管理', title: '設計依頼登録メモ',
     selfStamp: '発行者', // 本人欄（デート印を押す欄）
     meta: [{ label: '依頼日', key: 'date', type: 'date' }],
     bottomStamps: ['登録済検印'], // 下部（フッターの上）に置く押印欄

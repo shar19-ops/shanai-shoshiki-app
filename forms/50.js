@@ -109,10 +109,10 @@
   }
 
   FORM_DEFS['50'] = {
-    code: '購-09', hokan: '経理部', title: '工期設定チェックリスト',
+    code: '購-08', hokan: '経理部', title: '工期設定チェックリスト',
     orientation: 'landscape',
     bare: true, // 共通の表題・押印欄は使わず、元のExcelのままの見た目
-    footerRight: '購-09　　25/07/25　制定', // 番号は 2026-11-09 に 般-50 から変更（ユーザー指定）
+    footerRight: '購-08　　25/07/25　制定', // 番号は 2026-11-09 に 般-50 から購-09、2026-11-12 に購-08 へ変更（ユーザー指定）
     blocks: [{ type: 'custom', render }],
   };
 
@@ -165,7 +165,7 @@
       h('tr', null, h('th', null, '工事名称'), h('td', { colspan: 2 }, field({ key: 'koji' })))))) };
 
   FORM_DEFS['50v'] = {
-    code: '購-09', hokan: '経理部', title: '工期設定チェックリスト',
+    code: '購-08', hokan: '経理部', title: '工期設定チェックリスト',
     iso: '建設業法：第１９条の５', // 元の様式の表示。A0004 の【8.4.3】と同じくヘッダーの番号の後ろに
     orientation: 'portrait',
     sheetClass: 'b4-sheet b4-tate k50v',
