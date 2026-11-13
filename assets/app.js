@@ -1253,7 +1253,12 @@
   // 中身は { form, code, title, savedAt, values }。開いた（保存した）ファイルは覚えておき、次の保存はそのファイルに上書き
   //   （File System Access API のある Chrome・Edge。ないブラウザはダウンロード・ファイル選択で代用）
   let fileHandle = null;
+  let handleBase = ''; // fileHandle を選んだ・開いたときの fileBase の名前
   const JSON_TYPES = [{ description: 'JSONファイル', accept: { 'application/json': ['.json'] } }];
+  function baseName() {
+    if (!def.fileBase) return '';
+    return String(def.fileBase(values) || '').replace(/[\\/:*?"<>|\r\n\t]+/g, '_').replace(/\s+/g, '').slice(0, 80);
+  }
   function fileName() {
     const d = new Date();
     const p2 = (x) => String(x).padStart(2, '0');
@@ -1262,6 +1267,9 @@
     const title = String(def.title).replace(/\s+/g, '').replace(/[\\/:*?"<>|]+/g, '_').slice(0, 40); // 表題の空白は詰める（日　報 → 日報）
     // fileKeys：ファイル名に使う項目（fileNameStyle を指定した帳票だけ）
     const name = safe(def.fileKeys ? def.fileKeys.map((k) => values[k]).filter(Boolean).join('_') : '');
+    // fileBase(values)：帳票ごとに決めた名前（拡張子なし）。PDFで保存するときの名前（印刷時のページ名）にも使う（工-02 日報。2026-11-13）
+    const base = baseName();
+    if (base) return `${base}.json`;
     // fileNameStyle: 'title'：「帳票名_工番.json」（日付なし。同じ台帳を上書きしていく。本-工務-A0001。修正指示書）
     if (def.fileNameStyle === 'title') return `${title}${name ? '_' + name : ''}.json`;
     // fileNameStyle: 'keys'：「番号_管理番号_機器名_日付.json」（機器ごとに保存。本-品質-A0013。ユーザー指定）
@@ -1273,7 +1281,9 @@
     const text = JSON.stringify({ form: id, code: def.code, title: def.title, savedAt: new Date().toISOString(), values }, null, 2);
     try {
       if (window.showSaveFilePicker) {
-        if (!fileHandle) fileHandle = await window.showSaveFilePicker({ suggestedName: fileName(), types: JSON_TYPES });
+        // fileBase の帳票：名前（期間・苗字など）が変わっていたら、前のファイルに上書きせず新しいファイルとして保存
+        if (def.fileBase && fileHandle && baseName() !== handleBase) fileHandle = null;
+        if (!fileHandle) { fileHandle = await window.showSaveFilePicker({ suggestedName: fileName(), types: JSON_TYPES }); handleBase = baseName(); }
         const w = await fileHandle.createWritable();
         await w.write(text); await w.close();
         setSaved(`ファイルに保存しました（${fileHandle.name}）`);
@@ -1312,6 +1322,7 @@
         try { localStorage.setItem(storeKey, JSON.stringify(data.values)); } catch (e) { alert('読み込めませんでした（保存できる容量を超えています）。'); return; }
         fileHandle = hd;
         rebuild();
+        handleBase = baseName();
         setSaved(`ファイルを開きました（${hd.name}）`);
         return;
       }
@@ -1350,6 +1361,12 @@
     const root = document.getElementById('app');
     if (!def) { root.textContent = '帳票が見つかりません: ' + id; return; }
     document.title = `${def.code} ${def.title}`;
+    // 印刷（PDFで保存）のときだけ、ページ名を fileBase の名前に（ブラウザが PDF の名前の候補にする）
+    if (def.fileBase) {
+      const pageTitle = document.title;
+      window.addEventListener('beforeprint', () => { const b = baseName(); if (b) document.title = b; });
+      window.addEventListener('afterprint', () => { document.title = pageTitle; });
+    }
     storeKey = STORE_PREFIX + id;
     try { values = JSON.parse(localStorage.getItem(storeKey) || '{}') || {}; } catch (e) { values = {}; }
 

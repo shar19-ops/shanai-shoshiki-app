@@ -45,6 +45,12 @@
   FORM_DEFS['54'] = {
     code: '工-02', hokan: '非管理', title: '日　報',
     selfStamp: '発行者', // 押印欄の右端（発行者）にデート印
+    // 保存・PDFの名前は「日報_期間_苗字」（2026-11-13 ユーザー指定）。例：日報_2026年10月21日〜10月31日_山田
+    //   苗字は氏名の欄の最初の空白まで（空白がなければ氏名全体）、氏名が空なら押した印の苗字
+    fileBase: (v) => {
+      const sei = String(v.name || '').trim().split(/[\s　]+/)[0] || (v._selfStamp && v._selfStamp.sei) || '';
+      return ['日報', period(v), sei].filter(Boolean).join('_');
+    },
     // 表題の下：開始日（各月の1日・11日・21日から選ぶ）を大きめに、その下に期間
     meta: [
       { label: '', key: 'start', type: 'select', options: starts, placeholder: '　　　　年　　月　　日', cls: 'big noline', w: 50 },
