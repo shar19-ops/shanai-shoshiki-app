@@ -252,6 +252,20 @@
           if (!isNaN(n)) { e.target.value = fmtNum(n, f.dec ?? (type === 'money' ? 0 : 2)); setVal(key, e.target.value); }
         } : null,
       });
+      // fit：欄に入りきらない文字は、入りきるまで文字を小さくする（下限 5.5pt。工-02 日報の費用明細など。2026-11-13 ユーザー指定）
+      if (f.fit) {
+        const input = el;
+        const fit = () => {
+          input.style.fontSize = '';
+          if (!input.value || !input.clientWidth) return;
+          let pt = parseFloat(getComputedStyle(input).fontSize) * 0.75; // px → pt
+          while (input.scrollWidth > input.clientWidth + 1 && pt > 5.5) { pt -= 0.25; input.style.fontSize = pt + 'pt'; }
+        };
+        input.addEventListener('input', fit);
+        input.addEventListener('blur', () => { input.scrollLeft = 0; fit(); });
+        calcs.push(() => requestAnimationFrame(fit)); // 開いたとき・貼り付けやコピーで値が変わったとき
+        requestAnimationFrame(fit);
+      }
     }
     inputs[key] = el;
     el.dataset.key = key;
