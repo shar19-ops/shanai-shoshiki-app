@@ -228,6 +228,30 @@
         oninput: (e) => setVal(key, e.target.value),
       });
       el.value = v;
+      // fit2：1行の欄で、入りきらないときはまず1行のまま小さく（7ptまで）、それでも入らなければ2段に折り返して
+      //   2段が欄に収まるまで小さくする（下限 4.5pt）。Enter で改行して2段目に書くこともできる（工-02 日報の費用明細。2026-11-13 ユーザー指定）
+      if (f.fit2) {
+        const ta = el;
+        ta.classList.add('fit2');
+        const over = () => ta.scrollWidth > ta.clientWidth + 1 || ta.scrollHeight > ta.clientHeight + 1;
+        const fit = () => {
+          ta.style.fontSize = ''; ta.style.whiteSpace = 'pre'; ta.style.lineHeight = ta.clientHeight ? `${ta.clientHeight}px` : '';
+          ta.classList.remove('two');
+          if (!ta.value || !ta.clientWidth) return;
+          let pt = parseFloat(getComputedStyle(ta).fontSize) * 0.75; // px → pt
+          if (!ta.value.includes('\n')) {
+            while (over() && pt > 7) { pt -= 0.25; ta.style.fontSize = pt + 'pt'; }
+            if (!over()) return;
+          }
+          ta.classList.add('two'); ta.style.whiteSpace = 'pre-wrap'; ta.style.lineHeight = '1.12';
+          while (over() && pt > 4.5) { pt -= 0.25; ta.style.fontSize = pt + 'pt'; }
+          ta.scrollTop = 0;
+        };
+        ta.addEventListener('input', fit);
+        ta.addEventListener('blur', () => { ta.scrollLeft = 0; fit(); });
+        calcs.push(() => requestAnimationFrame(fit)); // 開いたとき・貼り付けやコピーで値が変わったとき
+        requestAnimationFrame(fit);
+      }
     } else if (type === 'calc') {
       el = h('input', { class: 'inp calc' + (f.align === 'left' ? '' : ' num'), readonly: true, tabindex: -1 });
       if (f.align === 'center') el.classList.add('center');
