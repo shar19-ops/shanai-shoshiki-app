@@ -27,6 +27,12 @@
     return d.getMonth() === p.mo - 1 ? d : null;
   };
   const groupOf = (r) => Math.floor((r - 1) / PER) + 1;
+  // 所属と所属CD（2026-11-13 ユーザー指定：基幹系の部署コード。所属を選ぶと所属CDが自動で入る。並びはコードの順）
+  const DEPTS = [['110', '経理部'], ['115', '情報システム部'], ['120', '工事本部'], ['121', '第一工事本部'], ['122', '第二工事本部'],
+    ['125', 'RE部'], ['130', 'CAD部'], ['140', '営業本部'], ['150', '工事管理部　直営'], ['155', '工事管理部'], ['160', '設計見積部'],
+    ['161', '設計部'], ['162', '見積部'], ['170', '安全品質保証部'], ['180', '購買部'], ['200', '横浜支店'], ['300', '東関東支店'],
+    ['400', '北関東支店'], ['500', '大阪支店'], ['600', '仙台支店'], ['700', '名古屋支店'], ['800', '福岡支店']];
+  const deptCdOf = (name) => (DEPTS.find(([, n]) => n === name) || [])[0] || '';
   // 期間：2026年10月21日 〜 10月31日
   const period = (v) => {
     const p = parse(v);
@@ -48,9 +54,10 @@
     blocks: [
       // 区分は見出しの下に値（予定／実施）を置く
       { type: 'grid', dense: true, rowH: 7.5, rows: [ // 行の高さは通常の1.5倍
-        [{ label: '区　分', span: 3 }, { label: '所属CD', key: 'deptCd', span: 11, lw: 3 },
+        // 所属CD：所属を選ぶと自動（一覧にない前の下書きは、前に手で入れたコードをそのまま出す）
+        [{ label: '区　分', span: 3 }, { label: '所属CD', key: 'deptCdAuto', type: 'calc', align: 'left', calc: (n, v) => deptCdOf(v.dept) || v.deptCd || '', span: 11, lw: 3 },
           { label: '社員CD', key: 'empCode', span: 10, lw: 3, maxlength: 7, inputmode: 'numeric', placeholder: '7桁の数字' }],
-        [{ key: 'kubun', type: 'select', options: ['予定', '実施'], default: '実施', align: 'center', span: 3 }, { label: '所　属', key: 'dept', span: 11, lw: 3 },
+        [{ key: 'kubun', type: 'select', options: ['予定', '実施'], default: '実施', align: 'center', span: 3 }, { label: '所　属', key: 'dept', type: 'select', options: DEPTS.map(([, n]) => n), span: 11, lw: 3 },
           { label: '氏　名', key: 'name', span: 10, lw: 3 }],
       ] },
       {
