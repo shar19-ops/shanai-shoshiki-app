@@ -65,11 +65,12 @@
         columns: [
           { label: '日', key: 'day', w: 3.5, grouped: true, rowCalc: (r, v) => { const d = dayOf(v, groupOf(r)); return d ? String(d.getDate()) : ''; } },
           { label: '曜', key: 'dow', w: 3.5, grouped: true, rowCalc: (r, v) => { const d = dayOf(v, groupOf(r)); return d ? '日月火水木金土'[d.getDay()] : ''; } },
-          { label: '工事番号', key: 'koban', w: 17.5, maxlength: 12 },
-          { label: '件名（略称）', key: 'subject', w: 17.5 },
-          { label: '行動・業務内容', key: 'work', w: 26 },
+          // 2026-11-13 ユーザー指定：工事番号を縮めて費用明細を広げる。入りきらない文字は小さくして表示（fit）
+          { label: '工事番号', key: 'koban', w: 15, maxlength: 12, fit: true },
+          { label: '件名（略称）', key: 'subject', w: 17.5, fit: true },
+          { label: '行動・業務内容', key: 'work', w: 26, fit: true },
           { label: '経費', key: 'cost', w: 10.5, type: 'money' },
-          { label: '費用明細', key: 'detail', w: 21.5 },
+          { label: '費用明細', key: 'detail', w: 24, fit: true },
         ],
         foot: [[{ label: '', span: 4, lbl: false }, { label: '計' }, { sum: 'cost' }, { label: '', lbl: false }]],
       },
