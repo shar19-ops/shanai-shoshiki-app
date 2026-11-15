@@ -17,7 +17,7 @@
     stamps: [{ boxes: ['見積部確認', '営業担当'] }],
     blocks: [
       { type: 'grid', rows: [
-        [{ label: '件　名', key: 'subject', span: 14 }, { label: 'ゼネコン', key: 'gc', span: 10 }],
+        [{ label: '件　名', key: 'subject', span: 14 }, { label: '客　先', key: 'gc', span: 10 }],
       ] },
       { type: 'grid', dense: true, rowH: 6.5, lalign: 'left', rows: [
         [{ label: '項　目', span: 6 }, { label: '確認事項', span: 9 }, { label: '確認', span: 2 }, { label: '備考', span: 7 }],
