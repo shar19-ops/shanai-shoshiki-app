@@ -16,9 +16,9 @@ FORM_DEFS['52'] = {
     {
       type: 'table', key: 'items', rows: 11,
       columns: [
-        { label: '業者コード', key: 'vcode', w: 13, align: 'center' },
+        { label: '業者コード', key: 'vcode', w: 17, align: 'center', maxlength: 10, fit: true }, // 業者コードは10桁（2026-11-17。摘要を縮めた）
         { label: '代行支払先', key: 'payee', w: 20 },
-        { label: '摘　要', key: 'desc', w: 25 },
+        { label: '摘　要', key: 'desc', w: 21, type: 'textarea', plain: true, lines: 1, fit2: true }, // 入りきらないときは2段に折り返して小さく（2026-11-17）
         { label: '数量', key: 'qty', w: 7, type: 'number' },
         { label: '単位', key: 'unit', w: 7, align: 'center' },
         { label: '単価', key: 'price', w: 12, type: 'money' },
