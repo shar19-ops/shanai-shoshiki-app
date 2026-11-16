@@ -48,7 +48,7 @@
   const make = (id, portrait) => {
   FORM_DEFS[id] = {
     code: '工-11', hokan: '非管理', title: '工料発注承認メモ', orientation: portrait ? 'portrait' : 'landscape',
-    tbNote: portrait ? '【縦・β版】' : '', // 画面の上部だけに出す（印刷には出ない）
+    tbNote: portrait ? '' : '【旧版】', // 画面の上部だけに出す（印刷には出ない）。2026-11-17 縦を正規版、横を旧版に（ユーザー指定）
     selfStamp: '発行者', // 本人欄（デート印を押す欄）
     meta: [
       { label: '発行日', key: 'date', type: 'date' },
