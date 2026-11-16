@@ -12,7 +12,7 @@
 <meta name="theme-color" content="#1f3f8f">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap">
-<link rel="stylesheet" href="assets/app.css?v=2026111702"> <!-- 版番号は form.html と同じ -->
+<link rel="stylesheet" href="assets/app.css?v=2026111703"> <!-- 版番号は form.html と同じ -->
 <style>
   .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
   .intro { background: #fff; border-radius: 6px; padding: 12px 16px; font-size: 10pt; line-height: 1.7; margin-bottom: 14px; }
@@ -54,6 +54,12 @@
   .card .beta-mark, .intro .beta-legend { font-weight: 800; color: #fff; background: #7b3fb5; border-radius: 99px; letter-spacing: .05em; white-space: nowrap; }
   .card .beta-mark { margin-left: auto; flex: none; font-size: 9pt; padding: 2px 9px; }
   .intro .beta-legend { display: inline-block; font-size: 8pt; padding: 1px 8px; vertical-align: 1px; margin-right: 2px; }
+  /* 旧版：新しい版（縦）を正規版にした帳票の前の版（A4横）。カードを灰色にして右端に「旧版」（2026-11-17 ユーザー指定） */
+  .card.old { background: #f1f2f4; border-color: #c3c7ce; color: #555; }
+  .card.old .no { background: #8a909b; }
+  .card .old-mark, .intro .old-legend { font-weight: 800; color: #fff; background: #8a909b; border-radius: 99px; letter-spacing: .05em; white-space: nowrap; }
+  .card .old-mark { margin-left: auto; flex: none; font-size: 9pt; padding: 2px 9px; }
+  .intro .old-legend { display: inline-block; font-size: 8pt; padding: 1px 8px; vertical-align: 1px; margin-right: 2px; }
   /* 伝票タブ：別アプリへのリンク。カード全体でアプリを開き、右の「使い方」は別リンク（2026-11-11） */
   .card.slip { position: relative; }
   .card.slip:hover { border-color: var(--accent); box-shadow: 0 1px 4px rgba(31,63,143,.25); }
@@ -78,7 +84,7 @@
   <div class="intro">
     帳票を選んで入力し、「印刷」ボタンで紙に出力して回送してください。<br>
     入力内容はこのパソコンのブラウザ内にだけ一時保存されます（サーバーには送信されません）。共用PCでは印刷後に「クリア」してください。<br>
-    <span class="new-legend">NEW</span> は新規に制定した帳票です。　<span class="beta-legend">β版</span> は試行中の帳票です。
+    <span class="new-legend">NEW</span> は新規に制定した帳票です。　<span class="old-legend">旧版</span> は前の版の帳票です（新しい版をお使いください）。
   </div>
   <div class="kinds" id="kinds"></div>
   <div class="cats-hint">所属の部署を選ぶと帳票が絞られます。</div>
@@ -86,7 +92,7 @@
   <input class="search" type="search" placeholder="帳票名・番号で絞り込み" id="q">
   <div class="list" id="list"></div>
 </div>
-<script src="forms/catalog.js?v=2026111702"></script>
+<script src="forms/catalog.js?v=2026111703"></script>
 <script>
   (function () {
     var list = document.getElementById('list');
@@ -209,7 +215,7 @@
     }
     function formCard(c) {
         var el = document.createElement('a');
-        el.className = 'card' + (c.kind === '品質' ? ' q' : '') + (c.isBeta ? ' beta' : '');
+        el.className = 'card' + (c.kind === '品質' ? ' q' : '') + (c.isBeta ? ' beta' : '') + (c.isOld ? ' old' : '');
         el.href = 'form.html?id=' + c.id;
         el.innerHTML = '<span class="no"></span><span class="t"></span>';
         el.querySelector('.no').textContent = c.no;
@@ -217,6 +223,7 @@
         if (cur && c.cat === '共通') { var cm = document.createElement('span'); cm.className = 'common'; cm.textContent = '共通'; el.querySelector('.t').after(cm); }
         if (c.isNew) { var nw = document.createElement('span'); nw.className = 'new'; nw.textContent = 'NEW'; el.appendChild(nw); }
         if (c.isBeta) { var bt = document.createElement('span'); bt.className = 'beta-mark'; bt.textContent = 'β版'; el.appendChild(bt); }
+        if (c.isOld) { var od = document.createElement('span'); od.className = 'old-mark'; od.textContent = '旧版'; el.appendChild(od); } // 前の版（catalog.js の isOld）
         return el;
     }
     // 伝票アプリのカード（catalog.js の url・guide・color）。アプリも使い方も新しいタブで開く
