@@ -34,7 +34,7 @@
       tb.append(
         h('tr', { class: 'b1-top' },
           h('td', { rowspan: 2, class: 'b1-no' }, String(n)),
-          h('td', { rowspan: 2 }, field({ key: k(n, 'code'), align: 'center' })),
+          h('td', { rowspan: 2, class: 'b1-code' }, field({ key: k(n, 'code'), align: 'center', maxlength: 10, fit: true })), // 業者コードは10桁（2026-11-17）
           h('td', { rowspan: 2 }, field({ key: k(n, 'name') })),
           h('td', { rowspan: 2, class: 'b1-auto b1-rank' }, field({ key: k(n, 'rank'), type: 'calc', align: 'center', calc: (_, v) => rank(v, n) })),
           h('td', { rowspan: 2, class: 'b1-auto' }, field({ key: k(n, 'avg'), type: 'calc', align: 'center',
@@ -46,7 +46,7 @@
           ...Array.from({ length: COLS }, (_, j) => h('td', null, field({ key: k(n, `p${j + 1}`), type: 'number', align: 'center' })))));
     }
     const table = h('table', { class: 'grid b1' },
-      h('colgroup', null, ...[7, 16, 40, 10, 11, 15, ...Array(COLS).fill(null)].map((w) => h('col', { style: w ? `width:${w}mm` : null }))), tb);
+      h('colgroup', null, ...[7, 21, 35, 10, 11, 15, ...Array(COLS).fill(null)].map((w) => h('col', { style: w ? `width:${w}mm` : null }))), tb);
     if (page !== pageCount(values)) return table;
     // 最後のページの下に、ページの追加・削除（印刷しない）
     const lastHasData = () => Object.keys(values).some((key) => {

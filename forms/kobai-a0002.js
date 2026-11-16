@@ -49,8 +49,8 @@
       h('colgroup', null, ...[12, ...Array(22).fill(null), 20, 20, 20].map((w) => h('col', { style: w ? `width:${w}mm` : null }))),
       h('tbody', null,
         h('tr', { class: 'b2-head' },
-          h('th', { colspan: 3 }, '業者コード'), h('td', { colspan: 3 }, field({ key: k(b, 'code'), align: 'center' })),
-          h('th', { colspan: 2 }, '社　名'), h('td', { colspan: 7 }, field({ key: k(b, 'name') })),
+          h('th', { colspan: 3 }, '業者コード'), h('td', { colspan: 4 }, field({ key: k(b, 'code'), align: 'center', maxlength: 10, fit: true })), // 業者コードは10桁（2026-11-17。社名の欄を1つ縮めた）
+          h('th', { colspan: 2 }, '社　名'), h('td', { colspan: 6 }, field({ key: k(b, 'name') })),
           h('th', { colspan: 3 }, '工種・品名'), h('td', { colspan: 5 }, field({ key: k(b, 'hinmei') })),
           h('th', { class: 'b2-kai' }, '雄栄会', h('br'), '雄和会'),
           h('td', { colspan: 2 }, field({ key: k(b, 'kai'), type: 'select', options: ['会員', '非会員'], align: 'center' }))),
