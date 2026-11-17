@@ -61,7 +61,7 @@
     stamps: [], // 元の様式に押印欄はない
     blocks: [
       { type: 'grid', cols: 6, colWidths: ['17mm', '37mm', '14mm', null, '17mm', '34mm'], rowH: 7, rows: [
-        [{ label: '工　番', key: 'koban', maxlength: 12, fit: true, lw: 1, span: 2 }, { label: '件　名', key: 'subject', lw: 1, span: 2 },
+        [{ label: '工　番', key: 'koban', maxlength: 12, fit: true, lw: 1, span: 2 }, { label: '件　名', key: 'subject', type: 'textarea', plain: true, lines: 1, fit2: true, lw: 1, span: 2 }, // 長い件名は小さく、それでも入らなければ2段に（2026-11-17）
           { label: '検査日', key: 'kensabi', type: 'date', jp: true, lw: 1, span: 2 }],
         [{ label: '検査種別', key: 'shubetsu', type: 'radio', nowrap: true, lw: 1, span: 4,
           options: ['1．工程内検査', '2．現場巡回検査', '3．中間検査', '4．竣工検査'] },
