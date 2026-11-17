@@ -835,6 +835,18 @@ table.grid.h20 textarea.h20-wrap { min-height: 0; padding: .6mm 1.5mm; line-heig
 /* 本-品質-A0021 検査報告書：添付書類の名前は元の書式どおり字間を空けて */
 table.grid td.h21-doc { text-align: left; padding-left: 2mm; letter-spacing: .12em; }
 /* 本-品質-A0047 現場巡回検査報告書：31項目を1枚に収めるため行を詰める */
+/* 本-品質-00016 ①元請負時 巡回・中間・完成検査チェックリスト（2026-11-17） */
+table.grid.q16 th { height: 5.5mm; font-size: 8.5pt; letter-spacing: .05em; white-space: nowrap; }
+table.grid.q16 td { height: 6.2mm; font-size: 8pt; padding: 0; }
+table.grid.q16 td.q16-cat { text-align: center; padding: 1mm 0; }
+table.grid.q16 td.q16-cat span { writing-mode: vertical-rl; letter-spacing: .1em; font-size: 8pt; display: inline-block; }
+table.grid.q16 td.q16-no { text-align: center; }
+table.grid.q16 td.q16-no .inp { text-align: center; }
+table.grid.q16 td.q16-text { text-align: left; padding: .5mm 1.5mm; line-height: 1.3; white-space: pre-line; }
+table.grid.q16 textarea.q16-wrap { min-height: 0; padding: .5mm 1.5mm; font-size: 8pt; line-height: 1.3; resize: none; overflow: hidden; display: block; }
+table.grid.q16 .q16-mark { width: 100%; height: 100%; min-height: 6.2mm; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 10.5pt; cursor: pointer; padding: 0; }
+.q16-head { display: flex; flex-wrap: wrap; gap: 1mm 6mm; font-size: 8.5pt; border: 1px solid #333; padding: 1.2mm 2mm; margin-bottom: 1.5mm; min-height: 6mm; }
+.q16-head b { font-weight: bold; margin-right: 2mm; color: #333; }
 /* 本-品質-00015 重点管理事項チェックリスト（2026-11-17） */
 table.grid.h15c th { height: 5.5mm; font-size: 8.5pt; letter-spacing: .05em; white-space: nowrap; }
 table.grid.h15c td { height: 8mm; font-size: 8.5pt; padding: 0; }
