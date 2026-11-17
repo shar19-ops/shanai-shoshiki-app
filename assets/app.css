@@ -856,6 +856,22 @@ table.grid.q16 td.q16-bikotd { vertical-align: top; }
 .q16-ver button { font: inherit; font-weight: 700; padding: 1mm 5mm; border: 1px solid #b8bfcc; border-radius: 99px; background: #fff; color: #333; cursor: pointer; }
 .q16-ver button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
 .q16-ver .q16-ver-hint { color: #4a5a7a; font-size: 8pt; }
+/* ③設備別 */
+table.grid.q16c td { height: 7mm; font-size: 9pt; }
+table.grid.q16c tr.q16-on td { background: #eef4ff; }
+.q16-hint { margin-top: 2mm; font-size: 9pt; color: #4a5a7a; }
+table.grid.q16h { margin-bottom: 1.5mm; }
+table.grid.q16h th { font-size: 8pt; letter-spacing: 0; }
+table.grid.q16h td { height: 6.5mm; font-size: 8.5pt; }
+table.grid.q16d th { white-space: pre-line; line-height: 1.1; font-size: 7.5pt; letter-spacing: 0; height: 4mm; }
+table.grid.q16d th.q16-shu { font-size: 6.5pt; white-space: nowrap; padding: 0; }
+table.grid.q16d td { height: 5.6mm; font-size: 7pt; }
+table.grid.q16d td.q16-text { line-height: 1.22; padding: .3mm 1.2mm; }
+table.grid.q16d .q16-mark { min-height: 5.6mm; font-size: 9pt; }
+table.grid.q16d textarea.q16-wrap { font-size: 7pt; line-height: 1.22; padding: .3mm 1.2mm; }
+table.grid.q16d tr.q16-sec td { height: 5mm; font-weight: bold; background: #f2f4f8; }
+.q16-red { color: #c00; }
+.q16-live { white-space: pre-wrap; }
 /* 本-品質-00015 重点管理事項チェックリスト（2026-11-17） */
 table.grid.h15c th { height: 5.5mm; font-size: 8.5pt; letter-spacing: .05em; white-space: nowrap; }
 table.grid.h15c td { height: 8mm; font-size: 8.5pt; padding: 0; }
