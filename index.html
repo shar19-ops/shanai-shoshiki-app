@@ -12,7 +12,7 @@
 <meta name="theme-color" content="#1f3f8f">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap">
-<link rel="stylesheet" href="assets/app.css?v=2026111704"> <!-- 版番号は form.html と同じ -->
+<link rel="stylesheet" href="assets/app.css?v=2026111705"> <!-- 版番号は form.html と同じ -->
 <style>
   .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
   .intro { background: #fff; border-radius: 6px; padding: 12px 16px; font-size: 10pt; line-height: 1.7; margin-bottom: 14px; }
@@ -45,6 +45,7 @@
   .kinds button { font: inherit; font-size: 11pt; font-weight: 700; padding: 7px 20px; border: 1px solid #b8bfcc; border-bottom: 0; border-radius: 6px 6px 0 0; background: #e9edf4; color: #555; cursor: pointer; margin-right: 4px; }
   .kinds button:hover { color: var(--accent); }
   .kinds button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  @media (max-width: 560px) { .kinds button { padding: 7px 9px; font-size: 10pt; white-space: nowrap; margin-right: 3px; } } /* タブが4つ（標準・基準を追加）でもスマホで1行に */
   .card.q .no { background: #2e7d5b; } /* 品質記録様式の番号は緑 */
   .list .empty { grid-column: 1 / -1; color: #666; font-size: 10pt; padding: 12px 4px; }
   .card .common { font-size: 8pt; color: #4a5a7a; background: #e6ecf7; border-radius: 3px; padding: 1px 5px; white-space: nowrap; }
@@ -93,7 +94,7 @@
   <input class="search" type="search" placeholder="帳票名・番号で絞り込み" id="q">
   <div class="list" id="list"></div>
 </div>
-<script src="forms/catalog.js?v=2026111704"></script>
+<script src="forms/catalog.js?v=2026111705"></script>
 <script>
   (function () {
     var list = document.getElementById('list');
@@ -114,7 +115,7 @@
       try { localStorage.setItem(KKEY, kind); } catch (e) {}
     }
     if (!KINDS.some(function (k) { return k[0] === kind; })) kind = '一般';
-    var SUB = { '一般': '社内書式アプリ　一般社内書類', '品質': '社内書式アプリ　品質記録様式', '伝票': '社内書式アプリ　伝票' };
+    var SUB = { '一般': '社内書式アプリ　一般社内書類', '品質': '社内書式アプリ　品質記録様式', '標準': '社内書式アプリ　標準・基準', '伝票': '社内書式アプリ　伝票' };
     var NO_CATS = { '伝票': true }; // 職種の絞り込みをしない種類（伝票は別アプリへのリンク）
     var hintEl = document.querySelector('.cats-hint');
     var HINT = hintEl.textContent;
@@ -216,7 +217,7 @@
     }
     function formCard(c) {
         var el = document.createElement('a');
-        el.className = 'card' + (c.kind === '品質' ? ' q' : '') + (c.isBeta ? ' beta' : '') + (c.isOld ? ' old' : '');
+        el.className = 'card' + (c.kind === '品質' || c.kind === '標準' ? ' q' : '') + (c.isBeta ? ' beta' : '') + (c.isOld ? ' old' : '');
         el.href = 'form.html?id=' + c.id;
         el.innerHTML = '<span class="no"></span><span class="t"></span>';
         el.querySelector('.no').textContent = c.no;
