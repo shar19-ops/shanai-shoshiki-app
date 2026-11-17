@@ -1422,5 +1422,5 @@
     window.scrollTo(0, 0);
   }
 
-  window.ShoshikiApp = { boot, version: APP_VERSION, toNum, fmtNum, layoutH };
+  window.ShoshikiApp = { boot, version: APP_VERSION, toNum, fmtNum, layoutH, shrinkImage };
 })();

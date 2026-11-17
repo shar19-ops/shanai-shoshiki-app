@@ -16,7 +16,66 @@
     for (let q = 1; q < p; q++) from += counts[q] ?? cap(q);
     return [from, from + (counts[p] ?? cap(p)) - 1];
   };
-  const hasData = (values, n) => ['no', 'mondai', 'kekka', 'in'].some((k) => String(values[`r${n}.${k}`] ?? '') !== '');
+  const hasData = (values, n) => ['no', 'mondai', 'kekka', 'in'].some((k) => String(values[`r${n}.${k}`] ?? '') !== '')
+    || ['mondai', 'kekka'].some((k) => (values[`r${n}.${k}__imgs`] || []).length > 0);
+  // 問題点・処置結果の欄の画像（2026-11-17 ユーザー指定。事故報告書と同じく Ctrl+V・ボタンで貼り、大きさを変えられる）
+  //   `<key>__imgs` = [{ src: data URL, w: 欄の幅に対する％ }]。文章の下に並べて印刷にも出す。高さは最大 IMG_MAX_H mm
+  const IMG_MAX_H = 120, IMG_DEF_H = 45;
+  const imgCell = (h, values, setVal, key, ta, changed) => {
+    const ik = key + '__imgs';
+    const list = () => (Array.isArray(values[ik]) ? values[ik] : []);
+    const area = h('div', { class: 'h56-imgs' });
+    const file = h('input', { type: 'file', accept: 'image/*', multiple: true, style: 'display:none',
+      onchange: (e) => { [...e.target.files].forEach(add); e.target.value = ''; } });
+    const btn = h('button', { type: 'button', class: 'h56-imgbtn no-print', title: '画像を貼る（この欄で Ctrl+V でも貼れます）', onclick: () => file.click() }, '画像');
+    const mmW = () => area.getBoundingClientRect().width / (96 / 25.4) || 80; // 欄の幅（mm）
+    // 幅％の上限：高さが IMG_MAX_H mm を超えない幅
+    const maxPct = (ratio) => Math.min(100, (IMG_MAX_H / ratio) / mmW() * 100);
+    const draw = () => {
+      area.innerHTML = '';
+      list().forEach((it, i) => {
+        const img = h('img', { src: it.src, alt: '' });
+        const box = h('div', { class: 'h56-img', style: `width:${it.w}%` }, img,
+          h('button', { type: 'button', class: 'h56-imgdel no-print', title: 'この画像を削除', onclick: () => { setVal(ik, list().filter((_, j) => j !== i)); draw(); changed(); } }, '×'));
+        // 右下の□をドラッグして大きさを変える（縦横の比率はそのまま）
+        const grip = h('span', { class: 'h56-grip no-print', title: 'ドラッグで大きさを変える' });
+        grip.addEventListener('pointerdown', (e) => {
+          e.preventDefault(); grip.setPointerCapture(e.pointerId);
+          const x0 = e.clientX, w0 = box.getBoundingClientRect().width, full = area.getBoundingClientRect().width;
+          const ratio = img.naturalHeight / img.naturalWidth || 1;
+          const move = (ev) => { box.style.width = Math.max(10, Math.min(maxPct(ratio), (w0 + ev.clientX - x0) / full * 100)) + '%'; };
+          const up = () => {
+            grip.removeEventListener('pointermove', move); grip.removeEventListener('pointerup', up);
+            setVal(ik, list().map((x, j) => (j === i ? { ...x, w: Math.round(parseFloat(box.style.width)) } : x)));
+            changed();
+          };
+          grip.addEventListener('pointermove', move); grip.addEventListener('pointerup', up);
+        });
+        box.append(grip);
+        area.append(box);
+      });
+      area.style.display = list().length ? '' : 'none';
+    };
+    function add(blob) {
+      ShoshikiApp.shrinkImage(blob, 1200, 0.8, (src) => {
+        const im = new Image();
+        im.onload = () => {
+          const ratio = im.height / im.width || 1;
+          const w = Math.round(Math.max(10, Math.min(100, (IMG_DEF_H / ratio) / mmW() * 100)));
+          setVal(ik, [...list(), { src, w }]); draw(); changed();
+        };
+        im.src = src;
+      });
+    }
+    ta.addEventListener('paste', (e) => {
+      const its = [...(e.clipboardData?.items || [])].filter((x) => x.type.startsWith('image/'));
+      if (!its.length) return; // 文字の貼り付けはそのまま
+      e.preventDefault();
+      its.forEach((x) => add(x.getAsFile()));
+    });
+    draw();
+    return h('div', { class: 'h56-cell' }, btn, file, ta, area);
+  };
   // 行の高さを測ってページごとの行数を決め直す（本-品質-A0053 と同じ）。edited：入力して欄を離れたとき
   const relayout = (values, setVal, rebuild, edited) => {
     const trs = [...document.querySelectorAll('table.h56 tr[data-n]')];
@@ -60,7 +119,7 @@
       const grow = () => { ta.style.height = '0'; ta.style.height = ta.scrollHeight + 'px'; };
       ta.addEventListener('input', grow);
       requestAnimationFrame(grow);
-      return ta;
+      return imgCell(h, values, setVal, key, ta, () => setTimeout(() => relayout(values, setVal, rebuild, true)));
     };
     const tb = h('tbody', null, h('tr', null, h('th', null, 'No'), h('th', null, '問　題　点'), h('th', null, '処　置　結　果'), h('th', null, '印')));
     for (let n = from; n <= to; n++) {
@@ -80,7 +139,7 @@
         Object.keys(values).filter((key) => { const m = /^r(\d+)\./.exec(key); return m && Number(m[1]) >= from; }).forEach((key) => delete values[key]);
         counts = {}; setVal('pageCount', String(pages - 1)); rebuild();
       } }, '最後のページを削除') : null,
-      h('span', { class: 'k1-hint' }, '議題が多いときは、最後の行に書くと次のページが自動で増えます。印の欄はクリックで押印。')));
+      h('span', { class: 'k1-hint' }, '議題が多いときは、最後の行に書くと次のページが自動で増えます。印の欄はクリックで押印。問題点・処置結果の欄は Ctrl+V（または「画像」）で画像を貼れます。右下の□で大きさを変えられます。')));
   } });
 
   FORM_DEFS['hin-a0056'] = {

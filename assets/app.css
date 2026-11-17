@@ -949,6 +949,19 @@ table.grid.h55k td.h55-k1 { border-right: 0; }
 table.grid.h55k td.h55-k2 { border-left: 0; }
 table.grid.h53 td.h55-note { text-align: left; font-size: 7.5pt; line-height: 1.35; padding: .6mm 1.5mm; vertical-align: top; }
 /* 本-品質-A0056 NET検討会報告書：印の欄（クリックで小さめの三文判風の認印） */
+/* NET検討会報告書：問題点・処置結果の欄の画像（2026-11-17）。「画像」ボタンは欄にカーソルを置いたときだけ右上に出す */
+table.grid.h56 .h56-cell { position: relative; }
+table.grid.h56 td:has(> .h56-cell) { vertical-align: top; } /* 隣の欄に画像があって行が高いとき、文章は上に揃える */
+table.grid.h56 .h56-imgbtn { position: absolute; top: .3mm; right: .3mm; z-index: 2; display: none; font: inherit; font-size: 7pt; line-height: 1; padding: .6mm 1.4mm; border: 1px solid #b8c4dc; border-radius: 3px; background: #e6ecf7; color: var(--accent); cursor: pointer; }
+table.grid.h56 tr:hover .h56-imgbtn, table.grid.h56 .h56-cell:focus-within .h56-imgbtn { display: block; }
+table.grid.h56 .h56-imgs { display: flex; flex-wrap: wrap; gap: 1mm; padding: 0 1.5mm 1mm; }
+table.grid.h56 .h56-img { position: relative; flex: none; }
+table.grid.h56 .h56-img img { display: block; width: 100%; height: auto; }
+table.grid.h56 .h56-imgdel { position: absolute; top: 0; right: 0; font-size: 8pt; line-height: 1; padding: .4mm 1.2mm; border: 0; background: rgba(0,0,0,.55); color: #fff; cursor: pointer; display: none; }
+table.grid.h56 .h56-grip { position: absolute; right: 0; bottom: 0; width: 3mm; height: 3mm; background: #fff; border: 1px solid var(--accent); cursor: nwse-resize; touch-action: none; display: none; }
+table.grid.h56 .h56-img:hover .h56-imgdel, table.grid.h56 .h56-img:hover .h56-grip { display: block; }
+@media (hover: none) { table.grid.h56 .h56-imgbtn, table.grid.h56 .h56-imgdel, table.grid.h56 .h56-grip { display: block; } } /* iPad：触れる前から出しておく */
+@media print { table.grid.h56 .h56-imgbtn, table.grid.h56 .h56-imgdel, table.grid.h56 .h56-grip { display: none !important; } }
 table.grid.h56 td.h56-in { padding: 0; }
 table.grid.h56 td.h56-in .inkan-box { height: 100%; min-height: 6.6mm; }
 table.grid.h56 td.h56-in .inkan-box svg { width: 6mm; height: 6mm; }
