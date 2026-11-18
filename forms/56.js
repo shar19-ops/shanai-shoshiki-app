@@ -56,7 +56,7 @@
         [{ label: '工　番', key: 'koban', span: 10, maxlength: 12, fit: true }, { label: '件　名', key: 'subject', type: 'textarea', plain: true, lines: 1, fit2: true, span: 14, lw: 3 }],
       ] },
       {
-        type: 'table', key: 'r', rows: ITEMS.length + 1, rowH: 4.5, headH: 6, dense: true, cls: 'k56',
+        type: 'table', key: 'r', rows: ITEMS.length + 1, rowH: 4.6, headH: 6, dense: true, cls: 'k56',
         columns: [
           { label: '経費コード', key: 'code', w: 13, align: 'center', head: (r) => at(r, 0) },
           { label: '科目名称', key: 'kamoku', w: 17, align: 'left', head: (r) => at(r, 1) },

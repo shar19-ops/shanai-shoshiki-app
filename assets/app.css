@@ -1225,3 +1225,4 @@ table.grid.b1 td.b1-code .inp { font-family: Arial, sans-serif; letter-spacing: 
 table.grid.k56 .inp::placeholder { color: #999; opacity: 1; }
 @media print { table.grid.k56 .inp::placeholder { color: #000 !important; } }
 table.grid.k56 td.txt { white-space: nowrap; padding: 0 1.5mm; }
+table.grid.k56 tbody td .inp, table.grid.k56 tfoot td .inp { height: 4mm; min-height: 0; line-height: 4mm; padding-top: 0; padding-bottom: 0; font-size: 9.5pt; }
