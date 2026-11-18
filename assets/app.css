@@ -732,7 +732,11 @@ table.grid.b8-calc-t td.b8-in.b8-last { border-right: 1px solid var(--line); }
 table.grid.b4.b8 td { height: 4.05mm; } /* 工番・件名を上に移した分、行を高く */
 table.grid.b4.b8 .b4-mark { min-height: 3.9mm; }
 /* 本-購買-A0004 業者名（左の表の上、幅は左の表とそろえる）と業者の追加・削除 */
-.b4-head { display: flex; align-items: center; gap: 4mm; }
+.b4-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4mm; }
+/* 本-購買-A0004：日付の順番の警告（見積依頼書 ＜ 見積提出日 ＜ 見積書工期。2026-11-18）。印刷には出ない */
+.b4-warn-box { flex-basis: 100%; background: #fdeeee; border: 1px solid #e6b4b4; color: #b42318; border-radius: 4px; padding: 1.2mm 2.5mm; font-size: 8.5pt; line-height: 1.5; }
+.b4-warn { outline: 2px solid #d92d20 !important; outline-offset: -2px; background: #fdeeee !important; }
+@media print { .b4-warn { outline: none !important; background: none !important; } }
 table.grid.b4-vendor { width: calc((297mm - 24mm - 4mm) / 2); flex: none; }
 table.grid.b4-vendor th { width: 23mm; height: 6.5mm; font-size: 9pt; }
 table.grid.b4-vendor td { height: 6.5mm; font-size: 10pt; }
