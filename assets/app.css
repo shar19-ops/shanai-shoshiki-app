@@ -1219,3 +1219,9 @@ td:has(> textarea.inp.fit2) { padding: 0; }
 
 /* 本-購買-A0001 業者コード（10桁。2026-11-17）：数字の幅の狭い書体 */
 table.grid.b1 td.b1-code .inp { font-family: Arial, sans-serif; letter-spacing: -.02em; }
+
+/* ---------- 工-13 工事経費計算書（般-56） ---------- */
+/* 摘要の注記（産廃含む など）：空欄のときの案内。画面は薄いグレー、印刷は黒（元のExcelと同じく紙にも出す） */
+table.grid.k56 .inp::placeholder { color: #999; opacity: 1; }
+@media print { table.grid.k56 .inp::placeholder { color: #000 !important; } }
+table.grid.k56 td.txt { white-space: nowrap; padding: 0 1.5mm; }

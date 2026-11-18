@@ -640,7 +640,7 @@
   //   foot: [{label, span, key(合計対象の列key) | text}]
   function tableBlock(b) {
     const cols = b.columns;
-    const tbl = h('table', { class: 'grid' + (b.dense ? ' dense' : '') }, // dense：行の多い表（日報など）
+    const tbl = h('table', { class: 'grid' + (b.dense ? ' dense' : '') + (b.cls ? ' ' + b.cls : '') }, // dense：行の多い表（日報など）。cls：表の見た目を追加
       h('colgroup', null, cols.map((c) => h('col', { style: c.w ? `width:${c.w}%` : '' }))));
     const lbl = (s) => String(s).split('\n').flatMap((x, i) => (i ? [h('br'), x] : [x]));
     const hh = 'height:' + (b.headH || 8) + 'mm';
@@ -724,6 +724,7 @@
         const headText = c.head ? c.head(r) : null;
         if (headText != null) return h('td', { class: 'txt', style: `text-align:${c.align || 'center'}` + (b.rowH ? `;height:${b.rowH}mm` : '') }, headText);
         const f = { ...c, key };
+        if (typeof c.placeholder === 'function') f.placeholder = c.placeholder(r) || ''; // 行ごとの案内（般-56 の摘要の注記）
         if (c.calc) f.calc = (n) => c.calc((k) => n(`${b.key}.${r}.${k}`));
         if (c.rowCalc) { f.type = 'calc'; f.calc = (n, v) => c.rowCalc(r, v); }
         if (c.rowAuto) f.auto = (v) => c.rowAuto(r, v); // mark の自動判定（行ごと）
