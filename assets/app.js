@@ -385,6 +385,8 @@
     const svg = p ? stampSvg(p) : '';
     document.querySelectorAll('.self-stamp').forEach((el) => {
       el.innerHTML = svg || (el.dataset.empty === '印' ? '<span class="stamp-mark">印</span>' : '<span class="self-hint no-print">クリックで<br>押印</span>');
+      // 押していないときは、押印部に薄く印字する役職名（'見積依頼書\n発行' の「発行」など）を残す（2026-11-18 本-購買-A0004）
+      if (!svg && el.dataset.roles) el.prepend(h('div', { class: 'sb-roles' }, ...el.dataset.roles.split('\n').flatMap((r, i) => (i ? [h('br'), r] : [r]))));
     });
     const inkan = p ? DateStamp.inkan({ name: p.sei, color: 'red' }) : '';
     document.querySelectorAll('.self-inkan').forEach((el) => { el.innerHTML = '印' + inkan; el.classList.toggle('on', !!inkan); });
@@ -464,7 +466,7 @@
             // dates：見出しの下に日付の欄。空欄なら「/　　/」を印字して手書きできるように（押印部はその分低く、枠の高さは同じ）
             // 日付の項目名は「sdate.見出し」。同じ見出しの欄が2つあるときは groups の stampKey で分ける
             g.dates ? h('div', { class: 'sb-date' }, field({ key: `${prefix}sdate.${head}`, align: 'center', placeholder: '/　　/' })) : null,
-            h('div', self ? { class: 'sb-area self-stamp' + (g.dates ? ' dated' : ''), title: 'クリックで押印', onclick: clickSelfStamp } : { class: 'sb-area' + (g.dates ? ' dated' : '') },
+            h('div', self ? { class: 'sb-area self-stamp' + (g.dates ? ' dated' : ''), title: 'クリックで押印', onclick: clickSelfStamp, 'data-roles': roles.join('\n') || null } : { class: 'sb-area' + (g.dates ? ' dated' : '') },
               roles.length ? h('div', { class: 'sb-roles' }, roles.flatMap((r, i) => (i ? [h('br'), r] : [r]))) : null));
           if (slashable) {
             box.addEventListener('click', (e) => {
