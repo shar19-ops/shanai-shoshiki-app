@@ -115,7 +115,7 @@
     bottomStamps: ['登録済検印'],
     // 付属帳票（ツールバーのボタンで開く。事業所・工番・物件略称を転記。2026-11-18 ユーザー指定）
     attach: [
-      { id: '56', code: '工-13', title: '工事経費計算書', fill: { office: 'jigyosho', koban: 'koban', subject: 'nameKanji' }, labels: { office: '事業所', koban: '工番', subject: '件名' } },
+      { id: '56', code: '工-14', title: '工事経費計算書', fill: { office: 'jigyosho', koban: 'koban', subject: 'nameKanji' }, labels: { office: '事業所', koban: '工番', subject: '件名' } },
     ],
     setup: (ctx) => { bindKana(ctx); bindChiku(ctx); },
     blocks: [
