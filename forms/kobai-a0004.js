@@ -170,6 +170,45 @@
     ...TERMS[kind][1].map((p) => h('p', { class: /^［/.test(p) ? 'art' : 'sub' }, p)),
     h('p', { class: 'b4-ijo' }, '以　上')) });
 
+  // 日付の順番の確認（2026-11-18 ユーザー指定）：見積依頼書（右上の押印欄の日付）＜ 見積提出日 ＜ 見積書工期（始まり）
+  //   順番どおりでなければ業者名の下に警告（印刷には出ない）、その日付の欄を赤枠に。同じ日も順番どおりではないとする
+  //   押印欄の日付は手書き用の文字の欄なので「11/18」「26/11/18」「2026/11/18」「11月18日」などを読む。年がなければ見積提出日に近い年
+  const iso = (s) => (/^\d{4}-\d{2}-\d{2}$/.test(s || '') ? s : '');
+  const md = (s) => { const [y, m, d] = s.split('-').map(Number); return `${y}/${m}/${d}`; };
+  const readDate = (s, near) => {
+    const t = String(s || '').normalize('NFKC').replace(/\s/g, '');
+    let m = /^(\d{2,4})[/.\-年](\d{1,2})[/.\-月](\d{1,2})日?$/.exec(t), y, mo, d;
+    if (m) { y = Number(m[1]); mo = Number(m[2]); d = Number(m[3]); if (y < 100) y += 2000; }
+    else if ((m = /^(\d{1,2})[/.\-月](\d{1,2})日?$/.exec(t))) {
+      mo = Number(m[1]); d = Number(m[2]);
+      const base = near ? Number(near.slice(0, 4)) : new Date().getFullYear();
+      const cand = [base - 1, base, base + 1].map((yy) => `${yy}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`);
+      const ref = near ? Date.parse(near) : Date.now();
+      return cand.sort((a, b) => Math.abs(Date.parse(a) - ref) - Math.abs(Date.parse(b) - ref))[0];
+    } else return '';
+    if (mo < 1 || mo > 12 || d < 1 || d > 31) return '';
+    return `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+  };
+  const dateCheck = (vn) => ({ render: ({ h, values }) => {
+    const el = h('div', { class: 'b4-warn-box no-print' });
+    const kIrai = `${pk(vn, '')}sdate.見積依頼書`, kTei = pk(vn, 'teishutsu'), kKoki = pk(vn, 'mitsuKoki');
+    const draw = () => {
+      const tei = iso(values[kTei]), koki = iso(values[kKoki]);
+      const irai = readDate(values[kIrai], tei || koki);
+      const msgs = [], bad = new Set();
+      if (irai && tei && irai >= tei) { msgs.push(`見積依頼書の日付（${md(irai)}）が、見積提出日（${md(tei)}）より前になっていません。`); bad.add(kIrai); bad.add(kTei); }
+      if (tei && koki && tei >= koki) { msgs.push(`見積提出日（${md(tei)}）が、見積書工期の始まり（${md(koki)}）より前になっていません。`); bad.add(kTei); bad.add(kKoki); }
+      if (irai && !tei && koki && irai >= koki) { msgs.push(`見積依頼書の日付（${md(irai)}）が、見積書工期の始まり（${md(koki)}）より前になっていません。`); bad.add(kIrai); bad.add(kKoki); }
+      el.innerHTML = '';
+      if (msgs.length) el.append(h('b', null, '⚠ 日付の順番を確認してください（見積依頼書 ＜ 見積提出日 ＜ 見積書工期）'), ...msgs.map((t) => h('div', null, t)));
+      el.style.display = msgs.length ? '' : 'none';
+      [kIrai, kTei, kKoki].forEach((k) => document.querySelectorAll(`[data-key="${CSS.escape(k)}"], [data-dkey="${CSS.escape(k)}"]`).forEach((x) => x.classList.toggle('b4-warn', bad.has(k))));
+    };
+    requestAnimationFrame(draw); // 欄が画面に出てから赤枠を付ける
+    document.addEventListener('input', draw); document.addEventListener('change', draw);
+    return el;
+  } });
+
   // 業者名（左の表の上。幅は左の表とそろえる）と、最後の業者のページだけ業者の追加・削除のボタン（印刷しない）
   const vendorHead = (vn) => ({ type: 'custom', render: ({ h, field, values, setVal, rebuild }) => {
     const total = pageCount(values);
@@ -190,7 +229,8 @@
       vn === total ? h('div', { class: 'b4-pages no-print' },
         h('button', { type: 'button', onclick: () => add(false) }, '＋ 業者を追加'),
         h('button', { type: 'button', onclick: () => add(true), title: '○✕と見積の欄を前の業者からコピー（業者名は空欄）' }, '＋ コピーして追加'),
-        total > 1 ? h('button', { type: 'button', onclick: del }, `${total}社目を削除`) : null) : null);
+        total > 1 ? h('button', { type: 'button', onclick: del }, `${total}社目を削除`) : null) : null,
+      dateCheck(vn).render({ h, values }));
   } });
 
   const make = (no, kind, tate) => {
