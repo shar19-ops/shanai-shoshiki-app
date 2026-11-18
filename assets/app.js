@@ -1423,7 +1423,7 @@
       def.fileIO !== false ? h('button', { onclick: () => openFile(id), title: '保存したJSONファイルを読み込む' }, 'ファイルを開く') : null,
       def.fileIO !== false ? h('button', { onclick: () => saveFile(id), title: '入力内容をJSONファイルに保存（開いたファイルには上書き）' }, 'ファイルに保存') : null,
       def.selfStamp ? h('button', { onclick: () => openStampDialog() }, '押印設定') : null,
-      // attach：付属帳票を開くボタン（工-04 → 工-13 など。事業所・工番・件名を転記）
+      // attach：付属帳票を開くボタン（工-04 → 工-14 など。事業所・工番・件名を転記）
       ...(def.attach || []).map((a) => h('button', { class: 'tb-attach', onclick: () => openAttach(a), title: `付属帳票「${a.code} ${a.title}」を新しいタブで開きます（${Object.values(a.labels || {}).join('・')}を転記）` }, `付属：${a.code} ${a.title}`)),
       // printNote：印刷の前に注意を出す（両面印刷など。A3の帳票は用紙の注意を自動で出す。修正指示書）
       h('button', { class: 'primary', onclick: () => {
