@@ -21,7 +21,7 @@
   const C = [['T00', '塗装費', 800], ['U03', '天井切込費', 816], ['K01', 'ハツリ補修費', 840], ['K02', '掘削費', 850], ['K00', '撤去工費', 870],
     ['K16', '高所作業足場費', 889], ['K50', '工料', 910], ['K60', '雑工事費', 913], ['L00', '場内運搬費', 920], ['L01', '重量物運搬費', 921],
     ['K29', '外注費', 928, '外注社員・CADオペ'], ['K31', 'D式管理費', 929], null];
-  const D = [['O07', '設計料', 714], ['O10', '斡旋料', 717], ['O31', '研究開発費（1）', 776, '営業・工事7％'], ['O0x', '変更予備費（2）', 786, 'その他予備費'],
+  const D = [['O07', '設計料', 714], ['O10', '斡旋料', 717], ['O31', '研究開発費（1）', 776, '営業・工事7％（推定実行は自動）'], ['O0x', '変更予備費（2）', 786, 'その他予備費'],
     ['O2X', 'VE予備費', 788], ['O92', '諸経費', 992], ['O96', '法定福利費', 997]];
   // 区分（行の key の頭文字・縦の見出し・行）
   const SECS = [['a', 'A\n主\n要\n資\n材', A], ['b', 'B\n一\n般\n資\n材\n他', B], ['c', 'C\n労\n務', C], ['d', 'D\n副\n社\n長', D]];
@@ -32,6 +32,8 @@
   const secSum = (n, p, list, col) => rowKeys(p, list).reduce((t, k) => t + n(`${k}.${col}`), 0);
   const total = (n, col) => SECS.reduce((t, [p, , list]) => t + secSum(n, p, list, col), 0) + EXTRA.reduce((t, [k]) => t + n(`${k}.${col}`), 0);
   const blankZero = (v) => (v === 0 ? '' : v);
+  // 研究開発費（1）：契約金額×7％を1万円単位で切り上げ
+  const kenkyu = (keiyaku) => (keiyaku > 0 ? Math.ceil(keiyaku * 7 / 1000000) * 10000 : null);
   // 粗利（％）：元のExcelと同じく小数1位で切り捨て
   const arari = (keiyaku, x) => (keiyaku && x ? Math.trunc((keiyaku - x) / keiyaku * 1000) / 10 : null);
 
@@ -63,7 +65,10 @@
         tr.append(h('td', null, field({ key: `${key}.code`, align: 'center' })), h('td', null, field({ key: `${key}.name` })), h('td', null, field({ key: `${key}.jun`, align: 'center' })));
       }
       COLS.forEach((c) => {
-        const td = h('td', null, money(`${key}.${c}`));
+        // O31 研究開発費（1）の推定実行は自動：契約金額×7％、1万円単位で切り上げ（2026-11-18 ユーザー指定）
+        const td = key === 'd3' && c === 'sui'
+          ? h('td', { class: 'jk-auto', title: '契約金額×7％（1万円単位で切り上げ）' }, field({ key: `${key}.${c}`, type: 'calc', calc: (n) => kenkyu(n('keiyakuGaku')) }))
+          : h('td', null, money(`${key}.${c}`));
         if (key === 'g' && c === 'sui') { // 現場経費の推定実行：工-14 の合計を取り込むボタン（画面だけ）
           td.classList.add('jk-keihi');
           const inp = td.querySelector('input');
@@ -116,7 +121,7 @@
         ] }] },
       ] },
       table,
-      { type: 'notes', items: ['※ 現場経費の推定実行は 工-14 工事経費計算書の合計（「工-14から」で取り込み）。決定金額は推定実行Ａの合計。　元の様式：Ver.12（2018年1月23日改訂）'] },
+      { type: 'notes', items: ['※ 現場経費の推定実行は 工-14 工事経費計算書の合計（「工-14から」で取り込み）。研究開発費（1）の推定実行は契約金額×7％（1万円単位で切り上げ、自動）。決定金額は推定実行Ａの合計。　元の様式：Ver.12（2018年1月23日改訂）'] },
     ],
   };
 })();
