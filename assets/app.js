@@ -1358,6 +1358,32 @@
     fitTitles();
   }
 
+  // ---------- 付属帳票への転記 ----------
+  // 元の帳票の def.attach: [{ id, code, title, fill: { 付属の key: 元の key }, labels: { 付属の key: '工番' など } }]
+  // 付属帳票を form.html?id=<id>&v.<key>=<値> で開き、開いた側（applyFill）で入力欄に入れる（空の値は送らない）
+  function openAttach(a) {
+    const sp = new URLSearchParams({ id: a.id });
+    Object.entries(a.fill || {}).forEach(([to, from]) => { const v = values[from]; if (v != null && String(v).trim() !== '') sp.set('v.' + to, String(v)); });
+    window.open('form.html?' + sp.toString(), '_blank');
+  }
+  // URL の v.<key> を入力に入れる。付属帳票に別の工番などの入力が残っていれば、消去してから転記するか確かめる
+  function applyFill(id) {
+    const sp = new URLSearchParams(location.search);
+    const fill = {};
+    sp.forEach((v, k) => { if (k.startsWith('v.')) fill[k.slice(2)] = v; });
+    if (!Object.keys(fill).length) return;
+    const filled = (v) => v != null && String(v) !== '';
+    const differs = Object.keys(fill).filter((k) => filled(values[k]) && values[k] !== fill[k]);
+    if (differs.length) {
+      const show = differs.map((k) => `「${values[k]}」→「${fill[k]}」`).join('\n');
+      if (confirm(`この帳票には前の入力が残っています。\n${show}\n\nOK：前の入力をすべて消去して転記\nキャンセル：ほかの入力はそのまま、転記する欄だけ書き換え`)) values = {};
+    }
+    Object.assign(values, fill);
+    try { localStorage.setItem(storeKey, JSON.stringify(values)); } catch (e) { /* noop */ }
+    // 再読み込みで二重に転記しないよう、URL から v.<key> を消す
+    history.replaceState(null, '', 'form.html?id=' + encodeURIComponent(id));
+  }
+
   // ---------- 起動 ----------
   function boot() {
     const id = new URLSearchParams(location.search).get('id');
@@ -1373,6 +1399,7 @@
     }
     storeKey = STORE_PREFIX + id;
     try { values = JSON.parse(localStorage.getItem(storeKey) || '{}') || {}; } catch (e) { values = {}; }
+    applyFill(id);
 
     const paper = def.paper || 'A4', orient = def.orientation || 'portrait';
     const st = document.createElement('style');
@@ -1396,6 +1423,8 @@
       def.fileIO !== false ? h('button', { onclick: () => openFile(id), title: '保存したJSONファイルを読み込む' }, 'ファイルを開く') : null,
       def.fileIO !== false ? h('button', { onclick: () => saveFile(id), title: '入力内容をJSONファイルに保存（開いたファイルには上書き）' }, 'ファイルに保存') : null,
       def.selfStamp ? h('button', { onclick: () => openStampDialog() }, '押印設定') : null,
+      // attach：付属帳票を開くボタン（工-04 → 工-13 など。事業所・工番・件名を転記）
+      ...(def.attach || []).map((a) => h('button', { class: 'tb-attach', onclick: () => openAttach(a), title: `付属帳票「${a.code} ${a.title}」を新しいタブで開きます（${Object.values(a.labels || {}).join('・')}を転記）` }, `付属：${a.code} ${a.title}`)),
       // printNote：印刷の前に注意を出す（両面印刷など。A3の帳票は用紙の注意を自動で出す。修正指示書）
       h('button', { class: 'primary', onclick: () => {
         const note = def.printNote || (paper === 'A3' ? '用紙サイズは「A3」を選んで印刷してください。（A4のままだと縮小されたり、はみ出したりします）' : '');
