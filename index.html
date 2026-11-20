@@ -12,7 +12,7 @@
 <meta name="theme-color" content="#1f3f8f">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap">
-<link rel="stylesheet" href="assets/app.css?v=2026111715"> <!-- 版番号は form.html と同じ -->
+<link rel="stylesheet" href="assets/app.css?v=2026111716"> <!-- 版番号は form.html と同じ -->
 <style>
   .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
   .intro { background: #fff; border-radius: 6px; padding: 12px 16px; font-size: 10pt; line-height: 1.7; margin-bottom: 14px; }
@@ -94,7 +94,7 @@
   <input class="search" type="search" placeholder="帳票名・番号で絞り込み" id="q">
   <div class="list" id="list"></div>
 </div>
-<script src="forms/catalog.js?v=2026111715"></script>
+<script src="forms/catalog.js?v=2026111716"></script>
 <script>
   (function () {
     var list = document.getElementById('list');
@@ -116,7 +116,11 @@
     }
     if (!KINDS.some(function (k) { return k[0] === kind; })) kind = '一般';
     var SUB = { '一般': '社内書式アプリ　一般社内書類', '品質': '社内書式アプリ　品質記録様式', '標準': '社内書式アプリ　標準・基準', '伝票': '社内書式アプリ　伝票' };
-    var NO_CATS = { '伝票': true }; // 職種の絞り込みをしない種類（伝票は別アプリへのリンク）
+    // 職種の絞り込みをしない種類と、そのときの案内（伝票は別アプリへのリンク。標準・基準は 2026-11-20 ユーザー指定で部署タグなし）
+    var NO_CATS = {
+      '伝票': '伝票は別のアプリが新しいタブで開きます。「使い方」から操作の説明を見られます。',
+      '標準': '標準・基準の様式は、部署に関係なくすべて表示しています。'
+    };
     var hintEl = document.querySelector('.cats-hint');
     var HINT = hintEl.textContent;
     function renderKinds() {
@@ -142,7 +146,7 @@
     function renderCats() {
       catsEl.innerHTML = '';
       catsEl.style.display = NO_CATS[kind] ? 'none' : '';
-      hintEl.textContent = NO_CATS[kind] ? '伝票は別のアプリが新しいタブで開きます。「使い方」から操作の説明を見られます。' : HINT;
+      hintEl.textContent = NO_CATS[kind] || HINT;
       if (NO_CATS[kind]) return; // 選んでいた職種（cur）は覚えたまま。ほかのタブに戻ると元どおり
       if (cur && catsOf().indexOf(cur) < 0) cur = ''; // ほかの種類にしかない職種を選んでいたら「すべて」に戻す
       [''].concat(catsOf()).forEach(function (name) {
