@@ -1259,3 +1259,23 @@ table.grid.h14 tr.h14-cut td { border-bottom-style: dashed; }
 table.grid.h14-head td.h14-note { border: none; font-size: 8pt; color: #667; text-align: right; }
 @media print { table.grid.h14 tr.h14-h td { background: #eef1f7 !important; } table.grid.h14-head td.h14-note { visibility: hidden; } }
 
+
+/* ---------- 工-04 得意先・担当者マスタ（ツールバーの「マスタ」・候補の一覧。印刷には出ない） ---------- */
+.toolbar button.tb-master.warn { border-style: dashed; opacity: .9; }
+.mst-pop { position: fixed; z-index: 1000; max-height: 50vh; overflow-y: auto; background: #fff; color: #222;
+  border: 1px solid #8a94b8; border-radius: 4px; box-shadow: 0 4px 14px rgba(0,0,0,.18); font-size: 10pt; }
+.mst-pop .mst-row { display: flex; gap: 10px; padding: 4px 10px; cursor: pointer; white-space: nowrap; }
+.mst-pop .mst-row:hover, .mst-pop .mst-row.on { background: #e3e9f8; }
+.mst-pop .mst-cd { min-width: 6.5em; color: #556; font-variant-numeric: tabular-nums; }
+.mst-pop .mst-more { position: sticky; bottom: 0; background: #fff; padding: 4px 10px; font-size: 8.5pt; color: #778; border-top: 1px solid #e3e6ee; }
+.mst-panel { position: fixed; z-index: 1001; width: 340px; max-width: calc(100vw - 16px); background: #fff; color: #222;
+  border: 1px solid #8a94b8; border-radius: 6px; box-shadow: 0 6px 20px rgba(0,0,0,.2); padding: 12px 14px; font-size: 10pt; }
+.mst-panel .mst-h { font-weight: bold; margin-bottom: 6px; }
+.mst-panel .mst-st { line-height: 1.6; }
+.mst-panel .mst-st.warn { color: #b3261e; }
+.mst-panel .mst-btns { display: flex; gap: 8px; margin: 10px 0; }
+.mst-panel .mst-btns button { font: inherit; padding: 5px 12px; border: 1px solid #8a94b8; border-radius: 4px; background: #fff; cursor: pointer; }
+.mst-panel .mst-btns button.primary { background: var(--toolbar-bg, #1f3f8f); color: #fff; border-color: transparent; }
+.mst-panel .mst-btns button:disabled { opacity: .5; cursor: default; }
+.mst-panel .mst-note { font-size: 8.5pt; color: #667; line-height: 1.5; }
+@media print { .mst-pop, .mst-panel { display: none !important; } }
