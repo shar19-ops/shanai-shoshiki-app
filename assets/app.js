@@ -226,6 +226,7 @@
         class: 'inp' + (f.plain ? ' plain' : ''), rows: lines,
         style: f.plain ? '' : `height:calc(${lines} * 7mm + 2mm)`,
         placeholder: f.placeholder || '',
+        maxlength: f.maxlength || null, // 文字数の上限（工-11 の件名など）
         oninput: (e) => setVal(key, e.target.value),
       });
       el.value = v;
