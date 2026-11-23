@@ -58,7 +58,9 @@
     blocks: [
       // 1項目＝6列（ラベル3列＋入力3列）を基本単位にそろえる。件名・発注先名・工期は幅広
       { type: 'grid', lw: 3, rows: [
-        [{ label: '事業所', key: 'officeCd', type: 'select', options: LISTS.officeCodes, span: 6 }, { label: '工　番', key: 'koban', span: 6 }, { label: '件　名', key: 'subject', span: 12 }],
+        // 工番は12桁まで（入りきらなければ文字を小さく）。件名は30文字まで、長いときは小さく、それでも入らなければ2段に（2026-11-24 ユーザー指定）
+        [{ label: '事業所', key: 'officeCd', type: 'select', options: LISTS.officeCodes, span: 6 }, { label: '工　番', key: 'koban', maxlength: 12, fit: true, span: 6 },
+          { label: '件　名', key: 'subject', type: 'textarea', plain: true, lines: 1, fit2: true, maxlength: 30, placeholder: '30文字以内', span: 12 }],
         [{ label: '発注先CD', key: 'vendorCd', span: 6 }, { label: '発注先名', key: 'vendor', span: 18 }],
         // 縦は幅が狭いので、工期とインボイス登録番号を1行に、残りの4項目を2行に組み替える
         ...(portrait ? [

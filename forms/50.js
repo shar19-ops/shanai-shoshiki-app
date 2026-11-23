@@ -31,6 +31,9 @@
     ['後片付け', [['完了検査、竣工検査・引き渡し前の後片付けや清掃、', '竣工後の初期点検に要する時間']]],
   ];
   const LEGEND = ['〇：条件を明示し、工期に反映済　　△：条件を一部明示し、工期に反映済', '×：条件が明示できず、工期に未反映　　－：該当工事で対象外'];
+  // 工事名称は30文字まで、契約時確認（業者名・担当者）とも、長いときは1行のまま小さく、それでも入らなければ2段に（2026-11-24 ユーザー指定）
+  const KOJI = { key: 'koji', type: 'textarea', plain: true, lines: 1, fit2: true, maxlength: 30, placeholder: '30文字以内' };
+  const KEIYAKU = (key, placeholder) => ({ key, type: 'textarea', plain: true, lines: 1, fit2: true, align: 'center', placeholder });
   const NOTE = '※見積依頼書/注文書付属書 （労務・材料労務）発行時に、本書を添付する。';
   const CAP1 = '1⃣　工期全般にわたって考慮すべき事項の例';
   const CAP2 = '2⃣　工程別に考慮すべき事項の例';
@@ -99,8 +102,8 @@
 
     const right = h('div', { class: 'k50-side' },
       h('table', { class: 'k50-tbl k50-top' }, colg(RIGHT), h('tbody', null,
-        h('tr', null, td({ class: 'k50-th', colspan: 2 }, '契約時確認'), td({ class: 'k50-in', colspan: 2 }, field({ key: 'keiyaku1', align: 'center' })), td({ class: 'k50-in', colspan: 2 }, field({ key: 'keiyaku2', align: 'center' }))),
-        h('tr', null, td({ class: 'k50-th', colspan: 2 }, '工事名称'), td({ class: 'k50-in k50-white', colspan: 4 }, field({ key: 'koji' }))))),
+        h('tr', null, td({ class: 'k50-th', colspan: 2 }, '契約時確認'), td({ class: 'k50-in', colspan: 2 }, field(KEIYAKU('keiyaku1'))), td({ class: 'k50-in', colspan: 2 }, field(KEIYAKU('keiyaku2')))),
+        h('tr', null, td({ class: 'k50-th', colspan: 2 }, '工事名称'), td({ class: 'k50-in k50-white', colspan: 4 }, field(KOJI))))),
       h('table', { class: 'k50-tbl k50-cap' }, colg(RIGHT), h('tbody', null, h('tr', null, td({ colspan: 6 }, CAP2)))),
       itemsTable(RIGHT, RIGHT_ITEMS, 'R', others),
       h('div', { class: 'k50-note' }, NOTE));
@@ -161,8 +164,8 @@
   const tateHead = { type: 'custom', render: ({ h, field }) => h('div', { class: 'b4-head' },
     h('table', { class: 'grid b4-vendor k50v-top' }, h('tbody', null,
       // 契約時確認は 確認先・担当者 を書く欄。空欄のときだけ薄いグレーで案内（画面だけ。印刷には出ない。2026-11-10 ユーザー指定）
-      h('tr', null, h('th', null, '契約時確認'), h('td', null, field({ key: 'keiyaku1', align: 'center', placeholder: '確認先' })), h('td', null, field({ key: 'keiyaku2', align: 'center', placeholder: '担当者' }))),
-      h('tr', null, h('th', null, '工事名称'), h('td', { colspan: 2 }, field({ key: 'koji' })))))) };
+      h('tr', null, h('th', null, '契約時確認'), h('td', null, field(KEIYAKU('keiyaku1', '確認先'))), h('td', null, field(KEIYAKU('keiyaku2', '担当者')))),
+      h('tr', null, h('th', null, '工事名称'), h('td', { colspan: 2 }, field(KOJI)))))) };
 
   FORM_DEFS['50v'] = {
     code: '購-08', hokan: '経理部', title: '工期設定チェックリスト',
