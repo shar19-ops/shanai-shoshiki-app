@@ -10,7 +10,7 @@
   //   f：'text'（文字）・'date'・'range'（期間）・'lines'（見出しの下に書く欄）・'kyuko'（休工日）・'kensa'（検査の欄）
   const LEFT = (kind) => [
     ['工事番号', [{ d: '○', f: 'text', key: 'koban', max: 12 }]],
-    ['工事名称', [{ d: '○', f: 'text', key: 'kojiName' }]],
+    ['工事名称', [{ d: '○', f: 'text', key: 'kojiName', max: 30, fit2: true, ph: '30文字以内' }]],
     ['施工場所', [{ d: '○', f: 'text', key: 'basho' }]],
     ['工事命令書工期', [{ d: '○', f: 'range', key: 'meirei' }]],
     // 工期設定確認：休工日は 4週8休・4週8閉所・□（自由入力）。下の空欄の行は除く（修正指示書）
@@ -131,7 +131,10 @@
       const cls = 'b4-txt' + (it.red ? ' red' : '');
       const k = (x) => pk(vn, x);
       switch (it.f) {
-        case 'text': return h('td', { class: 'b4-in' }, field({ key: k(it.key), maxlength: it.max }));
+        // fit2：長いときは1行のまま小さく、それでも入らなければ2段に（工事名称。2026-11-24 ユーザー指定）
+        case 'text': return h('td', { class: 'b4-in' }, field(it.fit2
+          ? { key: k(it.key), type: 'textarea', plain: true, lines: 1, fit2: true, maxlength: it.max, placeholder: it.ph }
+          : { key: k(it.key), maxlength: it.max }));
         case 'date': return h('td', { class: 'b4-in' }, field({ key: k(it.key), type: 'date', jp: true }));
         case 'range': return h('td', { class: 'b4-in' }, field({ key: k(it.key), key2: k(it.key + 'To'), type: 'daterange', jp: true }));
         case 'lines': return h('td', { class: cls + ' b4-lines' }, h('div', { class: 'b4-inline' }, h('span', { class: 'b4-lt' }, it.t), field({ key: k(it.key) })));
