@@ -223,7 +223,7 @@
     } else if (type === 'textarea') {
       const lines = f.lines || 4;
       el = h('textarea', {
-        class: 'inp' + (f.plain ? ' plain' : ''), rows: lines,
+        class: 'inp' + (f.plain ? ' plain' : '') + (f.align === 'center' ? ' center' : ''), rows: lines,
         style: f.plain ? '' : `height:calc(${lines} * 7mm + 2mm)`,
         placeholder: f.placeholder || '',
         maxlength: f.maxlength || null, // 文字数の上限（工-11 の件名など）
