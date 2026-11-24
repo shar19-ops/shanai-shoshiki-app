@@ -1,5 +1,5 @@
 // 本-品質-A0047 現場巡回検査報告書（品質記録様式。元Excel：本ー品質ーA0047 現場巡回検査報告書.xlsx、A4縦1ページ）
-// ISOの要求事項【8.2.3】はヘッダーの番号の後ろ（ユーザー指定）。監視及び測定項目（O・Q・C・D・S・E・I の31項目）の合否はクリックで 合 → 否 → 空欄
+// ISOの要求事項【8.2.3】はヘッダーの番号の後ろ（ユーザー指定）。監視及び測定項目（O・Q・C・D・S・E・I の31項目）の合否はクリックで 合 → 否 → ／（対象外。2026-11-24 ユーザー指定） → 空欄
 // 押印欄はヘッダーの右上（ユーザー指定。元の様式の最下段の空欄は削除）。8つを4つずつ2段、日付付き。巡回検査者（発行）はクリックでデート印（日付は検査日）
 (function () {
   const ITEMS = [
@@ -16,7 +16,7 @@
     ['E', ['環境目標を「環境目標（本-品質-A0130）」で設定し、実施しているか']],
     ['I', ['情報セキュリティ対策（PC,外付HDDにセキュリティワイヤー装着,PCは社外持出禁止、重要書類・電子媒体は施錠管理）']],
   ];
-  const MARKS = ['', '合', '否'];
+  const MARKS = ['', '合', '否', '／']; // ／＝対象外
 
   const list = { type: 'custom', render: ({ h, field, values, setVal }) => {
     const tb = h('tbody', null, h('tr', null, h('th', { colspan: 2 }, '監　視　及　び　測　定　項　目'), h('th', null, '合否'), h('th', null, '否　の　場　合　の　処　置')));
@@ -24,8 +24,8 @@
     ITEMS.forEach(([cat, items]) => items.forEach((text, i) => {
       n++;
       const key = `q${n}`;
-      // 合否：クリックで 合 → 否 → 空欄
-      const btn = h('button', { type: 'button', class: 'inp mark-btn h47-mark', title: 'クリックで 合 → 否 → 空欄' }, values[key] || '');
+      // 合否：クリックで 合 → 否 → ／（対象外） → 空欄
+      const btn = h('button', { type: 'button', class: 'inp mark-btn h47-mark', title: 'クリックで 合 → 否 → ／（対象外） → 空欄' }, values[key] || '');
       btn.addEventListener('click', () => {
         const next = MARKS[(MARKS.indexOf(values[key] || '') + 1) % MARKS.length];
         setVal(key, next); btn.textContent = next;
@@ -73,7 +73,7 @@
       ] },
       ] },
       { type: 'notes', items: [
-        '1.　合否欄は、合格の場合は合、不合格の場合は否を記入し、否の場合は処置欄に処置を記載すること。',
+        '1.　合否欄は、合格の場合は合、不合格の場合は否、対象外の場合は／を記入し、否の場合は処置欄に処置を記載すること。',
         '2.　作業所への指示は、「不適合処理報告書(本-品質-A0018)」及び/又は「検査指摘事項･確認書(本-品質-A0020)」に記載して、作業所長に交付する。そのコピーを本票に添付すること。',
       ] },
     ],
