@@ -85,6 +85,9 @@
   // ---------- 入力部品 ----------
   // f: {key, type, options, placeholder, unit, align, lines, ...}
   function field(f) {
+    // 件名（key: 'subject'）は全帳票で、長いときは1行のまま小さく、それでも入らなければ2段に（fit2。2026-11-25 ユーザー指定）
+    //   type を指定した欄（2行の textarea など）はそのまま。fit2: false で外せる
+    if (f.key === 'subject' && !f.type && f.fit2 !== false) f = { ...f, type: 'textarea', plain: true, lines: 1, fit2: true };
     const key = f.key;
     if (values[key] == null && f.default != null) values[key] = f.default;
     // 事業所コードの欄：前のコード（010 など）で保存された下書き・JSONは新しいコードに置き換える（2026-11-12）
@@ -238,6 +241,9 @@
         const over = () => ta.scrollWidth > ta.clientWidth + 1 || ta.scrollHeight > ta.clientHeight + 1;
         const fit = () => {
           ta.style.fontSize = ''; ta.style.whiteSpace = 'pre'; ta.style.paddingTop = '';
+          // 行の高さを欄の高さに合わせる前に、いったん元に戻してから測る（前に付けた行の高さで欄が押し広げられ、
+          //   それをまた測って…と伸び続けるのを防ぐ。押印欄の横に引き伸ばされる表の件名など。2026-11-25）
+          ta.style.lineHeight = '1';
           ta.style.lineHeight = ta.clientHeight ? `${ta.clientHeight}px` : '';
           ta.classList.remove('two');
           if (!ta.value || !ta.clientWidth) return;

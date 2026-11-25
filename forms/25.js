@@ -7,7 +7,7 @@ FORM_DEFS['25'] = {
       type: 'table', key: 'rows', rows: 12, rowH: 7.2,
       columns: [
         { label: 'No', key: 'no', w: 3, rowNo: true },
-        { label: '件　名', key: 'subject', w: 14.5 },
+        { label: '件　名', key: 'subject', w: 14.5, type: 'textarea', plain: true, lines: 1, fit2: true }, // 長いときは小さく → 2段（2026-11-25 ユーザー指定）
         { label: '工番', key: 'koban', w: 8, align: 'center' },
         { label: '契約金額', key: 'amount', w: 8, type: 'money' },
         { label: '設計契約先', key: 'partner', w: 8 },
