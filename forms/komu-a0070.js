@@ -47,7 +47,7 @@
           { label: '建築会社', ...fit2({ key: 'kenchiku' }), span: 19 }],
         [{ label: '部　署', key: 'dept', span: 16 }, { label: '現場代理人', key: 'dairinin', fit: true, span: 13 }, { label: '設計事務所', ...fit2({ key: 'sekkei' }), span: 19 }],
         [{ label: '監理技術者・主任技術者', key: 'gijutsusha', lw: 10, span: 29 }, { label: '施　主', ...fit2({ key: 'seshu' }), span: 19 }],
-        [{ label: '現場係員', key: 'kakari', span: 29 }, { label: '概　要', ...fit2({ key: 'gaiyo' }), span: 19 }],
+        [{ label: '現場係員', ...fit2({ key: 'kakari' }), span: 29 }, { label: '概　要', ...fit2({ key: 'gaiyo' }), span: 19 }],
         [{ label: '工　期', key: 'kFrom', key2: 'kTo', type: 'daterange', span: 29 },
           { label: '実行予算に対する\n現在の原価の率', key: 'genkaRitsu', type: 'number', unit: '%', lw: 9, span: 19 }],
         [{ label: '工事班', key: 'kojihan', span: 48 }],
@@ -75,14 +75,14 @@
           { key: 'lvP', prefix: '電力', span: 13 }, { key: 'pvP', prefix: '電力', span: 13 }],
         [{ key: 'lvL', prefix: '電灯', span: 13 }, { key: 'pvL', prefix: '電灯', span: 13 }],
         [{ label: '', span: 8 }, ...FIRE.map((t) => ({ label: t, span: 3 })),
-          // 追加の見出しは Enter で改行できる（長いときは小さく。2026-11-25 ユーザー指定）
-          ...[6, 7, 8, 9].map((n) => fit2({ key: `fireHead${n}`, align: 'center', span: 3 })),
+          // 追加の見出しは Enter で改行できる（長いときは小さく、2段でも縦は中央。2026-11-25 ユーザー指定）
+          ...[6, 7, 8, 9].map((n) => fit2({ key: `fireHead${n}`, align: 'center', vcenter: true, span: 3 })),
           { label: '', span: 5 }, { label: '主任\n技術者', span: 4 }, { label: '保安\n規程', span: 4 }],
         ...[['plan', '消防計画届'], ['set', '消防設置届']].map(([p, label], r) => [
-          // 日付などが入りきらないときは文字を小さく（2026-11-25 ユーザー指定）
-          { label, span: 8 }, ...Array.from({ length: 9 }, (_, i) => ({ key: `fire_${p}${i + 1}`, align: 'center', fit: true, span: 3 })),
+          // 日付（予定日 26/11/25 など）が入りきらないときは文字を小さく（下限 4pt。2026-11-25 ユーザー指定）
+          { label, span: 8 }, ...Array.from({ length: 9 }, (_, i) => ({ key: `fire_${p}${i + 1}`, align: 'center', fit: true, fitMin: 4, span: 3 })),
           ...(r === 0 ? [{ label: '産業保安\n監督部', span: 5, rs: 2 }] : []),
-          { key: `hoan_${p}1`, align: 'center', fit: true, span: 4 }, { key: `hoan_${p}2`, align: 'center', fit: true, span: 4 }]),
+          { key: `hoan_${p}1`, align: 'center', fit: true, fitMin: 4, span: 4 }, { key: `hoan_${p}2`, align: 'center', fit: true, fitMin: 4, span: 4 }]),
         [{ text: '消防設備と産業保安監督部について、該当する項目がない場合は、空欄に記入すること。', note: true, span: 48 }],
       ] },
       { type: 'free', label: '現状の問題点', key: 'mondai', lines: 2 },
