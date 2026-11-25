@@ -895,7 +895,7 @@ table.grid.h47 td.h47-item { text-align: left; padding: .2mm 1.2mm; line-height:
 table.grid.h47 .inp { min-height: 0; font-size: 8pt; }
 table.grid.h47 .h47-mark { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; padding: 0; }
 /* 建築現況・電気設備現況・所感の高さ（ユーザー指定で広めに。1枚に収まる範囲） */
-.sheet.h47 table.grid:not(.h47) textarea { height: 20mm !important; }
+.sheet.h47 table.grid:not(.h47) textarea:not(.fit2) { height: 20mm !important; } /* 件名（fit2）は除く（2026-11-25） */
 /* 本-品質-A0051 個別工事施工プロセス管理表（A3横）：12列の表。■□はクリックで切り替え */
 table.grid.h51 th { font-size: 8pt; line-height: 1.25; letter-spacing: .05em; padding: 0 .5mm; }
 table.grid.h51 td { font-size: 7.4pt; line-height: 1.3; vertical-align: top; text-align: left; padding: .6mm .8mm; }
