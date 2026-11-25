@@ -1040,7 +1040,10 @@ table.grid td.a14-ym .inp { font-size: 12pt; font-weight: bold; }
 /* 本-工務-A0070：月度は大きめの太字（修正指示書） */
 .sheet.k70 .f-meta .m-item:first-child, .sheet.k70 .f-meta .m-item:first-child .inp, .sheet.k70 .f-meta .m-item:first-child .pv { font-size: 13pt; font-weight: bold; }
 /* 本-工務-A0070：届出書類の日付・追加の見出しは欄が狭いので、左右の余白を詰めて文字を大きく残す（2026-11-25 ユーザー指定） */
-.sheet.k70 .inp[data-key^="fire_"], .sheet.k70 .inp[data-key^="hoan_"], .sheet.k70 .inp[data-key^="fireHead"] { padding-left: .3mm; padding-right: .3mm; }
+.sheet.k70 .inp[data-key^="fire_"], .sheet.k70 .inp[data-key^="hoan_"], .sheet.k70 .inp[data-key^="fireHead"] { padding-left: .5mm; padding-right: .5mm; }
+/* 入力欄どうしが隣り合うと、両側の入力欄（地の色）が罫線を半分ずつ覆って罫線が消えるので、入力欄を罫線の内側に収める（2026-11-25 ユーザー指摘） */
+.sheet.k70 td:has(> .inp[data-key^="fire_"]), .sheet.k70 td:has(> .inp[data-key^="hoan_"]), .sheet.k70 td:has(> .inp[data-key^="fireHead"]) { padding: 1px; }
+@media screen { .sheet.k70 td:has(> .inp[data-key^="fire_"]), .sheet.k70 td:has(> .inp[data-key^="hoan_"]), .sheet.k70 td:has(> .inp[data-key^="fireHead"]) { background: var(--input-bg); } } /* すき間も入力欄の色に（印刷は白） */
 /* 般-50：確認者の日付と押印欄（発行）の間の横罫線をなくす（修正指示書） */
 .k50-tbl td.k50-conf-d { border-bottom-style: hidden; } /* 罫線をつなげた表なので hidden（none だと隣の線が勝つ） */
 .k50-tbl td.k50-conf-s { border-top-style: hidden; }
