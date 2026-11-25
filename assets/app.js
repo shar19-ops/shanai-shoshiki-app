@@ -294,16 +294,21 @@
         } : null,
       });
       // fit：欄に入りきらない文字は、入りきるまで文字を小さくする（下限 5.5pt。工-02 日報の費用明細など。2026-11-13 ユーザー指定）
-      if (f.fit) {
+      //   2026-11-25 ユーザー指定：文字の欄（数字・金額以外）は指定がなくても自動で fit。入りきるあいだは今の大きさのまま。fit: false で外せる
+      if (f.fit ?? !isNum) {
         const input = el;
-        const fit = () => {
-          input.style.fontSize = '';
-          if (!input.value || !input.clientWidth) return;
+        let done = null; // 前に合わせたときの値。同じ値なら測り直さない（欄が多い帳票で、入力のたびに全部の欄を測って重くならないように）
+        const fit = (force) => {
+          if (force !== true && input.value === done) return;
+          if (!input.clientWidth) { done = null; return; } // 見えていない欄（隠れたページなど）は次の機会に
+          done = input.value;
+          if (input.style.fontSize) input.style.fontSize = '';
+          if (!input.value || input.scrollWidth <= input.clientWidth + 1) return; // 入りきるならそのまま
           let pt = parseFloat(getComputedStyle(input).fontSize) * 0.75; // px → pt
           while (input.scrollWidth > input.clientWidth + 1 && pt > (f.fitMin || 5.5)) { pt -= 0.25; input.style.fontSize = pt + 'pt'; } // fitMin：下限を変える（狭い日付欄など）
         };
-        input.addEventListener('input', fit);
-        input.addEventListener('blur', () => { input.scrollLeft = 0; fit(); });
+        input.addEventListener('input', () => fit(true));
+        input.addEventListener('blur', () => { input.scrollLeft = 0; fit(true); });
         calcs.push(() => requestAnimationFrame(fit)); // 開いたとき・貼り付けやコピーで値が変わったとき
         requestAnimationFrame(fit);
       }
