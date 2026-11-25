@@ -237,7 +237,8 @@
         ta.classList.add('fit2');
         const over = () => ta.scrollWidth > ta.clientWidth + 1 || ta.scrollHeight > ta.clientHeight + 1;
         const fit = () => {
-          ta.style.fontSize = ''; ta.style.whiteSpace = 'pre'; ta.style.lineHeight = ta.clientHeight ? `${ta.clientHeight}px` : '';
+          ta.style.fontSize = ''; ta.style.whiteSpace = 'pre'; ta.style.paddingTop = '';
+          ta.style.lineHeight = ta.clientHeight ? `${ta.clientHeight}px` : '';
           ta.classList.remove('two');
           if (!ta.value || !ta.clientWidth) return;
           let pt = parseFloat(getComputedStyle(ta).fontSize) * 0.75; // px → pt
@@ -247,6 +248,14 @@
           }
           ta.classList.add('two'); ta.style.whiteSpace = 'pre-wrap'; ta.style.lineHeight = '1.12';
           while (over() && pt > 4.5) { pt -= 0.25; ta.style.fontSize = pt + 'pt'; }
+          // vcenter：2段のときも縦の中央に（欄が高いとき上に寄らないように。本-工務-A0070 の追加の見出し。2026-11-25 ユーザー指定）
+          if (f.vcenter) {
+            const H = ta.clientHeight;
+            ta.style.height = '0px';
+            const ch = ta.scrollHeight; // 文字の高さ（上下の余白を含む）
+            ta.style.height = '';
+            if (H > ch) ta.style.paddingTop = `calc(.1mm + ${(H - ch) / 2}px)`;
+          }
           ta.scrollTop = 0;
         };
         ta.addEventListener('input', fit);
@@ -285,7 +294,7 @@
           input.style.fontSize = '';
           if (!input.value || !input.clientWidth) return;
           let pt = parseFloat(getComputedStyle(input).fontSize) * 0.75; // px → pt
-          while (input.scrollWidth > input.clientWidth + 1 && pt > 5.5) { pt -= 0.25; input.style.fontSize = pt + 'pt'; }
+          while (input.scrollWidth > input.clientWidth + 1 && pt > (f.fitMin || 5.5)) { pt -= 0.25; input.style.fontSize = pt + 'pt'; } // fitMin：下限を変える（狭い日付欄など）
         };
         input.addEventListener('input', fit);
         input.addEventListener('blur', () => { input.scrollLeft = 0; fit(); });
