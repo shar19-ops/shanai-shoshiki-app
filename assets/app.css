@@ -1044,6 +1044,9 @@ table.grid td.a14-ym .inp { font-size: 12pt; font-weight: bold; }
 /* 入力欄どうしが隣り合うと、両側の入力欄（地の色）が罫線を半分ずつ覆って罫線が消えるので、入力欄を罫線の内側に収める（2026-11-25 ユーザー指摘） */
 .sheet.k70 td:has(> .inp[data-key^="fire_"]), .sheet.k70 td:has(> .inp[data-key^="hoan_"]), .sheet.k70 td:has(> .inp[data-key^="fireHead"]) { padding: 1px; }
 @media screen { .sheet.k70 td:has(> .inp[data-key^="fire_"]), .sheet.k70 td:has(> .inp[data-key^="hoan_"]), .sheet.k70 td:has(> .inp[data-key^="fireHead"]) { background: var(--input-bg); } } /* すき間も入力欄の色に（印刷は白） */
+/* 画面を拡大・縮小すると、隣り合う入力欄の間の 1px の罫線が地の色に塗りつぶされて見えなくなるので、
+   画面だけ罫線と同じ線を outline で手前に重ねて描く（印刷は罫線が出るのでそのまま。2026-11-25 ユーザー指摘） */
+@media screen { .sheet.k70 td:has(> .inp[data-key^="fire_"]), .sheet.k70 td:has(> .inp[data-key^="hoan_"]), .sheet.k70 td:has(> .inp[data-key^="fireHead"]) { outline: 1px solid var(--line); outline-offset: -.5px; } }
 /* 般-50：確認者の日付と押印欄（発行）の間の横罫線をなくす（修正指示書） */
 .k50-tbl td.k50-conf-d { border-bottom-style: hidden; } /* 罫線をつなげた表なので hidden（none だと隣の線が勝つ） */
 .k50-tbl td.k50-conf-s { border-top-style: hidden; }
