@@ -11,6 +11,8 @@ FORM_DEFS['04'] = {
     { boxes: ['承認', '確認', '確認', '要求者'] },
   ],
   blocks: [
+    // 入力画面だけの注意書き（印刷には出ない。2026-11-25 ユーザー指定）
+    { type: 'custom', render: ({ h }) => h('div', { class: 'no-print scr-note' }, '通勤用定期券購入依頼は「', h('a', { href: 'form.html?id=53', target: '_blank', title: '共-01 通勤用定期券購入申請書を新しいタブで開きます' }, '共-01　通勤用定期券購入申請書'), '」で申請してください。') },
     {
       type: 'table', key: 'items', rows: 15,
       columns: [

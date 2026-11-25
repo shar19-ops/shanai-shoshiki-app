@@ -1290,3 +1290,7 @@ table.grid.h14-head td.h14-note { border: none; font-size: 8pt; color: #667; tex
 .mst-panel .mst-btns button:disabled { opacity: .5; cursor: default; }
 .mst-panel .mst-note { font-size: 8.5pt; color: #667; line-height: 1.5; }
 @media print { .mst-pop, .mst-panel { display: none !important; } }
+
+/* 入力画面だけの注意書き（印刷には出ない。購-01 の定期券の案内など。2026-11-25） */
+.scr-note { margin: 0 0 2mm; padding: 2mm 3mm; border: 1px solid #f0b46a; border-left: 4px solid #e8892b; border-radius: 4px; background: #fff6ea; color: #7a3d00; font-size: 10pt; line-height: 1.5; }
+.scr-note a { color: #b35400; font-weight: bold; }
