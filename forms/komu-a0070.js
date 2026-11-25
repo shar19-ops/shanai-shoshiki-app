@@ -7,7 +7,7 @@
     '安全管理・無事故無災害について', '労務管理について', '営業の協力度について', '購買の協力度について', '協力工事班の協力度について'];
   const ABCD = ['A', 'B', 'C', 'D'];
   const FIRE = ['自火報', '誘導灯', '非常\nコンセント', '変電', '発電']; // 消防の届出（残り4列は項目名を書ける）
-  // 長い文字は1行のまま小さく、それでも入らなければ2段に（所在地・契約先などの右の列・概要。2026-11-25 ユーザー指定）
+  // 長い文字は1行のまま小さく、それでも入らなければ2段に（件名・所在地・契約先などの右の列・概要・現場係員・工事班。2026-11-25 ユーザー指定）
   const fit2 = (o) => ({ type: 'textarea', plain: true, lines: 1, fit2: true, ...o });
   // 翌月分を作るときに空にする欄（月ごとに書く内容）
   const MONTHLY = ['jokyo', 'mondai', 'shijiTanto', 'shijiKobai'];
@@ -41,7 +41,7 @@
       // 48分割。どの行も見出し5列・区切りを16列目と29列目にそろえる
       // 2026-11-25 ユーザー指定：現場TEL・出来高・現場代理人の列を狭く（16→13）、契約先・建築会社・設計事務所・施主・概要の列を広く（16→19）
       { type: 'grid', cols: 48, lw: 5, rowH: 5, dense: true, rows: [
-        [{ label: '工　番', key: 'koban', maxlength: 12, span: 16 }, { label: '件　名', key: 'subject', span: 32 }],
+        [{ label: '工　番', key: 'koban', maxlength: 12, span: 16 }, { label: '件　名', ...fit2({ key: 'subject' }), span: 32 }],
         [{ label: '所在地', ...fit2({ key: 'addr' }), span: 16 }, { label: '現場TEL', key: 'tel', type: 'tel', fit: true, span: 13 }, { label: '契約先', ...fit2({ key: 'keiyakusaki' }), span: 19 }],
         [{ label: '契約金額', key: 'keiyaku', type: 'money', unit: '円', span: 16 }, { label: '出来高', key: 'dekidaka', type: 'number', unit: '%', span: 13 },
           { label: '建築会社', ...fit2({ key: 'kenchiku' }), span: 19 }],
@@ -50,7 +50,7 @@
         [{ label: '現場係員', ...fit2({ key: 'kakari' }), span: 29 }, { label: '概　要', ...fit2({ key: 'gaiyo' }), span: 19 }],
         [{ label: '工　期', key: 'kFrom', key2: 'kTo', type: 'daterange', span: 29 },
           { label: '実行予算に対する\n現在の原価の率', key: 'genkaRitsu', type: 'number', unit: '%', lw: 9, span: 19 }],
-        [{ label: '工事班', key: 'kojihan', span: 48 }],
+        [{ label: '工事班', ...fit2({ key: 'kojihan' }), span: 48 }],
       ] },
       // 中間での自己評価：今月（A〜D）・前月・コメント
       { type: 'grid', cols: 48, rowH: 4.6, dense: true, rows: [
