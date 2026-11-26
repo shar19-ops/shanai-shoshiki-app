@@ -1005,6 +1005,10 @@
   const SK_SYMS = [['①', '①当方'], ['②', '②相手車'], ['✖', '✖衝突場所'], ['♀', '♀人'], ['▽', '▽一時停止'], ['signal', '信号']];
   // 図形・文字の色（color。省略は黒）。色を選んでから置くか、置いた図形を選んで色を押すと変わる（2026-11-26 ユーザー指定）
   const SK_COLORS = [['#000000', '黒'], ['#d40000', '赤'], ['#0047d4', '青'], ['#008a3e', '緑']];
+  // 線種（dash。省略は実線）。線・矢印・四角・丸・枠文字の枠に使う（2026-11-26 ユーザー指定）。間隔は mm（線の太さ 0.5mm）
+  const SK_DASHES = [['', '実線', null], ['dash', '破線', '2 1.2'], ['dot', '点線', '0.05 1'], ['chain', '一点鎖線', '3 1 0.05 1']];
+  const SK_DASHABLE = ['line', 'arrow', 'rect', 'ellipse', 'text'];
+  const dashAttrs = (d) => { const x = SK_DASHES.find((s) => s[0] === d); return x && x[2] ? { 'stroke-dasharray': x[2], 'stroke-linecap': 'round' } : {}; };
   function sketchBlock(b) {
     const key = b.key, bgKey = key + '__bg';
     const NS = 'http://www.w3.org/2000/svg';
@@ -1046,7 +1050,7 @@
       items.forEach((it, i) => {
         const g = S('g', { class: 'sk-item' + (i === sel ? ' on' : '') });
         const col = it.color || '#000000';
-        const line = { stroke: col, 'stroke-width': 0.5, fill: 'none' };
+        const line = { stroke: col, 'stroke-width': 0.5, fill: 'none', ...(SK_DASHABLE.includes(it.t) ? dashAttrs(it.dash) : {}) };
         if (it.t === 'line' || it.t === 'arrow') {
           g.append(S('line', { x1: it.x1, y1: it.y1, x2: it.x2, y2: it.y2, ...line, 'marker-end': it.t === 'arrow' ? `url(#${arrowId(col)})` : null }));
           g.append(S('line', { x1: it.x1, y1: it.y1, x2: it.x2, y2: it.y2, stroke: 'transparent', 'stroke-width': 4, ...hit(i) }));
@@ -1094,28 +1098,51 @@
     }
 
     let curColor = '#000000'; // これから置く図形・文字の色
-    function add(it) { if (curColor !== '#000000') it.color = curColor; items.push(it); sel = items.length - 1; commit(); draw(); area.focus(); }
-    const colorBtns = [];
-    const shownColor = () => (selected() && selected().t !== 'img' ? (selected().color || '#000000') : curColor);
+    let curDash = ''; // これから置く線・図形の線種
+    function add(it) {
+      if (curColor !== '#000000') it.color = curColor;
+      if (curDash && SK_DASHABLE.includes(it.t)) it.dash = curDash;
+      items.push(it); sel = items.length - 1; commit(); draw(); area.focus();
+    }
+    const colorBtns = [], dashBtns = [];
+    const selStyled = () => { const it = selected(); return it && it.t !== 'img' ? it : null; };
     const paintColor = () => {
-      const c = shownColor();
+      const it = selStyled();
+      const c = it ? (it.color || '#000000') : curColor;
+      const d = it ? (it.dash || '') : curDash;
       colorBtns.forEach((bt) => bt.classList.toggle('on', bt.dataset.c === c));
+      dashBtns.forEach((bt) => bt.classList.toggle('on', bt.dataset.d === d));
       colorMain.style.setProperty('--c', c);
     };
     const setColor = (c) => {
       curColor = c;
-      const it = selected();
-      if (it && it.t !== 'img') { if (c === '#000000') delete it.color; else it.color = c; commit(); draw(); }
+      const it = selStyled();
+      if (it) { if (c === '#000000') delete it.color; else it.color = c; commit(); draw(); }
       paintColor();
     };
-    const pal = h('div', { class: 'sk-pal', hidden: '' }, SK_COLORS.map(([c, name]) => {
-      const bt = h('button', { type: 'button', class: 'sk-color', 'data-c': c, title: name, style: `--c:${c}`,
-        onclick: (e) => { e.preventDefault(); setColor(c); pal.hidden = true; } });
-      colorBtns.push(bt);
-      return bt;
-    }));
-    const colorMain = h('button', { type: 'button', class: 'sk-colorbtn', title: '色（選んだ図形・文字の色を変える。何も選んでいなければ、これから置くものの色）',
-      onclick: (e) => { e.preventDefault(); pal.hidden = !pal.hidden; } }, h('span', { class: 'sk-sw' }), '色');
+    const setDash = (d) => {
+      curDash = d;
+      const it = selected();
+      if (it && SK_DASHABLE.includes(it.t)) { if (d) it.dash = d; else delete it.dash; commit(); draw(); }
+      paintColor();
+    };
+    const pal = h('div', { class: 'sk-pal', hidden: '' },
+      h('div', { class: 'sk-pal-row' }, SK_COLORS.map(([c, name]) => {
+        const bt = h('button', { type: 'button', class: 'sk-color', 'data-c': c, title: name, style: `--c:${c}`,
+          onclick: (e) => { e.preventDefault(); setColor(c); pal.hidden = true; } });
+        colorBtns.push(bt);
+        return bt;
+      })),
+      // 線種：見本の線を描いたボタン
+      h('div', { class: 'sk-pal-row' }, SK_DASHES.map(([d, name]) => {
+        const sv = S('svg', { viewBox: '0 0 16 4', width: '16mm', height: '4mm' });
+        sv.append(S('line', { x1: 1, y1: 2, x2: 15, y2: 2, stroke: '#333', 'stroke-width': 0.6, ...dashAttrs(d) }));
+        const bt = h('button', { type: 'button', class: 'sk-dash', 'data-d': d, title: name, onclick: (e) => { e.preventDefault(); setDash(d); pal.hidden = true; } }, sv);
+        dashBtns.push(bt);
+        return bt;
+      })));
+    const colorMain = h('button', { type: 'button', class: 'sk-colorbtn', title: '色・線種（選んだ図形・文字の色や線の種類を変える。何も選んでいなければ、これから置くものの色・線種）',
+      onclick: (e) => { e.preventDefault(); pal.hidden = !pal.hidden; } }, h('span', { class: 'sk-sw' }), '色・線');
     const colorWrap = h('span', { class: 'sk-colorwrap' }, colorMain, pal);
     document.addEventListener('pointerdown', (e) => { if (!pal.hidden && !colorWrap.contains(e.target)) pal.hidden = true; });
     const cx = () => W / 2 + (items.length % 5) * 3, cy = () => H / 2 + (items.length % 5) * 3; // 重ならないよう少しずつずらす
