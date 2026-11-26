@@ -605,6 +605,7 @@ table.grid.q15 .q15-ev .mark-btn { position: absolute; inset: 0; font-size: 26pt
 .sketch .sk-tools button:hover { border-color: var(--accent); color: var(--accent); }
 .sketch .sk-tools .sk-sep { width: 1px; height: 4mm; background: #c9d0dc; margin: 0 1px; }
 /* 図形・文字の色のボタン（小さな色の四角。選んでいる色は枠を太く。2026-11-26） */
+.sketch .free-label.sk-head { overflow: visible; } /* 色の選択肢（見出しの下に開く）が隠れないように（2026-11-26） */
 .sketch .sk-tools .sk-colorwrap { position: relative; display: inline-flex; }
 .sketch .sk-tools button.sk-colorbtn { display: inline-flex; align-items: center; gap: 2px; }
 .sketch .sk-tools .sk-sw { display: inline-block; width: 2.6mm; height: 2.6mm; background: var(--c, #000); border-radius: 2px; }
