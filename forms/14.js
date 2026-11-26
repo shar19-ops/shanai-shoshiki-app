@@ -7,20 +7,39 @@
     ['F09', 'コンクリート材'], ['F10', '耐火処理材'], ['F20', '機器取付用木板'], ['F4X', 'ハンドホール'], ['F50', '材料費'],
     ['FXX', '仮設足場費'], ['G00', '電線管用付属品'], ['H00', '位置ボックス'], ['H01', 'プルボックス'], ['K02', '掘削費'],
     ['K10', 'ケーブル整端費'], ['K16', '高所作業足場費'], ['K18', 'ＡＬＣ開口費'], ['K31', 'Ｄ式管理費'], ['K50', '工料'],
-    ['K51', '住戸工料'], ['K53', '土工費'], ['K60', '雑工事費'], ['KXX', 'コンクリート舗装費'], ['L00', '場内運搬費'],
+    ['K51', '住戸工料'], ['K55', '土工費'], ['K60', '雑工事費'], ['KXX', 'コンクリート舗装費'], ['L00', '場内運搬費'], // 土工費は K53 → K55（2026-11-26 ユーザー指定）
     ['L01', '重量物運搬費'], ['L03', 'バスダクト運搬費'], ['M00', '消耗費'], ['M01', '雑材料'], ['M02', '予備線・接地材'],
     ['O00', '現場経費'], ['O16', '先行工事費'], ['O17', '予備費'], ['O6Y', '労務予備費'], ['O7Y', '検査予備費'],
     ['S00', '接地工事材料'], ['T00', '塗装費'], ['U00', '仮枠材'], ['U01', '天井切込補強費'], ['U03', '天井切込費'],
   ];
-  const kubunName = (code) => (KUBUN.find((k) => k[0] === code) || [])[1] || '';
+  const kubunName = (code) => (KUBUN.find((k) => k[0] === String(code || '').trim().toUpperCase()) || [])[1] || '';
+  // 区分を入れたら区分名を自動で入れる。区分名が空か、前の区分の名前のままのときだけ（手で直した区分名は残す）
+  function bindKubun({ inputs, setVal }) {
+    Object.keys(inputs).filter((k) => /\.kubun$/.test(k)).forEach((k) => {
+      const nk = k.replace(/kubun$/, 'name'), ki = inputs[k], ni = inputs[nk];
+      if (!ki || !ni) return;
+      let prev = ki.value;
+      if (!ni.value && kubunName(prev)) { ni.value = kubunName(prev); setVal(nk, ni.value); } // 区分だけ入っている下書き
+      const upd = () => {
+        const nm = kubunName(ki.value), was = kubunName(prev);
+        if (nm && ki.value !== ki.value.trim().toUpperCase()) { ki.value = ki.value.trim().toUpperCase(); setVal(k, ki.value); } // k50 → K50
+        if (nm && (!ni.value || ni.value === was)) { ni.value = nm; setVal(nk, nm); ni.dispatchEvent(new Event('blur')); }
+        else if (!nm && was && ni.value === was) { ni.value = ''; setVal(nk, ''); }
+        prev = ki.value;
+      };
+      ki.addEventListener('input', upd);
+      ki.addEventListener('change', upd);
+    });
+  }
   const ROWS = 7;
   const detail = (key, start, rows = ROWS) => ({
     type: 'table', key, rows, rowNoStart: start, rowH: 7.5,
     columns: [
       { label: '№', key: 'no', w: 8, rowNo: true },
-      // 選んだ後はコード（K50 など）だけを表示。区分名は右の列に自動表示
-      { label: '区分', key: 'kubun', w: 16, type: 'select', align: 'center', codeOnly: true, options: KUBUN.map((k) => [k[0], `${k[0]} ${k[1]}`]) },
-      { label: '区分名', key: 'name', w: 30, align: 'left', rowCalc: (r, v) => kubunName(v[`${key}.${r}.kubun`]) },
+      // 区分・区分名は自由に入力できる（2026-11-26 ユーザー指定。前は選択と自動表示）。
+      //   区分は候補の一覧からも選べ、一覧にあるコードを入れると区分名が自動で入る（区分名は書き換え可）。前に保存した K53 は K55 に
+      { label: '区分', key: 'kubun', w: 16, align: 'center', suggest: KUBUN, migrate: { K53: 'K55' } },
+      { label: '区分名', key: 'name', w: 30, align: 'left' },
       { label: '実行額', key: 'jikko', w: 23, type: 'money' },
       { label: '発注額', key: 'hachu', w: 23, type: 'money' },
     ],
@@ -50,6 +69,7 @@
     code: '工-11', hokan: '非管理', title: '工料発注承認メモ', orientation: portrait ? 'portrait' : 'landscape',
     tbNote: portrait ? '' : '【旧版】', // 画面の上部だけに出す（印刷には出ない）。2026-11-17 縦を正規版、横を旧版に（ユーザー指定）
     selfStamp: '発行者', // 本人欄（デート印を押す欄）
+    setup: bindKubun,
     meta: [
       { label: '発行日', key: 'date', type: 'date' },
       { label: '注文番号 ※2', key: 'orderNo', w: 40, right: true }, // 発行日と同じ行で押印欄側に寄せる

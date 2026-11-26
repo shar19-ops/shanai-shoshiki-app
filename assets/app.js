@@ -316,7 +316,8 @@
     inputs[key] = el;
     el.dataset.key = key;
     const parts = [el];
-    if (f.suggest) parts.push(h('datalist', { id: 'dl_' + key }, f.suggest.map((o) => h('option', { value: o }))));
+    // suggest：入力の候補。'値' または ['値', '説明']（説明は候補の一覧に並べて出す。工-11 の区分など）
+    if (f.suggest) parts.push(h('datalist', { id: 'dl_' + key }, f.suggest.map((o) => (Array.isArray(o) ? h('option', { value: o[0], label: `${o[0]} ${o[1]}` }) : h('option', { value: o })))));
     if (f.prefix || f.unit) {
       return h('div', { class: 'cell-wrap' },
         f.prefix ? h('span', { class: 'unit' }, f.prefix) : null, ...parts,
