@@ -1009,6 +1009,10 @@
   // 線種（dash。省略は実線）。線・矢印・四角・丸・枠文字の枠に使う（2026-11-26 ユーザー指定）。間隔は mm（線の太さ 0.5mm）
   const SK_DASHES = [['', '実線', null], ['dash', '破線', '2 1.2'], ['dot', '点線', '0.05 1'], ['chain', '一点鎖線', '3 1 0.05 1']];
   const SK_DASHABLE = ['line', 'arrow', 'rect', 'ellipse', 'text'];
+  // 塗りつぶし（fill）。四角・丸・枠文字の枠の中。省略は 四角・丸＝なし、枠文字＝白（2026-11-26 ユーザー指定）。下絵の地図が見えるよう薄い色
+  const SK_FILLS = [['none', 'なし'], ['#ffffff', '白'], ['#d9d9d9', '灰'], ['#fff3a0', '薄い黄'], ['#ffd0d0', '薄い赤'], ['#d0e0ff', '薄い青'], ['#d4f2dc', '薄い緑']];
+  const skFillable = (it) => it && (it.t === 'rect' || it.t === 'ellipse' || (it.t === 'text' && it.box));
+  const skFillOf = (it) => it.fill || (it.t === 'text' ? '#ffffff' : 'none');
   const dashAttrs = (d) => { const x = SK_DASHES.find((s) => s[0] === d); return x && x[2] ? { 'stroke-dasharray': x[2], 'stroke-linecap': 'round' } : {}; };
   function sketchBlock(b) {
     const key = b.key, bgKey = key + '__bg';
@@ -1067,8 +1071,8 @@
           const cx = it.x + it.w / 2, cy = it.y + it.h / 2;
           const sg = S('g', { transform: rotT(it, cx, cy) });
           sg.append(it.t === 'rect'
-            ? S('rect', { x: it.x, y: it.y, width: it.w, height: it.h, ...line, fill: 'rgba(0,0,0,0)', ...hit(i) })
-            : S('ellipse', { cx, cy, rx: it.w / 2, ry: it.h / 2, ...line, fill: 'rgba(0,0,0,0)', ...hit(i) }));
+            ? S('rect', { x: it.x, y: it.y, width: it.w, height: it.h, ...line, fill: skFillOf(it) === 'none' ? 'rgba(0,0,0,0)' : skFillOf(it), ...hit(i) })
+            : S('ellipse', { cx, cy, rx: it.w / 2, ry: it.h / 2, ...line, fill: skFillOf(it) === 'none' ? 'rgba(0,0,0,0)' : skFillOf(it), ...hit(i) }));
           if (i === sel) sg.append(S('circle', { class: 'sk-handle', cx: it.x + it.w, cy: it.y + it.h, r: 1.6, ...hit(i, 'size') }));
           g.append(sg);
         } else {
@@ -1089,7 +1093,7 @@
           requestAnimationFrame(() => {
             if (!sg.isConnected) return;
             const bb = sg.firstChild.getBBox();
-            if (it.t === 'text' && it.box) sg.insertBefore(S('rect', { x: bb.x - 1.2, y: bb.y - 0.8, width: bb.width + 2.4, height: bb.height + 1.6, ...line, fill: '#fff', 'data-i': i }), sg.firstChild);
+            if (it.t === 'text' && it.box) sg.insertBefore(S('rect', { x: bb.x - 1.2, y: bb.y - 0.8, width: bb.width + 2.4, height: bb.height + 1.6, ...line, fill: skFillOf(it) === 'none' ? 'rgba(0,0,0,0)' : skFillOf(it), 'data-i': i }), sg.firstChild);
             if (i === sel) sg.append(S('circle', { class: 'sk-handle', cx: bb.x + bb.width + 1, cy: bb.y + bb.height + 1, r: 1.6, ...hit(i, 'size') }));
           });
         }
@@ -1100,20 +1104,33 @@
 
     let curColor = '#000000'; // これから置く図形・文字の色
     let curDash = ''; // これから置く線・図形の線種
+    let curFill = ''; // これから置く四角・丸・枠文字の塗りつぶし（'' は省略＝それぞれの既定）
     function add(it) {
       if (curColor !== '#000000') it.color = curColor;
       if (curDash && SK_DASHABLE.includes(it.t)) it.dash = curDash;
+      if (curFill && skFillable(it) && curFill !== skFillOf(it)) it.fill = curFill;
       items.push(it); sel = items.length - 1; commit(); draw(); area.focus();
     }
-    const colorBtns = [], dashBtns = [];
+    const colorBtns = [], dashBtns = [], fillBtns = [];
     const selStyled = () => { const it = selected(); return it && it.t !== 'img' ? it : null; };
     const paintColor = () => {
       const it = selStyled();
       const c = it ? (it.color || '#000000') : curColor;
       const d = it ? (it.dash || '') : curDash;
+      const f = it && skFillable(it) ? skFillOf(it) : (curFill || 'none');
       colorBtns.forEach((bt) => bt.classList.toggle('on', bt.dataset.c === c));
       dashBtns.forEach((bt) => bt.classList.toggle('on', bt.dataset.d === d));
+      fillBtns.forEach((bt) => bt.classList.toggle('on', bt.dataset.f === f));
       colorMain.style.setProperty('--c', c);
+    };
+    const setFill = (f) => {
+      curFill = f;
+      const it = selected();
+      if (skFillable(it)) {
+        if (f === (it.t === 'text' ? '#ffffff' : 'none')) delete it.fill; else it.fill = f; // 既定と同じなら省略
+        commit(); draw();
+      }
+      paintColor();
     };
     const setColor = (c) => {
       curColor = c;
@@ -1128,21 +1145,28 @@
       paintColor();
     };
     const pal = h('div', { class: 'sk-pal', hidden: '' },
-      h('div', { class: 'sk-pal-row' }, SK_COLORS.map(([c, name]) => {
+      h('div', { class: 'sk-pal-row' }, h('span', { class: 'sk-pal-lbl' }, '色'), SK_COLORS.map(([c, name]) => {
         const bt = h('button', { type: 'button', class: 'sk-color', 'data-c': c, title: name, style: `--c:${c}`,
           onclick: (e) => { e.preventDefault(); setColor(c); pal.hidden = true; } });
         colorBtns.push(bt);
         return bt;
       })),
       // 線種：見本の線を描いたボタン
-      h('div', { class: 'sk-pal-row' }, SK_DASHES.map(([d, name]) => {
+      h('div', { class: 'sk-pal-row' }, h('span', { class: 'sk-pal-lbl' }, '線'), SK_DASHES.map(([d, name]) => {
         const sv = S('svg', { viewBox: '0 0 16 4', width: '16mm', height: '4mm' });
         sv.append(S('line', { x1: 1, y1: 2, x2: 15, y2: 2, stroke: '#333', 'stroke-width': 0.6, ...dashAttrs(d) }));
         const bt = h('button', { type: 'button', class: 'sk-dash', 'data-d': d, title: name, onclick: (e) => { e.preventDefault(); setDash(d); pal.hidden = true; } }, sv);
         dashBtns.push(bt);
         return bt;
+      })),
+      // 塗りつぶし：四角・丸・枠文字の枠の中（「なし」は斜線の見本）
+      h('div', { class: 'sk-pal-row' }, h('span', { class: 'sk-pal-lbl' }, '塗り'), SK_FILLS.map(([f, name]) => {
+        const bt = h('button', { type: 'button', class: 'sk-fill' + (f === 'none' ? ' none' : ''), 'data-f': f, title: `塗りつぶし：${name}（四角・丸・枠文字）`, style: f === 'none' ? '' : `--c:${f}`,
+          onclick: (e) => { e.preventDefault(); setFill(f); pal.hidden = true; } });
+        fillBtns.push(bt);
+        return bt;
       })));
-    const colorMain = h('button', { type: 'button', class: 'sk-colorbtn', title: '色・線種（選んだ図形・文字の色や線の種類を変える。何も選んでいなければ、これから置くものの色・線種）',
+    const colorMain = h('button', { type: 'button', class: 'sk-colorbtn', title: '色・線種・塗りつぶし（選んだ図形・文字を変える。何も選んでいなければ、これから置くもの）',
       onclick: (e) => { e.preventDefault(); pal.hidden = !pal.hidden; } }, h('span', { class: 'sk-sw' }), '色・線');
     const colorWrap = h('span', { class: 'sk-colorwrap' }, colorMain, pal);
     document.addEventListener('pointerdown', (e) => { if (!pal.hidden && !colorWrap.contains(e.target)) pal.hidden = true; });

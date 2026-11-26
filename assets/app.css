@@ -615,6 +615,11 @@ table.grid.q15 .q15-ev .mark-btn { position: absolute; inset: 0; font-size: 26pt
 .sketch .sk-edit { position: absolute; z-index: 5; box-sizing: border-box; margin: 0; padding: 2px 4px; border: 1.5px solid var(--accent); border-radius: 3px; background: #fff; font-family: inherit; line-height: 1.3; text-align: center; resize: none; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.18); outline: 0; }
 .sketch .sk-tools .sk-pal { flex-direction: column; }
 .sketch .sk-tools .sk-pal-row { display: flex; gap: 4px; }
+.sketch .sk-tools .sk-pal-row { align-items: center; }
+.sketch .sk-tools .sk-pal-lbl { width: 2.2em; font-size: 7.5pt; color: #556; white-space: nowrap; }
+.sketch .sk-tools .sk-pal button.sk-fill { min-width: 0; width: 5.5mm; height: 5.5mm; padding: 0; background: var(--c); border: 1px solid #b8bfcc; }
+.sketch .sk-tools .sk-pal button.sk-fill.none { background: linear-gradient(to top right, #fff calc(50% - 1px), #d40000 50%, #fff calc(50% + 1px)); }
+.sketch .sk-tools .sk-pal button.sk-fill.on { box-shadow: 0 0 0 2px var(--accent); border-color: #fff; }
 .sketch .sk-tools .sk-pal button.sk-dash { min-width: 0; height: 5.5mm; padding: 0 2px; background: #fff; border: 1px solid #b8bfcc; }
 .sketch .sk-tools .sk-pal button.sk-dash svg { display: block; }
 .sketch .sk-tools .sk-pal button.sk-dash.on { box-shadow: 0 0 0 2px var(--accent); border-color: #fff; }
