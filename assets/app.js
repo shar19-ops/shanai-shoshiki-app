@@ -1147,7 +1147,48 @@
     const colorWrap = h('span', { class: 'sk-colorwrap' }, colorMain, pal);
     document.addEventListener('pointerdown', (e) => { if (!pal.hidden && !colorWrap.contains(e.target)) pal.hidden = true; });
     const cx = () => W / 2 + (items.length % 5) * 3, cy = () => H / 2 + (items.length % 5) * 3; // 重ならないよう少しずつずらす
-    const askText = (cur) => { const t = prompt('文字を入力してください（2行にするときは「／」で区切ります）', cur || ''); return t == null ? null : t.replace(/／/g, '\n'); };
+    // 文字・枠文字の入力と直し：文字の位置にその場で入力欄を開く（2026-11-26 ユーザー指定。前は入力の窓（prompt））。
+    //   Enter で決定、Shift＋Enter で改行、Esc でやめる、欄の外を押しても決定。空にして決定すると文字を消す
+    let editing = null;
+    function editText(i) {
+      const it = items[i];
+      if (!it || it.t !== 'text') return;
+      if (editing) editing.done(true);
+      const k = area.clientWidth / W; // 欄の中の 1mm の大きさ（px。拡大・縮小する前）
+      const fs = it.size * k;
+      const ta = h('textarea', { class: 'sk-edit no-print', placeholder: '文字を入力', title: 'Enter で決定、Shift＋Enter で改行、Esc でやめる' });
+      ta.value = it.text || '';
+      ta.style.fontSize = fs + 'px';
+      ta.style.color = it.color || '#000';
+      const place = () => {
+        const ls = ta.value.split('\n');
+        const w = Math.max(30 * k, ...ls.map((l) => [...l].length * fs * 1.05 + 14));
+        const hh = ls.length * fs * 1.3 + 8;
+        Object.assign(ta.style, { width: w + 'px', height: hh + 'px', left: (it.x * k - w / 2) + 'px', top: (it.y * k - hh / 2) + 'px' });
+      };
+      let closed = false;
+      const done = (ok) => {
+        if (closed) return;
+        closed = true; editing = null;
+        const v = ta.value.replace(/\s+$/, '');
+        ta.remove();
+        if (ok && v.trim()) it.text = v;
+        if ((ok && !v.trim()) || (!ok && !it.text)) { items.splice(items.indexOf(it), 1); sel = -1; } // 空にした・新しい文字をやめた
+        commit(); draw(); area.focus();
+      };
+      ta.addEventListener('input', place);
+      ta.addEventListener('keydown', (e) => {
+        e.stopPropagation(); // 欄の Delete・矢印の操作を動かさない
+        if (e.isComposing) return;
+        if (e.key === 'Escape') { e.preventDefault(); done(false); } else if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); done(true); }
+      });
+      ta.addEventListener('pointerdown', (e) => e.stopPropagation());
+      ta.addEventListener('blur', () => done(true));
+      area.append(ta);
+      place();
+      ta.focus(); ta.select();
+      editing = { done };
+    }
     const tb = (label, fn, title) => h('button', { type: 'button', title: title || '', onclick: (e) => { e.preventDefault(); fn(); } }, label);
     const selected = () => (sel >= 0 ? items[sel] : null);
     const rotate = (d) => { const it = selected(); if (!it || it.t === 'line' || it.t === 'arrow') return; it.rot = ((it.rot || 0) + d + 360) % 360; commit(); draw(); };
@@ -1175,8 +1216,8 @@
       tb('─', () => add({ t: 'line', x1: cx() - 10, y1: cy(), x2: cx() + 10, y2: cy() }), '線'),
       tb('□', () => add({ t: 'rect', x: cx() - 10, y: cy() - 6, w: 20, h: 12, rot: 0 }), '四角（右下の○で大きさを変える）'),
       tb('○', () => add({ t: 'ellipse', x: cx() - 6, y: cy() - 6, w: 12, h: 12, rot: 0 }), '丸'),
-      tb('文字', () => { const t = askText(); if (t) add({ t: 'text', x: cx(), y: cy(), text: t, size: 4, rot: 0, box: false }); }, '文字（ダブルクリックで直す）'),
-      tb('枠文字', () => { const t = askText(); if (t) add({ t: 'text', x: cx(), y: cy(), text: t, size: 4, rot: 0, box: true }); }, '枠付きの文字（テキストボックス）'),
+      tb('文字', () => { add({ t: 'text', x: cx(), y: cy(), text: '', size: 4, rot: 0, box: false }); editText(sel); }, '文字（置いた後は、ダブルクリック または 選んで Enter で直す）'),
+      tb('枠文字', () => { add({ t: 'text', x: cx(), y: cy(), text: '', size: 4, rot: 0, box: true }); editText(sel); }, '枠付きの文字（テキストボックス。置いた後は、ダブルクリック または 選んで Enter で直す）'),
       h('span', { class: 'sk-sep' }),
       // hideSyms：帳票ごとに使わない記号のボタンを隠す（例：盗難現場見取図では信号を出さない）
       SK_SYMS.filter(([sym]) => !(b.hideSyms || []).includes(sym)).map(([sym, label]) => tb(sym === 'signal' ? '信号' : sym, () => add({ t: 'sym', x: cx(), y: cy(), sym, size: sym === 'signal' ? 4 : 6, rot: 0 }), label)),
@@ -1194,10 +1235,19 @@
       tb('全消去', () => { if (!confirm('この欄の図形と下絵をすべて消します。よろしいですか？')) return; items = []; sel = -1; commit(); setVal(bgKey, ''); draw(); }, '図形と下絵をすべて消す'),
       file, imgFile);
 
+    // ダブルクリックは自分で見分ける（1回目の押下で描き直すので、ブラウザの dblclick は同じ図形の上と見なされず届かない）
+    let lastDown = { i: -1, t: 0 };
     svg.addEventListener('pointerdown', (e) => {
       const t = e.target.closest('[data-i]');
-      if (!t) { sel = -1; draw(); return; }
+      if (!t) { sel = -1; lastDown = { i: -1, t: 0 }; draw(); return; }
       const i = Number(t.getAttribute('data-i'));
+      const now = Date.now();
+      if (lastDown.i === i && now - lastDown.t < 450 && items[i] && items[i].t === 'text' && !t.getAttribute('data-h')) {
+        lastDown = { i: -1, t: 0 };
+        sel = i; draw(); editText(i); e.preventDefault();
+        return;
+      }
+      lastDown = { i, t: now };
       sel = i;
       drag = { i, h: t.getAttribute('data-h') || 'move', p: toMM(e), o: { ...items[i] } };
       svg.setPointerCapture(e.pointerId);
@@ -1230,19 +1280,10 @@
     const end = () => { if (drag) { drag = null; commit(); } };
     svg.addEventListener('pointerup', end);
     svg.addEventListener('pointercancel', end);
-    svg.addEventListener('dblclick', (e) => {
-      const t = e.target.closest('[data-i]');
-      if (!t) return;
-      const it = items[Number(t.getAttribute('data-i'))];
-      if (it.t !== 'text') return;
-      const v = askText(it.text.replace(/\n/g, '／'));
-      if (v == null) return;
-      if (v === '') items.splice(items.indexOf(it), 1); else it.text = v;
-      sel = -1; commit(); draw();
-    });
     area.addEventListener('keydown', (e) => {
       const it = selected();
       if (!it) return;
+      if (it.t === 'text' && (e.key === 'Enter' || e.key === 'F2')) { editText(sel); e.preventDefault(); return; } // 選んだ文字を直す
       if (e.key === 'Delete' || e.key === 'Backspace') { del(); e.preventDefault(); return; }
       const mv = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
       if (!mv) return;
