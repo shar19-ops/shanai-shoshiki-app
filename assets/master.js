@@ -79,7 +79,8 @@
       try { await del('dir'); } catch (e) { /* noop */ }
       emit();
     }
-    const NOT_FOUND = 'このフォルダに customers.json と staff.json が見つかりません。\nBOX の「app_data」フォルダを選んでください。';
+    // 置き場所：BOX の 全社共有フォルダ\999_Y-Formatデータ\app_data（2026-11-27 ユーザー指定で移動）
+    const NOT_FOUND = 'このフォルダに customers.json と staff.json が見つかりません。\nBOX の「全社共有フォルダ ＞ 999_Y-Formatデータ ＞ app_data」フォルダを選んでください。';
     const LOST = '前に選んだフォルダを確認できませんでした（BOX のフォルダが移動・名前変更されたか、BOX Drive が止まっている可能性があります）。';
     // フォルダを選ぶ（Edge・Chrome）。使えないブラウザは2つのファイルを選ぶ
     async function pick() {
@@ -100,7 +101,7 @@
           const files = [...inp.files];
           inp.remove();
           const f = (name) => files.find((x) => x.name.toLowerCase() === name);
-          if (!f(FILES.customers) || !f(FILES.staff)) { alert('customers.json と staff.json の2つを選んでください（BOX の「app_data」フォルダ）。'); resolve(false); return; }
+          if (!f(FILES.customers) || !f(FILES.staff)) { alert('customers.json と staff.json の2つを選んでください（BOX の「全社共有フォルダ ＞ 999_Y-Formatデータ ＞ app_data」フォルダ）。'); resolve(false); return; }
           try { await apply(parse(await f(FILES.customers).text(), FILES.customers), parse(await f(FILES.staff).text(), FILES.staff), ''); resolve(true); }
           catch (e) { alert(String(e.message || e)); resolve(false); }
         });
@@ -113,7 +114,7 @@
       if (!hd) return pick();
       let perm;
       try { perm = await within(hd.requestPermission({ mode: 'read' }), T.request, 'フォルダの使用の確認'); }
-      catch (e) { await forget(LOST); alert(LOST + '\n「フォルダを選ぶ」から BOX の「app_data」フォルダを選び直してください。'); return false; }
+      catch (e) { await forget(LOST); alert(LOST + '\n「フォルダを選ぶ」から BOX の「全社共有フォルダ ＞ 999_Y-Formatデータ ＞ app_data」フォルダを選び直してください。'); return false; }
       if (perm !== 'granted') return false;
       try { const cs = await readDir(hd); await apply(cs[0], cs[1], hd.name); return true; }
       catch (e) {
@@ -250,13 +251,14 @@
       ok
         ? el('div', { class: 'mst-st' }, `得意先 ${s.customers.length.toLocaleString()}件・担当者 ${s.staff.length.toLocaleString()}件`, el('br'),
           `${fmtAt(s.at)} に${s.dir ? `「${s.dir}」から` : ''}読み込み`)
-        : el('div', { class: 'mst-st warn' }, 'まだ読み込んでいません。', el('br'), 'BOX の「app_data」フォルダを選んでください。'),
+        : el('div', { class: 'mst-st warn' }, 'まだ読み込んでいません。', el('br'), 'BOX の「全社共有フォルダ ＞ 999_Y-Formatデータ ＞ app_data」フォルダを選んでください（BOX Drive が必要です）。'),
       s.checking ? el('div', { class: 'mst-st' }, '前に選んだフォルダを確認しています…') : null,
-      s.lost ? el('div', { class: 'mst-st warn' }, s.lost, el('br'), '「フォルダを選び直す」から BOX の「app_data」フォルダを選んでください。', ok ? el('br') : null, ok ? '（それまでは前に読み込んだ内容で候補が出ます）' : null) : null,
+      s.lost ? el('div', { class: 'mst-st warn' }, s.lost, el('br'), '「フォルダを選び直す」から BOX の「全社共有フォルダ ＞ 999_Y-Formatデータ ＞ app_data」フォルダを選んでください。', ok ? el('br') : null, ok ? '（それまでは前に読み込んだ内容で候補が出ます）' : null) : null,
       el('div', { class: 'mst-btns' }, ok && s.handle && !s.lost ? upd : null, pk),
       el('div', { class: 'mst-note' },
         panelNote || '読み込むと、得意先・担当者の欄で、コードか名称の一部を入力すると候補が出ます（↑↓で選んで Enter）。',
-        el('br'), '読み込んだマスタは、このパソコンのブラウザに保存されます（外部には送りません）。ほかの帳票でも同じマスタを使います。'),
+        el('br'), '読み込んだマスタは、このパソコンのブラウザに保存されます（外部には送りません）。ほかの帳票でも同じマスタを使います。',
+        el('br'), el('a', { href: 'torisetsu-master.html', target: '_blank' }, '読み込み方の説明（使い方）')), // 2026-11-27 説明書
     ].filter(Boolean));
   }
 
