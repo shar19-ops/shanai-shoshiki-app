@@ -59,7 +59,7 @@
   };
 
   const days = (key, start, rows, foot) => ({
-    type: 'table', key, rows, rowH: 9, dense: true, headH: 12, foot,
+    type: 'table', key, rows, rowH: 9, dense: true, headH: 12, foot, cls: foot ? 'a14-days' : null, // a14-days：月末 入庫時の行も日の行と同じ高さ（app.css）
     columns: [
       { label: '日付', key: 'day', w: 6, align: 'center', rowCalc: (r, v) => (inMonth(v, r + start - 1) ? String(r + start - 1) : '') },
       // 休日：年月を選ぶと土日・祝日に〇（クリックで付け外しできる。会社の休日など）
