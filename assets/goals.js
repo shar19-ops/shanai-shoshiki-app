@@ -8,13 +8,20 @@
  *   読み込んだ内容は、このブラウザの IndexedDB（yformat-master の anzenGoals）に覚える。データはどこにも送らない。
  *   一度保存した報告書の目標は書き換えない（開いたときは空欄のときだけ入れる。検査日を変えたときだけ、その月の目標に入れ替える）。
  *
+ * 安全衛生委員会の議事録（Word .docx）も読む（2026-11-27 ユーザー指定：A案・番号は36から）
+ *   「安全衛生目標」フォルダに毎月の議事録を入れるだけでよい。「(1) 12月度安全衛生目標」の下の
+ *   「イ. 感電災害事故の防止」「ロ．…」の見出しだけを、番号 36・37… で取り込む（その下の「・」の文や、
+ *   「4. 労働災害の…」より後ろは読まない。労働災害の報告などは取り出さない）。
+ *   年は議事録のファイル名（8年11月…）か本文の「令和8年」から決め、目標の月がそれより前なら翌年（12月の議事録 → 1月度）。
+ *   同じ月が Excel と議事録の両方にあるときは Excel を優先（議事録が読めないときや手で直したいときの予備）。
+ *
  * 帳票の setup から：YGoals.bind(ctx, { rows: 8 })
  *   入力欄：goalMonth（月）・goalNo1〜（番号）・goal1〜（目標）。どの月の目標を入れたかは goalYm（2026-12 など）に覚える。
  */
 (function () {
   const M = () => window.YMaster && window.YMaster.Master;
   const SUB = '安全衛生目標', FILE = '安全衛生目標.xlsx', SHEET = '安全衛生目標';
-  const PLACE = 'BOX の「全社共有フォルダ ＞ 999_Y-Formatデータ ＞ app_data ＞ 安全衛生目標」フォルダの「安全衛生目標.xlsx」';
+  const PLACE = 'BOX の「全社共有フォルダ ＞ 999_Y-Formatデータ ＞ app_data ＞ 安全衛生目標」フォルダ（安全衛生委員会の議事録・安全衛生目標.xlsx）';
 
   // ---------- Excel（.xlsx）を読む：zip を開いて、シートのセルの文字を取り出すだけの小さな読み取り ----------
   async function unzip(buf) {
@@ -98,24 +105,89 @@
     return goals;
   }
 
+  // ---------- 安全衛生委員会の議事録（.docx）を読む ----------
+  const GOAL_NO = 36; // 番号は検査項目（〜35）の続き
+  const IROHA = 'イロハニホヘトチリヌルヲワカヨタ';
+  const reiwa = (s) => (s === '元' ? 1 : Number(s)) + 2018;
+  // 議事録1つ → { ym: '2026-12', list: [['36', '感電災害事故の防止'], ...] }（目標が無ければ null）
+  async function readDocx(buf, fileName) {
+    const get = await unzip(buf);
+    const doc = xml(await get('word/document.xml') || '');
+    const paras = tags(doc, 'p').map((p) => tags(p, 't').map((t) => t.textContent).join('').normalize('NFKC').trim()).filter(Boolean);
+    const h = paras.findIndex((t) => /\d{1,2}\s*月度\s*安全衛生目標/.test(t));
+    if (h < 0) return null;
+    const month = Number(paras[h].match(/(\d{1,2})\s*月度/)[1]);
+    const list = [];
+    for (let i = h + 1; i < paras.length; i++) {
+      const t = paras[i];
+      const m = t.match(new RegExp(`^([${IROHA}])\\s*[.．。、,]\\s*(.+)$`));
+      if (m) { list.push([String(GOAL_NO + list.length), m[2].trim()]); continue; }
+      if (/^(\d+\s*[.．]|[(（]\d+[)）])/.test(t)) break; // 次の見出し（4. 労働災害… や (2)）で終わり
+    }
+    if (!list.length || month < 1 || month > 12) return null;
+    // 年：ファイル名の「8年11月」→ 議事録の年月。無ければ本文で最初の「令和8年9月」
+    const nm = String(fileName).normalize('NFKC');
+    let y, mm;
+    const f = nm.match(/(?:令和|R)?\s*(\d{1,2}|元)\s*年\s*(\d{1,2})\s*月/i);
+    if (f) { y = reiwa(f[1]); mm = Number(f[2]); }
+    else {
+      const b = paras.join('\n').match(/令和\s*(\d{1,2}|元)\s*年\s*(\d{1,2})\s*月/);
+      if (!b) return null;
+      y = reiwa(b[1]); mm = Number(b[2]);
+    }
+    if (month < mm) y += 1; // 12月の議事録の 1月度 は翌年
+    return { ym: `${y}-${String(month).padStart(2, '0')}`, list };
+  }
+
   // ---------- 読み込みと保存 ----------
-  const state = { goals: null, at: '', err: '' };
+  const state = { goals: null, src: {}, skipped: [], at: '', err: '' };
   const listeners = [];
   const emit = () => listeners.forEach((f) => { try { f(); } catch (e) { /* noop */ } });
-  async function fileHandle(hd) {
-    try { return await (await hd.getDirectoryHandle(SUB)).getFileHandle(FILE); }
-    catch (e) { return hd.getFileHandle(FILE); } // app_data の直下に置いたとき
+  // 「安全衛生目標」フォルダの 安全衛生目標.xlsx と議事録（.docx）をすべて読む。フォルダが無ければ app_data 直下の Excel だけ
+  async function collect(hd) {
+    const goals = {}, src = {}, skipped = [];
+    let sub = null;
+    try { sub = await hd.getDirectoryHandle(SUB); } catch (e) { /* 直下の Excel を読む */ }
+    const files = [];
+    if (sub) {
+      for await (const [name, h] of sub.entries()) {
+        if (h.kind === 'file' && !name.startsWith('~$') && /\.docx$/i.test(name)) files.push(h);
+      }
+    }
+    // 議事録：古い名前順に読み、同じ月が2つあれば後のほう（名前順で後）を使う
+    files.sort((a, b) => a.name.localeCompare(b.name, 'ja'));
+    for (const h of files) {
+      try {
+        const r = await readDocx(await (await h.getFile()).arrayBuffer(), h.name);
+        if (r) { goals[r.ym] = r.list; src[r.ym] = h.name; } else skipped.push(h.name);
+      } catch (e) { console.warn('安全衛生目標：議事録を読めませんでした', h.name, e); skipped.push(h.name); }
+    }
+    // Excel（あれば。同じ月は Excel を優先）
+    let xh = null;
+    try { xh = await (sub || hd).getFileHandle(FILE); } catch (e) { if (sub) { try { xh = await hd.getFileHandle(FILE); } catch (e2) { /* 無い */ } } }
+    if (xh) {
+      let g = {};
+      try { g = toGoals(await readXlsx(await (await xh.getFile()).arrayBuffer())); }
+      catch (e) { if (!Object.keys(goals).length) throw e; } // 予備の Excel が空でも、議事録が読めていればよい
+      Object.entries(g).forEach(([k, v]) => { goals[k] = v; src[k] = FILE; });
+    }
+    if (!Object.keys(goals).length) {
+      const e = new Error(sub ? `「${SUB}」フォルダに、目標の入った議事録（.docx）も ${FILE} もありません。` : '');
+      e.name = sub ? 'Error' : 'NotFoundError';
+      throw e;
+    }
+    return { goals, src, skipped };
   }
   async function readFrom(hd) {
     const m = M();
     try {
-      const goals = await m.within((async () => toGoals(await readXlsx(await (await (await fileHandle(hd)).getFile()).arrayBuffer())))(), m.T.read, `${FILE} の読み取り`);
-      state.goals = goals; state.at = new Date().toISOString(); state.err = '';
-      try { await m.kv.put('anzenGoals', { goals, at: state.at }); } catch (e) { /* 覚えられなくても今回は使える */ }
+      const { goals, src, skipped } = await m.within(collect(hd), m.T.read * 2, '安全衛生目標の読み取り'); // 議事録が何か月分もあるので長めに
+      state.goals = goals; state.src = src; state.skipped = skipped; state.at = new Date().toISOString(); state.err = '';
+      try { await m.kv.put('anzenGoals', { goals, src, at: state.at }); } catch (e) { /* 覚えられなくても今回は使える */ }
       emit();
       return true;
     } catch (e) {
-      state.err = e && e.name === 'NotFoundError' ? `${FILE} が見つかりません。${PLACE}を確認してください。` : String((e && e.message) || e);
+      state.err = e && e.name === 'NotFoundError' ? `「${SUB}」フォルダが見つかりません。${PLACE}を確認してください。` : String((e && e.message) || e);
       emit();
       return false;
     }
@@ -124,7 +196,7 @@
   function init() {
     return inited || (inited = (async () => {
       const m = M();
-      try { const d = await m.kv.get('anzenGoals'); if (d && d.goals) { state.goals = d.goals; state.at = d.at || ''; emit(); } } catch (e) { /* noop */ }
+      try { const d = await m.kv.get('anzenGoals'); if (d && d.goals) { state.goals = d.goals; state.src = d.src || {}; state.at = d.at || ''; emit(); } } catch (e) { /* noop */ }
       await m.init(); // 前に選んだフォルダの確認（得意先・担当者マスタと共通。時間切れ付き）
       const hd = m.state.handle;
       if (hd && !m.state.lost) {
@@ -210,6 +282,8 @@
       ok
         ? el('div', { class: 'mst-st' }, `${fmtYm(months[0])}〜${fmtYm(months[months.length - 1])}（${months.length}か月分）`, el('br'), `${fmtAt(s.at)} に読み込み`)
         : el('div', { class: 'mst-st warn' }, 'まだ読み込んでいません。', el('br'), `${PLACE}を読みます。「フォルダを選ぶ」で BOX の app_data フォルダを選んでください（BOX Drive が必要です）。`),
+      e ? el('div', { class: 'mst-st' }, `${fmtYm(e.ym)}の目標：${s.src[e.ym] === FILE ? FILE : s.src[e.ym] ? `議事録「${s.src[e.ym]}」` : ''}`) : null,
+      s.skipped && s.skipped.length ? el('div', { class: 'mst-st warn' }, `目標を読み取れなかった議事録：${s.skipped.join('、')}`) : null,
       e && e.instead ? el('div', { class: 'mst-st warn' }, `${fmtYm(e.instead)} の目標はまだ登録されていません（${fmtYm(e.ym)} の目標を使います）。`) : null,
       s.err ? el('div', { class: 'mst-st warn' }, s.err) : null,
       m.state.lost ? el('div', { class: 'mst-st warn' }, m.state.lost, el('br'), '「フォルダを選び直す」から app_data フォルダを選んでください。') : null,
@@ -265,5 +339,5 @@
     auto(false);
   }
 
-  window.YGoals = { bind, state, _test: { readXlsx, toGoals, ym } };
+  window.YGoals = { bind, state, _test: { readXlsx, toGoals, ym, readDocx } };
 })();
