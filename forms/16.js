@@ -15,6 +15,7 @@
     selfStamp: '発行者', // 本人欄（デート印を押す欄）
     meta: [{ label: '依頼日', key: 'date', type: 'date' }],
     bottomStamps: ['登録済検印'], // 下部（フッターの上）に置く押印欄
+    setup: (ctx) => ShoshikiApp.bindChiku(ctx),
     stamps: [{ boxes: ['確認', '確認', '発行者'] }],
     blocks: [
       { type: 'grid', dense: true, rowH: 6.2, lalign: 'left', lw: 5, rows: [
@@ -26,7 +27,8 @@
         [it('01', '物件名称', 'name', { span: 24, placeholder: '30文字以内', maxlength: 30 })],
         [it('02', '物件略称(ｶﾀｶﾅ)', 'kana', { span: 24, placeholder: '30文字以内', maxlength: 30 })],
         [it('03', '予想工期', 'kFrom', { key2: 'kTo', type: 'daterange', span: 24 })], // 「〜」の両側に罫線なし
-        [...code('04', '施工地区', 'area'), it('05', '工事場所', 'place', { placeholder: '漢字・30文字以内' })],
+        // 04.施工地区は工-04 の 06 と同じ作り（候補から選ぶと 05 の先頭に名称。2026-11-27 ユーザー指定）
+        [it('04', '施工地区', 'chiku', { placeholder: '都道府県・市区町村名の一部を入力 → 候補から選択' }), it('05', '工事場所', 'place', { placeholder: '漢字・30文字以内（04で候補を選ぶと先頭に名称）' })],
         [...code('06', '設計引合先', 'hikiai'), it('07', '設計引合先窓口', 'madoguchi', { placeholder: '部署・氏名等' })],
         [...code('08', '建設会社', 'kensetsu'), ...code('09', '設計事務所', 'sekkei')],
         [...code('10', '施主', 'seshu'), ...code('11', '予想契約先', 'keiyaku')],
