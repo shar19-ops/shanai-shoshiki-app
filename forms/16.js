@@ -20,7 +20,8 @@
     selfStamp: '発行者', // 本人欄（デート印を押す欄）
     meta: [{ label: '依頼日', key: 'date', type: 'date' }],
     bottomStamps: ['登録済検印'], // 下部（フッターの上）に置く押印欄
-    setup: (ctx) => ShoshikiApp.bindChiku(ctx),
+    // 04.施工地区は工-04 と同じ作り（app.js の bindChiku）。得意先・担当者は工-04 と同じマスタから候補（assets/master.js。2026-11-27 ユーザー指定）
+    setup: (ctx) => { ShoshikiApp.bindChiku(ctx); YMaster.bind(ctx, [['hikiai', 'customers'], ['kensetsu', 'customers'], ['sekkei', 'customers'], ['seshu', 'customers'], ['keiyaku', 'customers'], ['eigyo', 'staff']], '読み込むと、06 設計引合先・08 建設会社・09 設計事務所・10 施主・11 予想契約先・20 営業担当者で、コードか名称の一部を入力すると候補が出ます（↑↓で選んで Enter）。'); },
     stamps: [{ boxes: ['確認', '確認', '発行者'] }],
     blocks: [
       { type: 'grid', dense: true, rowH: 6.2, lalign: 'left', cols: 48, lw: 8, rows: dbl([
