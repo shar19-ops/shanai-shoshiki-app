@@ -27,7 +27,7 @@
         [it('02', '物件略称(ｶﾀｶﾅ)', 'kana', { span: 24, placeholder: '30文字以内', maxlength: 30 })],
         [it('03', '予想工期', 'kFrom', { key2: 'kTo', type: 'daterange', span: 24 })], // 「〜」の両側に罫線なし
         [...code('04', '施工地区', 'area'), it('05', '工事場所', 'place', { placeholder: '漢字・30文字以内' })],
-        [...code('06', '積算引合先', 'hikiai'), it('07', '設計引合先窓口', 'madoguchi', { placeholder: '部署・氏名等' })],
+        [...code('06', '設計引合先', 'hikiai'), it('07', '設計引合先窓口', 'madoguchi', { placeholder: '部署・氏名等' })],
         [...code('08', '建設会社', 'kensetsu'), ...code('09', '設計事務所', 'sekkei')],
         [...code('10', '施主', 'seshu'), ...code('11', '予想契約先', 'keiyaku')],
         [it('12', '建物用途', 'youto', { suggest: C.youto }), it('13', '主要構造', 'kozo', { suggest: C.kozo })],
