@@ -11,6 +11,52 @@
     { key: key + 'Name', placeholder: '名称', span: span / 2 },
   ];
 
+  // 04.施工地区：工-04 受注報告登録メモの 06.施工地区と同じ作り（2026-11-27 ユーザー指定。forms/22.js の bindChiku と同じ）。
+  //   都道府県・市区町村の候補（forms/data/prefectures.js、「コード5桁 名称」）から選ぶ。選ぶと 05.工事場所の先頭に名称を入れる
+  //   （前に入れた名称（placePrefix）だけを差し替え、その後ろに入力した番地などは残す）。
+  //   前のコード・名称の2つの欄（areaCd・areaName）で保存した下書き・JSON は、1つの欄にまとめて引き継ぐ
+  function bindChiku({ inputs, values, setVal }) {
+    const chiku = inputs.chiku, place = inputs.place;
+    if (!chiku || !place) return;
+    if (!values.chiku && (values.areaCd || values.areaName)) {
+      chiku.value = `${values.areaCd || ''} ${values.areaName || ''}`.trim();
+      setVal('chiku', chiku.value);
+      // 工事場所が前の名称で始まっていれば、そこを差し替える部分として覚える（選び直したときに前の名称が残らないように）
+      if (values.areaName && !values.placePrefix && String(values.place || '').startsWith(values.areaName)) setVal('placePrefix', values.areaName);
+    }
+    const ready = () => {
+      if (!document.getElementById('dl_chiku15')) {
+        const dl = document.createElement('datalist');
+        dl.id = 'dl_chiku15';
+        window.PREFECTURES.forEach((p) => { const o = document.createElement('option'); o.value = p; dl.append(o); });
+        document.body.append(dl);
+      }
+      chiku.setAttribute('list', 'dl_chiku15');
+    };
+    if (window.PREFECTURES) ready();
+    else {
+      const s = document.createElement('script');
+      s.src = 'forms/data/prefectures.js';
+      s.onload = ready;
+      document.head.append(s);
+    }
+    let last = chiku.value;
+    const apply = () => {
+      if (chiku.value === last || !window.PREFECTURES || window.PREFECTURES.indexOf(chiku.value) < 0) return; // 候補から選んだ時だけ
+      last = chiku.value;
+      const name = chiku.value.replace(/^\d+\s/, '');
+      const old = values.placePrefix || '';
+      const cur = place.value || '';
+      const rest = cur === old ? '' : old && cur.startsWith(old) ? cur.slice(old.length) : cur;
+      place.value = name + rest;
+      setVal('place', place.value);
+      setVal('placePrefix', name);
+      place.dispatchEvent(new Event('blur')); // 入りきらないときは文字を小さく
+    };
+    chiku.addEventListener('input', apply);
+    chiku.addEventListener('change', apply);
+  }
+
   // 見出しの幅を詰めて入力欄を広く（2026-11-27 ユーザー指定）：表を48列にして、span・lw を2倍にする。
   //   ここに書く span・lw は24列のときの値（0.5 刻みも可）。見出しはいちばん長い「07. 積算引合先窓口」が入る 4（＝31mm、前は 5＝38.7mm）
   const dbl = (rows) => rows.map((r) => (typeof r === 'string' ? r : r.map((f) => ({ ...f, span: (f.span || 24) * 2, ...(f.lw != null ? { lw: f.lw * 2 } : {}) }))));
@@ -20,6 +66,7 @@
     selfStamp: '発行者', // 本人欄（デート印を押す欄）
     meta: [{ label: '依頼日', key: 'date', type: 'date' }],
     bottomStamps: ['登録済検印'], // 下部（フッターの上）に置く押印欄
+    setup: bindChiku,
     stamps: [{ boxes: ['確認', '確認', '発行者'] }],
     blocks: [
       { type: 'grid', dense: true, lalign: 'left', cols: 48, lw: 8, rows: dbl([
@@ -32,7 +79,7 @@
         [it('01', '物件名称', 'name', { span: 24, placeholder: '30文字以内', maxlength: 30 })],
         [it('02', '物件略称(ｶﾀｶﾅ)', 'kana', { span: 24, placeholder: '30文字以内', maxlength: 30 })],
         [it('03', '予想工期', 'kFrom', { key2: 'kTo', type: 'daterange', span: 24 })], // 「〜」の両側に罫線なし
-        [...code('04', '施工地区', 'area'), it('05', '工事場所', 'place', { placeholder: '漢字・30文字以内' })],
+        [it('04', '施工地区', 'chiku', { placeholder: '都道府県・市区町村名の一部を入力 → 候補から選択' }), it('05', '工事場所', 'place', { placeholder: '漢字・30文字以内（04で候補を選ぶと先頭に名称）' })],
         [...code('06', '積算引合先', 'hikiai'), it('07', '積算引合先窓口', 'madoguchi')],
         [...code('08', '建設会社', 'kensetsu'), ...code('09', '設計事務所', 'sekkei')],
         [...code('10', '施主', 'seshu'), ...code('11', '予想契約先', 'keiyaku')],
