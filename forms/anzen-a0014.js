@@ -4,7 +4,8 @@
 (function () {
   // 縦に1文字ずつ並べる。括弧は縦書き用の字形（︵︶）にして横向きに見せる（修正指示書）
   const vt = (s) => s.replace(/（/g, '︵').replace(/）/g, '︶').split('').join('\n');
-  // 走行距離 ＝ 翌日の出庫時メーター − その日の出庫時メーター（元Excelの G列の式と同じ）
+  // 走行距離 ＝ 次に出庫した日の出庫時メーター − その日の出庫時メーター
+  //   （元Excelは「翌日 − その日」で、土日など出庫しない日をはさむと空欄になり合計にも入らなかった → 2026-11-27 ユーザー指定で次に出庫した日に）
   // 2026-11-27 ユーザー指定：月末の下に「入庫時メーター指針」の欄（endMeter）。その月の最後に出庫した日
   //   （それより後の日に出庫時メーターが無い日。月末が土日で出庫しないときも）の走行距離 ＝ 入庫時 − その日の出庫時
   const toN = (x) => { const s = String(x ?? '').replace(/[,，\s]/g, ''); return s === '' || isNaN(Number(s)) ? null : Number(s); };
@@ -15,10 +16,8 @@
     if (d > L) return '';
     const m0 = meter(v, d);
     if (m0 == null) return '';
-    const m1 = d < L ? meter(v, d + 1) : null;
-    if (m1 != null) return m1 - m0;
-    for (let x = d + 1; x <= L; x++) if (meter(v, x) != null) return ''; // 後の日にまだ出庫がある（間が空いた日は今までどおり空欄）
-    const e = toN(v.endMeter);
+    for (let x = d + 1; x <= L; x++) { const m1 = meter(v, x); if (m1 != null) return m1 - m0; } // 次に出庫した日
+    const e = toN(v.endMeter); // 月の最後の出庫 → 入庫時
     return e == null ? '' : e - m0;
   };
   const num = (s) => { const n = Number(String(s ?? '').replace(/[,，\s]/g, '')); return isNaN(n) ? 0 : n; };
