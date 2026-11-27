@@ -126,6 +126,14 @@
       ] },
     ],
     blocks: [
+      // 画面だけの説明（印刷しない）：月安全衛生目標の読み込み方（2026-11-27 ユーザー指定）
+      { type: 'custom', render: ({ h }) => h('div', { class: 'no-print scr-note scr-steps' },
+        h('b', null, '月安全衛生目標の読み込み方（最初に1回だけ）'),
+        h('ol', null,
+          h('li', null, '画面上の「', h('b', null, '安全衛生目標'), '」ボタン →「', h('b', null, 'フォルダを選ぶ'), '」を押す'),
+          h('li', null, 'Box ＞ 全社共有フォルダ ＞ 999_Y-Formatデータ ＞ ', h('b', null, 'app_data'), ' を1回クリックして「フォルダーの選択」→「', h('b', null, '表示'), '」'),
+          h('li', null, h('b', null, '検査日'), 'を入れると、その月の目標（36〜）が自動で入ります')),
+        '※ BOX Drive が必要です。得意先・担当者マスタで app_data を選んだことがあれば 1・2 は不要。目標が変わったら「安全衛生目標」→「', h('b', null, '最新に更新'), '」') },
       { type: 'grid', lw: 4, dense: true, rowH: 5, rows: [
         [{ label: '規　模', key: 'chika', prefix: '地下', unit: '階', span: 7 },
           { key: 'chijo', prefix: '地上', unit: '階', span: 3 },
