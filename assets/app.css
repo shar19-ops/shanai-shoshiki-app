@@ -1050,6 +1050,7 @@ table.grid.h56 td.h56-in .inkan-hint::after { content: '印'; font-size: 7pt; co
 /* 本-安全-A0014 運転月報：年月は大きめの太字（修正指示書） */
 .f-meta .m-item.a14-ym, .f-meta .m-item.a14-ym .inp, .f-meta .m-item.a14-ym .pv { font-size: 13pt; font-weight: bold; }
 table.grid td.a14-ym .inp { font-size: 12pt; font-weight: bold; }
+table.grid.a14-days tfoot td { height: 9mm; } /* 本-安全-A0014 月末 入庫時の行（日の行と同じ高さ。2026-11-27 ユーザー指定） */
 /* 本-安全-A0014 運転月報：年月は大きめの太字（修正指示書） */
 .f-meta .m-item.a14-ym, .f-meta .m-item.a14-ym .inp, .f-meta .m-item.a14-ym .pv { font-size: 13pt; font-weight: bold; }
 table.grid td.a14-ym .inp { font-size: 12pt; font-weight: bold; }
