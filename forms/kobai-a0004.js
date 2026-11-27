@@ -239,7 +239,7 @@
   const make = (no, kind, tate) => {
     FORM_DEFS[`kobai-a0004-${no}${tate ? '-tate' : ''}`] = {
       code: `本-購買-A0004-${no}`, title: `見積依頼書／注文書付属書（${kind === 1 ? '労務・材料労務' : '物品納品'}）`,
-      seitei: '99/01/04', kaitei: '26/11/17', // フッター：制定日は元の様式のまま、最終改訂日はユーザー指定
+      seitei: '99/01/04', kaitei: '25/07/25', // フッター：制定日は元の様式のまま、最終改訂日はユーザー指定（2026-11-27 26/11/17 → 25/07/25）
       orientation: tate ? 'portrait' : 'landscape',
       sheetClass: tate ? 'b4-sheet b4-tate' : 'b4-sheet',
       tbNote: tate ? '' : '【旧版】', // 画面の上部だけに出す（印刷には出ない）。2026-11-17 縦を正規版、横を旧版に（ユーザー指定）
