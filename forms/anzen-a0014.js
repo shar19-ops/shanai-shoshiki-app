@@ -4,16 +4,22 @@
 (function () {
   // 縦に1文字ずつ並べる。括弧は縦書き用の字形（︵︶）にして横向きに見せる（修正指示書）
   const vt = (s) => s.replace(/（/g, '︵').replace(/）/g, '︶').split('').join('\n');
-  // 走行距離 ＝ 翌日の出庫時メーター − その日の出庫時メーター（元Excelの G列の式と同じ。31日は空欄）
-  const meter = (v, d) => {
-    const k = d <= 15 ? `a.${d}.meter` : `b.${d - 15}.meter`;
-    const s = String(v[k] ?? '').replace(/[,，\s]/g, '');
-    return s === '' || isNaN(Number(s)) ? null : Number(s);
-  };
+  // 走行距離 ＝ 翌日の出庫時メーター − その日の出庫時メーター（元Excelの G列の式と同じ）
+  // 2026-11-27 ユーザー指定：月末の下に「入庫時メーター指針」の欄（endMeter）。その月の最後に出庫した日
+  //   （それより後の日に出庫時メーターが無い日。月末が土日で出庫しないときも）の走行距離 ＝ 入庫時 − その日の出庫時
+  const toN = (x) => { const s = String(x ?? '').replace(/[,，\s]/g, ''); return s === '' || isNaN(Number(s)) ? null : Number(s); };
+  const meter = (v, d) => toN(v[d <= 15 ? `a.${d}.meter` : `b.${d - 15}.meter`]);
+  const lastDay = (v) => { const ym = ymOf(v); return ym ? new Date(ym[0], ym[1], 0).getDate() : 31; };
   const distance = (v, d) => {
-    if (d >= 31) return '';
-    const m0 = meter(v, d), m1 = meter(v, d + 1);
-    return m0 == null || m1 == null ? '' : m1 - m0;
+    const L = lastDay(v);
+    if (d > L) return '';
+    const m0 = meter(v, d);
+    if (m0 == null) return '';
+    const m1 = d < L ? meter(v, d + 1) : null;
+    if (m1 != null) return m1 - m0;
+    for (let x = d + 1; x <= L; x++) if (meter(v, x) != null) return ''; // 後の日にまだ出庫がある（間が空いた日は今までどおり空欄）
+    const e = toN(v.endMeter);
+    return e == null ? '' : e - m0;
   };
   const num = (s) => { const n = Number(String(s ?? '').replace(/[,，\s]/g, '')); return isNaN(n) ? 0 : n; };
   const totalDist = (v) => { let s = 0; for (let d = 1; d <= 31; d++) { const x = distance(v, d); if (x !== '') s += x; } return s; };
@@ -53,8 +59,8 @@
     return w === 0 || w === 6 || holidays(ym[0]).has(`${ym[1]}-${d}`);
   };
 
-  const days = (key, start, rows) => ({
-    type: 'table', key, rows, rowH: 9, dense: true, headH: 12,
+  const days = (key, start, rows, foot) => ({
+    type: 'table', key, rows, rowH: 9, dense: true, headH: 12, foot,
     columns: [
       { label: '日付', key: 'day', w: 6, align: 'center', rowCalc: (r, v) => (inMonth(v, r + start - 1) ? String(r + start - 1) : '') },
       // 休日：年月を選ぶと土日・祝日に〇（クリックで付け外しできる。会社の休日など）
@@ -110,7 +116,10 @@
     pages: [
       { blocks: [info, days('a', 1, 15), checklist('mid', '15日')] },
       // 2枚目：押印欄は1枚目だけ。合計（走行距離・給油）と燃費は自動
-      { stamps: [], meta: [], subtitle: '（2/2）', blocks: [info2, days('b', 16, 16),
+      { stamps: [], meta: [], subtitle: '（2/2）', blocks: [info2, days('b', 16, 16, [
+        // 月末の下：月末の入庫時メーター指針（出庫時メーターの列に入力。最後に出庫した日の走行距離に使う。2026-11-27 ユーザー指定）
+        [{ label: '月末 入庫時', span: 2 }, { key: 'endMeter', type: 'number', dec: 0 },
+          { label: '← 月末の入庫時のメーター指針（km）', lbl: false, span: 6 }]]),
         { type: 'grid', lw: 4, rowH: 7, dense: true, rows: [
           [{ label: '走行距離合計', key: 'sumDist', type: 'calc', unit: 'km', calc: (n, v) => totalDist(v), span: 8 },
             { label: '燃費≒走行距離\n合計/給油合計', key: 'nenpi', type: 'calc', unit: 'km/ℓ', dec: 1, calc: (n, v) => { const f = totalFuel(v); return f ? totalDist(v) / f : NaN; }, lw: 5, span: 9 },
