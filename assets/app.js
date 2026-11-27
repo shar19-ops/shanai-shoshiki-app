@@ -1650,5 +1650,50 @@
     window.scrollTo(0, 0);
   }
 
-  window.ShoshikiApp = { boot, version: APP_VERSION, toNum, fmtNum, layoutH, shrinkImage };
+  // 施工地区（chiku）：都道府県・市区町村の候補（forms/data/prefectures.js、「コード5桁 名称」）から選び、選ぶと工事場所（place）の先頭に名称を入れる
+  //   （前に入れた名称（placePrefix）だけを差し替え、その後ろに入力した番地などは残す）。営-06・営-08 の 04.施工地区（2026-11-27 ユーザー指定。工-04 の 06 と同じ作り）
+  //   前のコード・名称の2つの欄（areaCd・areaName）で保存した下書き・JSON は、1つの欄にまとめて引き継ぐ。帳票の setup から ShoshikiApp.bindChiku(ctx)
+  function bindChiku({ inputs, values, setVal }) {
+    const chiku = inputs.chiku, place = inputs.place;
+    if (!chiku || !place) return;
+    if (!values.chiku && (values.areaCd || values.areaName)) {
+      chiku.value = `${values.areaCd || ''} ${values.areaName || ''}`.trim();
+      setVal('chiku', chiku.value);
+      // 工事場所が前の名称で始まっていれば、そこを差し替える部分として覚える（選び直したときに前の名称が残らないように）
+      if (values.areaName && !values.placePrefix && String(values.place || '').startsWith(values.areaName)) setVal('placePrefix', values.areaName);
+    }
+    const ready = () => {
+      if (!document.getElementById('dl_chiku_pref')) {
+        const dl = document.createElement('datalist');
+        dl.id = 'dl_chiku_pref';
+        window.PREFECTURES.forEach((p) => { const o = document.createElement('option'); o.value = p; dl.append(o); });
+        document.body.append(dl);
+      }
+      chiku.setAttribute('list', 'dl_chiku_pref');
+    };
+    if (window.PREFECTURES) ready();
+    else {
+      const s = document.createElement('script');
+      s.src = 'forms/data/prefectures.js';
+      s.onload = ready;
+      document.head.append(s);
+    }
+    let last = chiku.value;
+    const apply = () => {
+      if (chiku.value === last || !window.PREFECTURES || window.PREFECTURES.indexOf(chiku.value) < 0) return; // 候補から選んだ時だけ
+      last = chiku.value;
+      const name = chiku.value.replace(/^\d+\s/, '');
+      const old = values.placePrefix || '';
+      const cur = place.value || '';
+      const rest = cur === old ? '' : old && cur.startsWith(old) ? cur.slice(old.length) : cur;
+      place.value = name + rest;
+      setVal('place', place.value);
+      setVal('placePrefix', name);
+      place.dispatchEvent(new Event('blur')); // 入りきらないときは文字を小さく
+    };
+    chiku.addEventListener('input', apply);
+    chiku.addEventListener('change', apply);
+  }
+
+  window.ShoshikiApp = { boot, version: APP_VERSION, toNum, fmtNum, layoutH, shrinkImage, bindChiku };
 })();
