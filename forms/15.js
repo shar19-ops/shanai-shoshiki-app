@@ -15,6 +15,24 @@
   //   都道府県・市区町村の候補（forms/data/prefectures.js、「コード5桁 名称」）から選ぶ。選ぶと 05.工事場所の先頭に名称を入れる
   //   （前に入れた名称（placePrefix）だけを差し替え、その後ろに入力した番地などは残す）。
   //   前のコード・名称の2つの欄（areaCd・areaName）で保存した下書き・JSON は、1つの欄にまとめて引き継ぐ
+  // 45・46：前のコード・名称の2つの欄（juchuBuCd・juchuBuName など）で保存した下書き・JSON は、一覧の部署に引き継ぐ
+  //   （新しい3桁のコード、前の5桁のコード、名称のどれかで一覧の部署を探す）
+  function migrateBusho({ inputs, values, setVal }) {
+    const norm = (s) => String(s || '').normalize('NFKC').replace(/第1/g, '第一').replace(/第2/g, '第二').trim();
+    ['juchuBu', 'sekoBu'].forEach((k) => {
+      const el = inputs[k], cd = String(values[k + 'Cd'] || '').trim(), nm = norm(values[k + 'Name']);
+      if (!el || values[k] || (!cd && !nm)) return;
+      const list = LISTS.bushoCodes;
+      const oldKey = cd && Object.keys(LISTS.bushoCodesOld).find((o) => o.startsWith(cd + '：'));
+      const hit = (cd && list.find((o) => o.startsWith(cd + '：'))) || (oldKey && LISTS.bushoCodesOld[oldKey])
+        || (nm && list.find((o) => norm(o.split('：')[1]) === nm));
+      if (!hit) return;
+      el.value = hit;
+      setVal(k, hit);
+      el.dispatchEvent(new Event('change'));
+    });
+  }
+
   function bindChiku({ inputs, values, setVal }) {
     const chiku = inputs.chiku, place = inputs.place;
     if (!chiku || !place) return;
@@ -66,7 +84,7 @@
     selfStamp: '発行者', // 本人欄（デート印を押す欄）
     meta: [{ label: '依頼日', key: 'date', type: 'date' }],
     bottomStamps: ['登録済検印'], // 下部（フッターの上）に置く押印欄
-    setup: bindChiku,
+    setup: (ctx) => { bindChiku(ctx); migrateBusho(ctx); },
     stamps: [{ boxes: ['確認', '確認', '発行者'] }],
     blocks: [
       { type: 'grid', dense: true, lalign: 'left', cols: 48, lw: 8, rows: dbl([
@@ -95,7 +113,8 @@
         [it('19', 'JV工事識別', 'jv', { type: 'select', options: C.jv, span: 8 }), it('20', '元請・下請', 'motouke', { type: 'select', options: C.motouke, span: 8 }), it('21', '直接契約識別', 'choku', { type: 'select', options: C.chokusetsu, span: 8 })],
         [it('22', 'コストオン識別', 'costOn', { type: 'select', options: C.costOn, span: 8 }), it('23', '物件状況識別', 'bukken', { suggest: C.bukken, span: 8 }), { span: 8 }],
         [...code('24', '営業担当者', 'eigyo'), it('25', '予想受注月度', 'juchuM', { type: 'ym' })],
-        [...code('45', '受注担当部署', 'juchuBu'), ...code('46', '施工担当部署', 'sekoBu')],
+        // 45・46 は工-04 の 31・33 と同じ部署の一覧から選ぶ（2026-11-27 ユーザー指定。前はコード・名称の手入力）
+        [it('45', '受注担当部署', 'juchuBu', { type: 'select', options: LISTS.bushoCodes, migrate: LISTS.bushoCodesOld }), it('46', '施工担当部署', 'sekoBu', { type: 'select', options: LISTS.bushoCodes, migrate: LISTS.bushoCodesOld })],
         [it('26', '備考（物件説明）', 'biko1', { span: 24, placeholder: '上段・30文字以内', maxlength: 30 })],
         [{ label: '', key: 'biko2', span: 24, placeholder: '下段・30文字以内', maxlength: 30 }],
         '■ 提出条件',
