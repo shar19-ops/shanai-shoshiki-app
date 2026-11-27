@@ -54,7 +54,9 @@
       [35, '所内会議を行い周知と現場を把握しているか'],
     ]],
   ];
-  const GOALS = 7; // 月安全衛生目標の行数
+  // 月安全衛生目標の行数。2026-11-27 7 → 8（安全品質保証部が毎月更新する目標が8項目。番号つき）
+  //   目標は BOX の 安全衛生目標.xlsx から検査日の月の分を自動で入れる（assets/goals.js。運用 B：ユーザー指定）
+  const GOALS = 8;
   const LABEL_W = 'calc((210mm - 24mm) * 4 / 24)'; // 下の表の見出し列（24分割の4列）と同じ幅
 
   // 検査項目の表（左右で同じ形）。区分は縦書き
@@ -85,7 +87,8 @@
         i === 1 ? h('td', { class: 'lbl q-cat q-goal-h', rowspan: GOALS },
           h('div', { class: 'q-month' }, field({ key: 'goalMonth', align: 'center', maxlength: 2, inputmode: 'numeric' })),
           h('div', { class: 'q-vt' }, '月安全衛生目標')) : null,
-        h('td', { class: 'q-goal', colspan: 2 }, field({ key: `goal${i}` })),
+        h('td', { class: 'q-no q-goal-no' }, field({ key: `goalNo${i}`, align: 'center', maxlength: 3 })), // 番号（35 など。検査項目の続き）
+        h('td', { class: 'q-goal' }, field({ key: `goal${i}` })),
         h('td', { class: 'q-chk' }, field({ key: `goalJ${i}`, type: 'select', options: MARKS, align: 'center' }))));
     }
   };
@@ -98,6 +101,7 @@
     code: '本-安全-A0001', title: '安全･衛生検査指導報告書',
     seitei: '02/09/12', kaitei: '26/11/17', // フッター：制定日は元の様式のまま、最終改訂日はユーザー指定（2026-10-27 指示）
     selfStamp: '発行者', // 本人欄（デート印を押す欄）
+    setup: (ctx) => { if (window.YGoals) YGoals.bind(ctx, { rows: GOALS }); }, // 月安全衛生目標を BOX から（2026-11-27）
     meta: [
       { label: '検査日', key: 'date', type: 'date', w: 30 },
       { label: '天候', key: 'weather', w: 14, cls: 'fixw near' }, // 検査日のすぐ横

@@ -168,7 +168,8 @@
       const c = norm(code);
       return c && state[kind] ? state[kind].find((x) => x.c === c) || null : null;
     };
-    return { state, init, pick, update, search, byCode, onChange: (f) => listeners.push(f), T };
+    // kv・within は安全衛生目標（assets/goals.js）も使う（同じ保存領域・同じフォルダ。2026-11-27）
+    return { state, init, pick, update, search, byCode, onChange: (f) => listeners.push(f), T, kv: { get, put }, within };
   })();
 
   const fmtAt = (iso) => {
