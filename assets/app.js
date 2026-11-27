@@ -405,7 +405,9 @@
       const hit = LISTS.officeCodes.find(([cd]) => cd === code);
       return hit ? hit[1].replace(/^\d+\s*/, '') : s;
     };
-    const names = c.title === '支店長' ? { nameTop: officeName(values.office || c.office).replace(/支店$/, ''), nameBottom: '支店長' }
+    //   事業所は押印設定で選んだもの（その支店長の支店）を優先。帳票の事業所の欄は、押印設定に事業所がないときだけ
+    //   （前は帳票の欄を優先していて、案件の事業所が本店だと大阪支店長の印に「本店」と出た。2026-11-27 ユーザー指摘）
+    const names = c.title === '支店長' ? { nameTop: officeName(c.office || values.office).replace(/支店$/, ''), nameBottom: '支店長' }
       : c.title ? { nameTop: c.sei, nameBottom: c.title } : { name: c.sei };
     return DateStamp.svg({ ...names, date: stampDate(c), color: c.color });
   }
