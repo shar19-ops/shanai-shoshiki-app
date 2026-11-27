@@ -21,6 +21,8 @@
 (function () {
   const M = () => window.YMaster && window.YMaster.Master;
   const SUB = '安全衛生目標', FILE = '安全衛生目標.xlsx', SHEET = '安全衛生目標';
+  // iPad（フォルダを選べない）：議事録・Excel のファイルを選ぶ
+  const IPAD_HOW = '「ファイルを選ぶ」→「ファイル」の画面で Box ＞ 全社共有フォルダ ＞ 999_Y-Formatデータ ＞ app_data ＞ 安全衛生目標 を開き、議事録（.docx）を選んで「開く」（右上の「選択」で何か月分でも選べます）。';
   const PLACE = 'BOX の「全社共有フォルダ ＞ 999_Y-Formatデータ ＞ app_data ＞ 安全衛生目標」フォルダ（安全衛生委員会の議事録・安全衛生目標.xlsx）';
 
   // ---------- Excel（.xlsx）を読む：zip を開いて、シートのセルの文字を取り出すだけの小さな読み取り ----------
@@ -207,7 +209,35 @@
     })());
   }
   async function update() { const m = M(); if (await m.update() && m.state.handle) return readFrom(m.state.handle); return false; }
-  async function pick() { const m = M(); if (await m.pick() && m.state.handle) return readFrom(m.state.handle); return false; }
+  async function pick() {
+    const m = M();
+    if (!m.canDir) return pickFiles();
+    if (await m.pick() && m.state.handle) return readFrom(m.state.handle);
+    return false;
+  }
+  // iPad など（フォルダを選べない）：「ファイル」アプリの Box から議事録（.docx）・安全衛生目標.xlsx を選ぶ（複数可。2026-11-27）
+  //   フォルダ全体を読めないので、前に読み込んだ月に足していく（今月の議事録1つだけ選んでも前の月は消えない）。同じ月は Excel を優先
+  async function pickFiles() {
+    const files = await M().chooseFiles('.docx,.xlsx,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    if (!files) return false;
+    const goals = { ...(state.goals || {}) }, src = { ...(state.src || {}) }, skipped = [];
+    let n = 0;
+    const docs = files.filter((f) => /\.docx$/i.test(f.name)).sort((a, b) => a.name.localeCompare(b.name, 'ja'));
+    const xlsx = files.filter((f) => /\.xlsx$/i.test(f.name));
+    for (const f of docs) {
+      try { const r = await readDocx(await f.arrayBuffer(), f.name); if (r) { goals[r.ym] = r.list; src[r.ym] = f.name; n++; } else skipped.push(f.name); }
+      catch (e) { console.warn('安全衛生目標：議事録を読めませんでした', f.name, e); skipped.push(f.name); }
+    }
+    for (const f of xlsx) {
+      try { Object.entries(toGoals(await readXlsx(await f.arrayBuffer()))).forEach(([k, v]) => { goals[k] = v; src[k] = FILE; n++; }); }
+      catch (e) { skipped.push(f.name); }
+    }
+    if (!n) { alert(`目標を読み取れませんでした（${skipped.join('、') || '選んだファイル'}）。\n安全衛生委員会の議事録（.docx）か ${FILE} を選んでください。`); return false; }
+    state.goals = goals; state.src = src; state.skipped = skipped; state.at = new Date().toISOString(); state.err = '';
+    try { await M().kv.put('anzenGoals', { goals, src, at: state.at }); } catch (e) { /* 今回は使える */ }
+    emit();
+    return true;
+  }
 
   // ---------- 帳票へ入れる ----------
   const pad = (n) => String(n).padStart(2, '0');
@@ -273,7 +303,8 @@
     const e = ok ? entryFor(target()) : null;
     const upd = el('button', { type: 'button', class: 'primary' }, '最新に更新');
     upd.addEventListener('click', busy(upd, update));
-    const pk = el('button', { type: 'button', class: !ok || m.state.lost ? 'primary' : null }, ok ? 'フォルダを選び直す' : 'フォルダを選ぶ');
+    const what = m.canDir ? 'フォルダ' : 'ファイル';
+    const pk = el('button', { type: 'button', class: !ok || m.state.lost ? 'primary' : null }, ok && m.canDir ? 'フォルダを選び直す' : `${what}を選ぶ`);
     pk.addEventListener('click', busy(pk, pick));
     const fill = el('button', { type: 'button' }, '検査日の月の目標を入れる');
     fill.addEventListener('click', fillNow);
@@ -281,7 +312,10 @@
       el('div', { class: 'mst-h' }, '月安全衛生目標'),
       ok
         ? el('div', { class: 'mst-st' }, `${fmtYm(months[0])}〜${fmtYm(months[months.length - 1])}（${months.length}か月分）`, el('br'), `${fmtAt(s.at)} に読み込み`)
-        : el('div', { class: 'mst-st warn' }, 'まだ読み込んでいません。', el('br'), `${PLACE}を読みます。「フォルダを選ぶ」で BOX の app_data フォルダを選んでください（BOX Drive が必要です）。`),
+        : el('div', { class: 'mst-st warn' }, 'まだ読み込んでいません。', el('br'), m.canDir
+          ? `${PLACE}を読みます。「フォルダを選ぶ」で BOX の app_data フォルダを選んでください（BOX Drive が必要です）。`
+          : IPAD_HOW),
+      ok && !m.canDir ? el('div', { class: 'mst-st' }, '新しい月の議事録が出たら「ファイルを選ぶ」でその議事録を選んでください（前の月の分は残ります。iPad は自動で読み直せません）。') : null,
       e ? el('div', { class: 'mst-st' }, `${fmtYm(e.ym)}の目標：${s.src[e.ym] === FILE ? FILE : s.src[e.ym] ? `議事録「${s.src[e.ym]}」` : ''}`) : null,
       s.skipped && s.skipped.length ? el('div', { class: 'mst-st warn' }, `目標を読み取れなかった議事録：${s.skipped.join('、')}`) : null,
       e && e.instead ? el('div', { class: 'mst-st warn' }, `${fmtYm(e.instead)} の目標はまだ登録されていません（${fmtYm(e.ym)} の目標を使います）。`) : null,
@@ -292,7 +326,7 @@
       el('div', { class: 'mst-note' },
         '検査日の月の目標が、自動で「月安全衛生目標」の欄に入ります（その月が無いときは前の月）。入った文字は手で直せます。',
         el('br'), '保存した報告書の目標は、あとで目標が更新されても変わりません。',
-        el('br'), 'フォルダは得意先・担当者マスタと同じ app_data です。'),
+        el('br'), m.canDir ? 'フォルダは得意先・担当者マスタと同じ app_data です。' : 'iPad では Box アプリが必要です（「ファイル」の画面に Box が出ないときは「ブラウズ」→「…」→「編集」で Box をオン）。'),
     ].filter(Boolean));
   }
   function togglePanel(btn) {

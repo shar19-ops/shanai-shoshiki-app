@@ -25,6 +25,25 @@
     ]);
   }
 
+  // フォルダを選べるか（Edge・Chrome のパソコン）。iPad の Safari・Chrome・Edge はできない → ファイルを選ぶ（2026-11-27）
+  const canDir = typeof window.showDirectoryPicker === 'function';
+  const IPAD_HOW = '「ファイル」の画面で Box ＞ 全社共有フォルダ ＞ 999_Y-Formatデータ ＞ app_data を開き、右上の「選択」で customers.json と staff.json の2つを選んで「開く」。';
+  // ファイルを選ぶ（複数可）。選ばずに閉じたら null（cancel が来ないブラウザでも、画面に戻ったら null）
+  function chooseFiles(accept) {
+    return new Promise((resolve) => {
+      const inp = document.createElement('input');
+      inp.type = 'file'; inp.multiple = true; inp.accept = accept; inp.style.display = 'none';
+      let done = false;
+      const finish = (v) => { if (done) return; done = true; inp.remove(); window.removeEventListener('focus', onFocus); resolve(v); };
+      const onFocus = () => setTimeout(() => { if (!inp.files || !inp.files.length) finish(null); }, 1500);
+      inp.addEventListener('change', () => finish(inp.files && inp.files.length ? [...inp.files] : null));
+      inp.addEventListener('cancel', () => finish(null));
+      document.body.append(inp);
+      setTimeout(() => window.addEventListener('focus', onFocus), 500);
+      inp.click(); // ボタンを押した処理の中で開く（iPad はそうしないと開かない）
+    });
+  }
+
   const Master = (() => {
     const ST = 'kv';
     let dbp = null;
@@ -94,19 +113,13 @@
         await apply(cs[0], cs[1], hd.name);
         return true;
       }
-      return new Promise((resolve) => {
-        const inp = document.createElement('input');
-        inp.type = 'file'; inp.multiple = true; inp.accept = '.json,application/json'; inp.style.display = 'none';
-        inp.addEventListener('change', async () => {
-          const files = [...inp.files];
-          inp.remove();
-          const f = (name) => files.find((x) => x.name.toLowerCase() === name);
-          if (!f(FILES.customers) || !f(FILES.staff)) { alert('customers.json と staff.json の2つを選んでください（BOX の「全社共有フォルダ ＞ 999_Y-Formatデータ ＞ app_data」フォルダ）。'); resolve(false); return; }
-          try { await apply(parse(await f(FILES.customers).text(), FILES.customers), parse(await f(FILES.staff).text(), FILES.staff), ''); resolve(true); }
-          catch (e) { alert(String(e.message || e)); resolve(false); }
-        });
-        document.body.append(inp); inp.click();
-      });
+      // iPad など（フォルダを選べない）：「ファイル」アプリの Box から customers.json と staff.json の2つを選ぶ（2026-11-27）
+      const files = await chooseFiles('.json,application/json');
+      if (!files) return false;
+      const f = (name) => files.find((x) => x.name.toLowerCase() === name);
+      if (!f(FILES.customers) || !f(FILES.staff)) { alert(`customers.json と staff.json の2つを選んでください。\n${IPAD_HOW}`); return false; }
+      try { await apply(parse(await f(FILES.customers).text(), FILES.customers), parse(await f(FILES.staff).text(), FILES.staff), 'ファイルを選んで'); return true; }
+      catch (e) { alert(String(e.message || e)); return false; }
     }
     // 前に選んだフォルダから読み直す（権限が切れていれば、ここで確認が出る）。返らなければ打ち切って選び直しへ
     async function update() {
@@ -169,7 +182,7 @@
       return c && state[kind] ? state[kind].find((x) => x.c === c) || null : null;
     };
     // kv・within は安全衛生目標（assets/goals.js）も使う（同じ保存領域・同じフォルダ。2026-11-27）
-    return { state, init, pick, update, search, byCode, onChange: (f) => listeners.push(f), T, kv: { get, put }, within };
+    return { state, init, pick, update, search, byCode, onChange: (f) => listeners.push(f), T, kv: { get, put }, within, canDir, chooseFiles };
   })();
 
   const fmtAt = (iso) => {
@@ -245,14 +258,18 @@
     const busy = (b, fn) => async () => { b.disabled = true; try { await fn(); } finally { b.disabled = false; } };
     const upd = el('button', { type: 'button', class: 'primary' }, '最新に更新');
     upd.addEventListener('click', busy(upd, Master.update));
-    const pk = el('button', { type: 'button', class: s.lost || !ok ? 'primary' : null }, ok ? 'フォルダを選び直す' : 'フォルダを選ぶ');
+    const what = canDir ? 'フォルダ' : 'ファイル';
+    const pk = el('button', { type: 'button', class: s.lost || !ok ? 'primary' : null }, ok ? `${what}を選び直す` : `${what}を選ぶ`);
     pk.addEventListener('click', busy(pk, Master.pick));
     panel.replaceChildren(...[ // null（出さない段）は除く（replaceChildren は null を文字の「null」にする）
       el('div', { class: 'mst-h' }, '得意先・担当者マスタ'),
       ok
         ? el('div', { class: 'mst-st' }, `得意先 ${s.customers.length.toLocaleString()}件・担当者 ${s.staff.length.toLocaleString()}件`, el('br'),
           `${fmtAt(s.at)} に${s.dir ? `「${s.dir}」から` : ''}読み込み`)
-        : el('div', { class: 'mst-st warn' }, 'まだ読み込んでいません。', el('br'), 'BOX の「全社共有フォルダ ＞ 999_Y-Formatデータ ＞ app_data」フォルダを選んでください（BOX Drive が必要です）。'),
+        : el('div', { class: 'mst-st warn' }, 'まだ読み込んでいません。', el('br'), canDir
+          ? 'BOX の「全社共有フォルダ ＞ 999_Y-Formatデータ ＞ app_data」フォルダを選んでください（BOX Drive が必要です）。'
+          : `「ファイルを選ぶ」→ ${IPAD_HOW}（Box アプリが必要です）`),
+      ok && !canDir ? el('div', { class: 'mst-st' }, 'マスタが新しくなったら、もう一度「ファイルを選び直す」で2つを選んでください（iPad は自動で読み直せません）。') : null,
       s.checking ? el('div', { class: 'mst-st' }, '前に選んだフォルダを確認しています…') : null,
       s.lost ? el('div', { class: 'mst-st warn' }, s.lost, el('br'), '「フォルダを選び直す」から BOX の「全社共有フォルダ ＞ 999_Y-Formatデータ ＞ app_data」フォルダを選んでください。', ok ? el('br') : null, ok ? '（それまでは前に読み込んだ内容で候補が出ます）' : null) : null,
       el('div', { class: 'mst-btns' }, ok && s.handle && !s.lost ? upd : null, pk),
