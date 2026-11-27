@@ -398,7 +398,16 @@
     // selfStampStyle: 'inkan'：デート印ではなく三文判風の認印（苗字だけ、朱。本-品質-A0020 の検査者。ユーザー指定）
     if (def.selfStampStyle === 'inkan') return DateStamp.inkan({ name: c.sei, color: 'red' });
     // 役職なし：苗字を上下に分割／役職あり：上に苗字・下に役職／支店長：上に事業所名（「支店」を除く）
-    const names = c.title === '支店長' ? { nameTop: (values.office || c.office || '').replace(/支店$/, ''), nameBottom: '支店長' }
+    //   帳票の「事業所」の欄がコード（'500' など。11/12 の新コード。前のコード '040' も）なら事業所名に読み替える
+    //   （読み替えないと印に「500」と出ていた。2026-11-27 ユーザー指摘）
+    const officeName = (v) => {
+      const s = String(v || ''), code = LISTS.officeCodesOld[s] || s;
+      const hit = LISTS.officeCodes.find(([cd]) => cd === code);
+      return hit ? hit[1].replace(/^\d+\s*/, '') : s;
+    };
+    //   事業所は押印設定で選んだもの（その支店長の支店）を優先。帳票の事業所の欄は、押印設定に事業所がないときだけ
+    //   （前は帳票の欄を優先していて、案件の事業所が本店だと大阪支店長の印に「本店」と出た。2026-11-27 ユーザー指摘）
+    const names = c.title === '支店長' ? { nameTop: officeName(c.office || values.office).replace(/支店$/, ''), nameBottom: '支店長' }
       : c.title ? { nameTop: c.sei, nameBottom: c.title } : { name: c.sei };
     return DateStamp.svg({ ...names, date: stampDate(c), color: c.color });
   }
