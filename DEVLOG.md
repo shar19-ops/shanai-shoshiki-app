@@ -1896,3 +1896,36 @@ GitHubリポジトリ: https://github.com/shar19-ops/shanai-shoshiki-app （publ
 |---|---|
 | `85d7a23` | PR #197 選択リストの文字を小さく |
 | `53171c2` | PR #198 営-06 見出しを詰めて入力欄を広く |
+
+## 2026-11-27: 営-06・営-08 の改良と、得意先・担当者マスタの共通化（PR #200〜#204）
+
+### PR #200 営-06 04.施工地区を工-04 と同じ作りに
+- コード・名称の2欄（areaCd・areaName）→ 1欄 `chiku`。forms/data/prefectures.js（1,965件）の datalist、候補を選ぶと 05.工事場所の先頭に名称（placePrefix だけ差し替え、番地は残す）
+- 前の下書き・JSON は1欄にまとめて引き継ぎ、工事場所が前の名称で始まっていれば placePrefix にして選び直しで差し替わるように
+
+### PR #201 営-06 45・46 担当部署を一覧から選ぶ
+- 工-04 の 31・33 と同じ部署の一覧。一覧と前のコードの置き換えを app.js の `LISTS.bushoCodes`・`LISTS.bushoCodesOld` にまとめ、工-04 と共通に
+- 前の juchuBuCd・juchuBuName などは、新しい3桁・前の5桁のコード・名称（NFKC、第1→第一）のどれかで一覧の部署に引き継ぐ（`migrateBusho`）
+
+### PR #202 営-08 04.施工地区も同じ作りに
+- 営-06 の仕組みを app.js の `ShoshikiApp.bindChiku(ctx)` に移して共通に（datalist の id は dl_chiku_pref）。工-04 は 22.js の bindChiku のまま
+
+### PR #203 営-08 見出しの幅を詰めて入力欄を広く
+- 営-06（PR #198）と同じ：`dbl()` で48列、見出し lw 4（31mm）、短い見出しはさらに、`code()` はコード span/2。名称 38.4 → 46.2mm など
+
+### PR #204 得意先・担当者マスタを共通部品に（固まらない対策）、営-06・営-08 でも候補
+- ユーザーの質問「営-06・営-08 も工-04 と同じマスタ方式にすると、Y-Plan のような不具合は出るか」→ 作図予定表・能力要件表と同じく、BOX の場所が変わると queryPermission・requestPermission・読み取りが返らず「最新に更新」が無反応になるおそれ（工-04 にも対策なし、app_data は 11/23 に移動済み）と回答。順番（対策 → 共通化 → つなぐ）で進めた
+- 22.js のマスタを `assets/master.js`（`YMaster.bind(ctx, [[キー, 'customers'|'staff'], ...], 説明)`）に移す。form.html で読み込み。IndexedDB（yformat-master）は共通なので、どれか1つで読み込めばほかでも候補
+- `within(p, ms)`：保存領域 4秒・queryPermission 4秒・requestPermission 10秒・読み取り 8秒。返らなければ `forget()`（state.handle を消し、IndexedDB の dir も削除、`state.lost`）→ ボタン「マスタ（要選び直し）」、パネルで選び直しを案内。前の内容で候補は出続ける
+- 営-06：hikiai・kensetsu・sekkei・seshu・keiyaku（得意先）、eigyo（担当者）。営-08 も同じ
+- 確認：ダミーのマスタで工-04 → 営-06・営-08 を開くと選び直さずに候補。**返らない許可（10.1秒で打ち切り）・返らない読み取り（8.1秒）・壊れた記憶（開いたときに要選び直し）・返らない保存領域（4秒、入力は可）**をわざと作って確認。前の工-04 のテストも通る。replaceChildren に null を渡すと「null」と出るので filter(Boolean)
+- 版番号 `2026111748`
+- Excel：帳票一覧（営-06・営-08・工-04 の備考）・修正指示書 No.163〜167
+
+| ハッシュ | 内容 |
+|---|---|
+| `884270e` | PR #200 営-06 施工地区 |
+| `2dd38a1` | PR #201 営-06 担当部署の一覧 |
+| `455aad4` | PR #202 営-08 施工地区（bindChiku 共通） |
+| `2e22001` | PR #203 営-08 見出しを詰める |
+| `be2c2c1` | PR #204 マスタ共通化・固まらない対策 |
