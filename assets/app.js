@@ -84,6 +84,7 @@
 
   // ---------- 入力部品 ----------
   // f: {key, type, options, placeholder, unit, align, lines, ...}
+  let fitSelectCanvas = null; // 選択リストの文字の幅を測る canvas（1つを使い回す）
   function field(f) {
     // 件名（key: 'subject'）は全帳票で、長いときは1行のまま小さく、それでも入らなければ2段に（fit2。2026-11-25 ユーザー指定）
     //   type を指定した欄（2行の textarea など）はそのまま。fit2: false で外せる
@@ -223,6 +224,33 @@
         onblur: f.codeOnly ? () => labels(false) : null,
       }, h('option', { value: '' }, f.placeholder || ''), opts.map(([ov, ol]) => h('option', { value: ov, selected: ov === v }, f.codeOnly ? ov : ol)));
       if (f.codeOnly) window.addEventListener('beforeprint', () => labels(false)); // 印刷は必ずコードだけ
+      // 選んだ文字が欄に入りきらないときは文字を小さくする（下限 5.5pt。文字の欄の自動 fit と同じ。fit: false で外す。2026-11-27 ユーザー指摘）
+      //   select は scrollWidth で測れないので、選んだ文字の幅を canvas で測る
+      if (f.fit !== false) {
+        const sel = el;
+        let done = null;
+        const fit = (force) => {
+          const op = sel.options[sel.selectedIndex];
+          const text = op ? op.textContent : '';
+          if (force !== true && text === done) return;
+          if (!sel.clientWidth) { done = null; return; }
+          done = text;
+          sel.style.fontSize = '';
+          if (!text) return;
+          const cs = getComputedStyle(sel);
+          const avail = sel.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 2;
+          const ctx = (fitSelectCanvas = fitSelectCanvas || document.createElement('canvas')).getContext('2d');
+          let px = parseFloat(cs.fontSize);
+          const width = () => { ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${px}px ${cs.fontFamily}`; return ctx.measureText(text).width; };
+          let pt = px * 0.75;
+          while (width() > avail && pt > (f.fitMin || 5.5)) { pt -= 0.25; px = pt / 0.75; }
+          if (pt < parseFloat(cs.fontSize) * 0.75) sel.style.fontSize = pt + 'pt';
+        };
+        sel.addEventListener('change', () => fit(true));
+        calcs.push(() => requestAnimationFrame(fit)); // 開いたとき・ファイルを開いたとき
+        requestAnimationFrame(fit);
+        if (document.fonts) document.fonts.ready.then(() => fit(true)); // 字形が読み込まれてから測り直す
+      }
     } else if (type === 'textarea') {
       const lines = f.lines || 4;
       el = h('textarea', {
